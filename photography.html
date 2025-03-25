@@ -48,6 +48,7 @@
             font-size: 0.9rem;
             letter-spacing: 1px;
             transition: opacity 0.3s ease;
+            cursor: pointer;
         }
         
         .nav-menu a:hover, .nav-menu a.active {
@@ -59,9 +60,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 2rem 0;
+            justify-content: flex-start;
+            padding: 1rem 0;
             width: 100%;
+            max-height: calc(100vh - 180px); /* Adjust based on header and footer height */
+            overflow-y: auto;
         }
         
         .loading-spinner {
@@ -100,25 +103,70 @@
         .social-links a:hover {
             opacity: 0.7;
         }
+        
+        /* Gallery grid styles */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 5px;
+            width: 100%;
+            max-width: 1700px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            aspect-ratio: 1 / 1;
+            background-color: #1a1a1a;
+            width: 350px;
+            height: 350px;
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .no-images-message {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+        }
     </style>
 </head>
 <body>
     <header class="site-header">
         <h1 class="site-title"><a href="index.html" style="color: white; text-decoration: none;">NATHAN LIU</a></h1>
         
-        <nav class="nav-menu">
-            <a href="#" class="active">ALL</a>
-            <a href="#">CALIFORNIA</a>
-            <a href="#">JAPAN</a>
-            <a href="#">HAWAII</a>
-            <a href="#">SOUTH KOREA</a>
-            <a href="#">DEV</a>
+        <nav class="nav-menu" id="category-nav">
+            <a href="#" class="active" data-category="all">ALL</a>
+            <!-- Static fallback categories - these will be replaced by dynamic ones if API succeeds -->
+            <a href="#" data-category="california">CALIFORNIA</a>
+            <a href="#" data-category="japan">JAPAN</a>
+            <a href="#" data-category="hawaii">HAWAII</a>
+            <a href="#" data-category="south_korea">SOUTH KOREA</a>
+            <a href="#" data-category="dev">DEV</a>
         </nav>
     </header>
     
     <main class="gallery-container">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Loading image gallery...</p>
+        <div id="loading">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading image gallery...</p>
+        </div>
+        
+        <div id="gallery" class="gallery-grid" style="display: none;">
+            <!-- Images will be loaded here -->
+        </div>
     </main>
     
     <footer>
@@ -131,16 +179,169 @@
     </footer>
 
     <script>
-        // Gallery functionality will be added here
-        // This is a placeholder for future implementation
-        document.addEventListener('DOMContentLoaded', function() {
-            // Simulate loading time
-            setTimeout(function() {
-                // This would be replaced with actual image loading code
-                console.log('Gallery loaded');
-                // The loading spinner would be replaced with the actual gallery
-            }, 2000);
+        // Global variables
+        let currentCategory = 'all';
+        let allImages = [];
+        
+        // DOM elements
+        const categoryNav = document.getElementById('category-nav');
+        const loadingElement = document.getElementById('loading');
+        const galleryElement = document.getElementById('gallery');
+        
+        // Wait for DOM to be loaded before fetching data
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Add click handlers to all category links (including fallback ones)
+            document.querySelectorAll('#category-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    document.querySelectorAll('#category-nav a').forEach(a => {
+                        a.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Update current category and load images
+                    currentCategory = this.getAttribute('data-category');
+                    loadImages(currentCategory);
+                });
+            });
+            
+            // Fetch categories and populate the navigation
+            await loadCategories();
+            
+            // Load images from the selected category (default is 'all')
+            await loadImages(currentCategory);
         });
+        
+        // Function to load categories from the API
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const categories = await response.json();
+                
+                // Only clear existing links if we successfully got categories
+                if (categories && categories.length > 0) {
+                    // Clear existing links except for "ALL"
+                    const allCategoryLink = document.querySelector('#category-nav a[data-category="all"]');
+                    categoryNav.innerHTML = '';
+                    categoryNav.appendChild(allCategoryLink);
+                    
+                    // Add category links to the navigation
+                    categories.forEach(category => {
+                        const categoryLink = document.createElement('a');
+                        categoryLink.textContent = category.displayName || category.name.toUpperCase();
+                        categoryLink.setAttribute('data-category', category.name);
+                        categoryLink.href = '#';
+                        
+                        // Add click event handler
+                        categoryLink.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            
+                            // Remove active class from all links
+                            document.querySelectorAll('#category-nav a').forEach(a => {
+                                a.classList.remove('active');
+                            });
+                            
+                            // Add active class to clicked link
+                            this.classList.add('active');
+                            
+                            // Update current category and load images
+                            currentCategory = this.getAttribute('data-category');
+                            loadImages(currentCategory);
+                        });
+                        
+                        categoryNav.appendChild(categoryLink);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                showError('Failed to load categories. Please try again later.');
+            }
+        }
+        
+        // Function to load images from the API based on selected category
+        async function loadImages(category) {
+            try {
+                // Show loading spinner
+                loadingElement.style.display = 'flex';
+                galleryElement.style.display = 'none';
+                
+                // Fetch images from the API
+                const response = await fetch(`/api/images/${category}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const images = await response.json();
+                allImages = images;
+                
+                // Display images in the gallery
+                displayImages(images);
+            } catch (error) {
+                console.error('Error loading images:', error);
+                showError('Failed to load images. Please try again later.');
+            }
+        }
+        
+        // Function to display images in the gallery
+        function displayImages(images) {
+            // Clear the gallery
+            galleryElement.innerHTML = '';
+            
+            if (images.length === 0) {
+                // Show message if no images found
+                const noImagesMsg = document.createElement('div');
+                noImagesMsg.className = 'no-images-message';
+                noImagesMsg.textContent = 'No images found in this category.';
+                galleryElement.appendChild(noImagesMsg);
+            } else {
+                // Create gallery items for each image
+                images.forEach(image => {
+                    const galleryItem = document.createElement('div');
+                    galleryItem.className = 'gallery-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = image.url;
+                    img.alt = image.key.split('/').pop().replace(/\.[^/.]+$/, ""); // Use filename as alt text
+                    img.loading = 'lazy'; // Lazy load images
+                    
+                    // Add click event for fullscreen view (optional)
+                    galleryItem.addEventListener('click', () => {
+                        // You could implement a lightbox/modal here
+                        console.log('Image clicked:', image.key);
+                    });
+                    
+                    galleryItem.appendChild(img);
+                    galleryElement.appendChild(galleryItem);
+                });
+            }
+            
+            // Hide loading spinner and show gallery
+            loadingElement.style.display = 'none';
+            galleryElement.style.display = 'grid';
+        }
+        
+        // Function to show error messages
+        function showError(message) {
+            loadingElement.style.display = 'none';
+            
+            const errorElement = document.createElement('div');
+            errorElement.className = 'no-images-message';
+            errorElement.textContent = message;
+            
+            galleryElement.innerHTML = '';
+            galleryElement.appendChild(errorElement);
+            galleryElement.style.display = 'block';
+        }
     </script>
 </body>
 </html>
