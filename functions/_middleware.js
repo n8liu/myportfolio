@@ -39,15 +39,42 @@ async function serveR2Object(objectKey, env) {
       throw new Error('R2 bucket binding not available');
     }
 
+    console.log(`Attempting to serve R2 object: ${objectKey}`);
     const object = await env.MY_BUCKET.get(objectKey);
     
     if (!object) {
-      return new Response('Object Not Found', { status: 404 });
+      console.error(`Object not found: ${objectKey}`);
+      return new Response('Object Not Found', { 
+        status: 404,
+        headers: {
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': '*'
+        }
+      });
     }
     
     const headers = new Headers();
     object.writeHttpMetadata(headers);
     headers.set('etag', object.httpEtag);
+    
+    // Ensure content type is set correctly based on file extension
+    if (!headers.has('content-type')) {
+      const fileExtension = objectKey.split('.').pop().toLowerCase();
+      let contentType = 'application/octet-stream';
+      
+      // Set appropriate content type based on file extension
+      if (['jpg', 'jpeg'].includes(fileExtension)) {
+        contentType = 'image/jpeg';
+      } else if (fileExtension === 'png') {
+        contentType = 'image/png';
+      } else if (fileExtension === 'gif') {
+        contentType = 'image/gif';
+      } else if (fileExtension === 'webp') {
+        contentType = 'image/webp';
+      }
+      
+      headers.set('Content-Type', contentType);
+    }
     
     // Set cache control
     headers.set('Cache-Control', 'public, max-age=31536000');
@@ -55,14 +82,22 @@ async function serveR2Object(objectKey, env) {
     // Set CORS headers
     headers.set('Access-Control-Allow-Origin', '*');
     
+    console.log(`Successfully serving: ${objectKey}, Content-Type: ${headers.get('Content-Type')}`);
     return new Response(object.body, {
       headers
     });
   } catch (error) {
-    console.error('Error serving R2 object:', error);
-    return new Response(JSON.stringify({ error: 'Failed to serve object', message: error.message }), {
+    console.error(`Error serving R2 object: ${objectKey}`, error);
+    return new Response(JSON.stringify({ 
+      error: 'Failed to serve object', 
+      message: error.message,
+      path: objectKey 
+    }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
   }
 }
@@ -127,8 +162,8 @@ async function getImages(category, env) {
     
     // Create URLs that point to our own Functions endpoint
     const images = objects.map((object) => {
-      // Always use a simple relative URL path that will be resolved by the client
-      const url = `img/${object.key}`;
+      // Important: Always ensure the image path starts with a slash
+      const url = `/img/${object.key}`;
       
       return {
         key: object.key,
@@ -140,14 +175,22 @@ async function getImages(category, env) {
       };
     });
     
+    console.log(`Returning ${images.length} images for category: ${category}`);
+    
     return new Response(JSON.stringify(images), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
   } catch (error) {
     console.error('Error fetching images:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch images', message: error.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     });
   }
 }
