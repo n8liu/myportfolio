@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photography - Nathan Liu</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background-color: #121212;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .site-header {
+            text-align: center;
+            padding: 2rem 0;
+            width: 100%;
+        }
+        
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+        
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+            padding: 0 1rem;
+        }
+        
+        .nav-menu a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav-menu a:hover, .nav-menu a.active {
+            opacity: 0.7;
+        }
+        
+        .gallery-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+            width: 100%;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .social-links a {
+            color: #ffffff;
+            font-size: 1.2rem;
+            transition: opacity 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <h1 class="site-title"><a href="index.html" style="color: white; text-decoration: none;">NATHAN LIU</a></h1>
+        
+        <nav class="nav-menu">
+            <a href="#" class="active">ALL</a>
+            <a href="#">CALIFORNIA</a>
+            <a href="#">JAPAN</a>
+            <a href="#">HAWAII</a>
+            <a href="#">SOUTH KOREA</a>
+            <a href="#">DEV</a>
+        </nav>
+    </header>
+    
+    <main class="gallery-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading image gallery...</p>
+    </main>
+    
+    <footer>
+        <div class="social-links">
+            <a href="https://linkedin.com/nathan-dtliu" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://instagram.com/n8.trvl" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://github.com/n8liu" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="mailto:nathan.dtliu@gmail.com"><i class="fas fa-envelope"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Gallery functionality will be added here
+        // This is a placeholder for future implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading time
+            setTimeout(function() {
+                // This would be replaced with actual image loading code
+                console.log('Gallery loaded');
+                // The loading spinner would be replaced with the actual gallery
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
