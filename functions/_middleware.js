@@ -15,12 +15,52 @@ export async function onRequest(context) {
         return await getImages(category, env);
       }
     }
+    
+    // Handle R2 image requests directly
+    if (path.startsWith('/img/')) {
+      return await serveR2Object(path.substring(4), env); // Remove '/img/' from path
+    }
 
     // Pass through all other requests
     return context.next();
   } catch (error) {
     console.error('Middleware error:', error);
     return new Response(JSON.stringify({ error: 'Internal server error', message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+// Serve an R2 object directly
+async function serveR2Object(objectKey, env) {
+  try {
+    if (!env.MY_BUCKET) {
+      throw new Error('R2 bucket binding not available');
+    }
+
+    const object = await env.MY_BUCKET.get(objectKey);
+    
+    if (!object) {
+      return new Response('Object Not Found', { status: 404 });
+    }
+    
+    const headers = new Headers();
+    object.writeHttpMetadata(headers);
+    headers.set('etag', object.httpEtag);
+    
+    // Set cache control
+    headers.set('Cache-Control', 'public, max-age=31536000');
+    
+    // Set CORS headers
+    headers.set('Access-Control-Allow-Origin', '*');
+    
+    return new Response(object.body, {
+      headers
+    });
+  } catch (error) {
+    console.error('Error serving R2 object:', error);
+    return new Response(JSON.stringify({ error: 'Failed to serve object', message: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -85,49 +125,20 @@ async function getImages(category, env) {
     // Filter out directory placeholders (objects with trailing slashes)
     const objects = result.objects.filter(obj => !obj.key.endsWith('/'));
     
-    // Try different methods to get object URLs
-    const images = [];
-    
-    for (const object of objects) {
-      try {
-        let url;
-        
-        // First try to get the object directly if possible
-        const obj = await env.MY_BUCKET.get(object.key);
-        if (obj) {
-          url = obj.url || '';
-        }
-        
-        // If no URL was obtained, try to construct one
-        if (!url) {
-          const accountId = env.R2_ACCOUNT_ID || '';
-          const bucketName = env.R2_BUCKET_NAME || 'myportfolio';
-          
-          // Default to a standard R2 public URL format (requires public bucket configuration)
-          url = `https://${bucketName}.${accountId}.r2.cloudflarestorage.com/${object.key}`;
-        }
-        
-        images.push({
-          key: object.key,
-          name: object.key.split('/').pop(),
-          url: url,
-          category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
-          size: object.size,
-          uploaded: object.uploaded
-        });
-      } catch (objError) {
-        console.error(`Error processing object ${object.key}:`, objError);
-        // Still add the object even if URL generation fails
-        images.push({
-          key: object.key,
-          name: object.key.split('/').pop(),
-          url: '',
-          category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
-          size: object.size,
-          uploaded: object.uploaded
-        });
-      }
-    }
+    // Create URLs that point to our own Functions endpoint
+    const images = objects.map((object) => {
+      // We use our own /img/ endpoint to serve the images
+      const url = `/img/${object.key}`;
+      
+      return {
+        key: object.key,
+        name: object.key.split('/').pop(),
+        url: url,
+        category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
+        size: object.size,
+        uploaded: object.uploaded
+      };
+    });
     
     return new Response(JSON.stringify(images), {
       headers: { 'Content-Type': 'application/json' }
