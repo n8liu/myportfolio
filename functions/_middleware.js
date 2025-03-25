@@ -85,22 +85,49 @@ async function getImages(category, env) {
     // Filter out directory placeholders (objects with trailing slashes)
     const objects = result.objects.filter(obj => !obj.key.endsWith('/'));
     
-    // Get public URLs for each image
-    const images = await Promise.all(objects.map(async (object) => {
-      // Create a URL that will be accessible publicly (valid for 24 hours)
-      const url = await env.MY_BUCKET.createSignedUrl(object.key, {
-        expirationTtl: 86400, // 24 hours in seconds
-      });
-      
-      return {
-        key: object.key,
-        name: object.key.split('/').pop(),
-        url: url,
-        category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
-        size: object.size,
-        uploaded: object.uploaded
-      };
-    }));
+    // Try different methods to get object URLs
+    const images = [];
+    
+    for (const object of objects) {
+      try {
+        let url;
+        
+        // First try to get the object directly if possible
+        const obj = await env.MY_BUCKET.get(object.key);
+        if (obj) {
+          url = obj.url || '';
+        }
+        
+        // If no URL was obtained, try to construct one
+        if (!url) {
+          const accountId = env.R2_ACCOUNT_ID || '';
+          const bucketName = env.R2_BUCKET_NAME || 'myportfolio';
+          
+          // Default to a standard R2 public URL format (requires public bucket configuration)
+          url = `https://${bucketName}.${accountId}.r2.cloudflarestorage.com/${object.key}`;
+        }
+        
+        images.push({
+          key: object.key,
+          name: object.key.split('/').pop(),
+          url: url,
+          category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
+          size: object.size,
+          uploaded: object.uploaded
+        });
+      } catch (objError) {
+        console.error(`Error processing object ${object.key}:`, objError);
+        // Still add the object even if URL generation fails
+        images.push({
+          key: object.key,
+          name: object.key.split('/').pop(),
+          url: '',
+          category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
+          size: object.size,
+          uploaded: object.uploaded
+        });
+      }
+    }
     
     return new Response(JSON.stringify(images), {
       headers: { 'Content-Type': 'application/json' }

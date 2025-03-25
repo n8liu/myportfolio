@@ -87,7 +87,11 @@ async function getImages(category, env) {
     
     // Get public URLs for each image
     const images = await Promise.all(objects.map(async (object) => {
-      const url = await env.MY_BUCKET.publicUrl(object.key);
+      // Create a URL that will be accessible publicly (valid for 24 hours)
+      const url = await env.MY_BUCKET.createSignedUrl(object.key, {
+        expirationTtl: 86400, // 24 hours in seconds
+      });
+      
       return {
         key: object.key,
         name: object.key.split('/').pop(),
