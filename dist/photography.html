@@ -266,7 +266,8 @@
         // Function to load categories from the API
         async function loadCategories() {
             try {
-                const response = await fetch('/api/categories');
+                // Use absolute URL path with origin
+                const response = await fetch(window.location.origin + '/api/categories');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -321,8 +322,8 @@
                 loadingElement.style.display = 'flex';
                 galleryElement.style.display = 'none';
                 
-                // Fetch images from the API
-                const response = await fetch(`/api/images/${category}`);
+                // Fetch images from the API with absolute URL path
+                const response = await fetch(window.location.origin + `/api/images/${category}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -351,23 +352,28 @@
                 noImagesMsg.textContent = 'No images found in this category.';
                 galleryElement.appendChild(noImagesMsg);
             } else {
-                // Create gallery items for each image
+                // Create and append image elements
                 images.forEach(image => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'gallery-item';
                     
                     const img = document.createElement('img');
-                    img.src = image.url;
-                    img.alt = image.key.split('/').pop().replace(/\.[^/.]+$/, ""); // Use filename as alt text
-                    img.loading = 'lazy'; // Lazy load images
+                    // Ensure URL is absolute by adding origin if it starts with a slash
+                    let imgUrl = image.url;
+                    if (imgUrl.startsWith('/')) {
+                        imgUrl = window.location.origin + imgUrl;
+                    }
+                    img.src = imgUrl;
+                    img.alt = image.name || 'Gallery image';
+                    img.loading = 'lazy';
                     
-                    // Add click event for fullscreen view (optional)
-                    img.addEventListener('click', function() {
-                        openModal(image.url);
+                    // Add click event to open the image in a modal
+                    imgContainer.addEventListener('click', function() {
+                        openModal(imgUrl);
                     });
                     
-                    galleryItem.appendChild(img);
-                    galleryElement.appendChild(galleryItem);
+                    imgContainer.appendChild(img);
+                    galleryElement.appendChild(imgContainer);
                 });
             }
             
