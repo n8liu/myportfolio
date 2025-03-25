@@ -1,0 +1,9 @@
+# Cloudflare Workers configuration
+name = "myportfolio"
+main = "functions/_middleware.js"
+compatibility_date = "2023-05-18"
+
+[[r2_buckets]]
+binding = "PORTFOLIO_BUCKET"
+bucket_name = "myportfolio"
+preview_bucket_name = "myportfolio"
