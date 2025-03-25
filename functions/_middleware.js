@@ -127,8 +127,8 @@ async function getImages(category, env) {
     
     // Create URLs that point to our own Functions endpoint
     const images = objects.map((object) => {
-      // We use our own /img/ endpoint to serve the images
-      const url = `/img/${object.key}`;
+      // Always use a simple relative URL path that will be resolved by the client
+      const url = `img/${object.key}`;
       
       return {
         key: object.key,

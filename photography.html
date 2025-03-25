@@ -358,11 +358,14 @@
                     imgContainer.className = 'gallery-item';
                     
                     const img = document.createElement('img');
-                    // Ensure URL is absolute by adding origin if it starts with a slash
+                    // Fix the URL to directly use our own domain for the image path
                     let imgUrl = image.url;
                     if (imgUrl.startsWith('/')) {
                         imgUrl = window.location.origin + imgUrl;
+                    } else {
+                        imgUrl = window.location.origin + '/' + imgUrl;
                     }
+                    
                     img.src = imgUrl;
                     img.alt = image.name || 'Gallery image';
                     img.loading = 'lazy';
