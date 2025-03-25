@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "mkdir -p dist && cp -r *.html *.css dist/ && mkdir -p dist/images && [ -d utils ] && cp -r utils dist/ || true && [ -d functions ] && cp -r functions dist/ || true && [ -d assets ] && cp -r assets dist/ || true",
+    "build": "mkdir -p dist && cp -r *.html *.css dist/ && [ -d utils ] && cp -r utils dist/ || true && [ -d functions ] && cp -r functions dist/ || true && [ -d assets ] && cp -r assets dist/ || true",
+    "serve": "cd dist && npx http-server -p 8080",
     "deploy": "npm run build && npx wrangler pages deploy ./dist"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "express": "^4.21.2"
   },
   "devDependencies": {
+    "http-server": "^14.1.1",
     "nodemon": "^3.1.9",
     "wrangler": "^3.22.3"
   }
