@@ -1,26 +1,39 @@
 // Cloudflare Pages Functions middleware to handle R2 image requests
 
 export async function onRequest(context) {
-  const { request, env } = context;
-  const url = new URL(request.url);
-  const path = url.pathname;
+  try {
+    const { request, env } = context;
+    const url = new URL(request.url);
+    const path = url.pathname;
 
-  // Handle API requests for categories and images
-  if (path.startsWith('/api/')) {
-    if (path === '/api/categories') {
-      return await getCategories(env);
-    } else if (path.startsWith('/api/images/')) {
-      const category = path.split('/').pop();
-      return await getImages(category, env);
+    // Handle API requests for categories and images
+    if (path.startsWith('/api/')) {
+      if (path === '/api/categories') {
+        return await getCategories(env);
+      } else if (path.startsWith('/api/images/')) {
+        const category = path.split('/').pop();
+        return await getImages(category, env);
+      }
     }
-  }
 
-  // Pass through all other requests
-  return context.next();
+    // Pass through all other requests
+    return context.next();
+  } catch (error) {
+    console.error('Middleware error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error', message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 }
 
 async function getCategories(env) {
   try {
+    // Check if bucket is available
+    if (!env.MY_BUCKET) {
+      throw new Error('R2 bucket binding not available');
+    }
+    
     // List all "directories" in the R2 bucket by examining object keys and finding unique prefixes
     const objects = await env.MY_BUCKET.list();
     const keys = objects.objects.map(obj => obj.key);
@@ -44,7 +57,8 @@ async function getCategories(env) {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch categories' }), {
+    console.error('Error fetching categories:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch categories', message: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -53,6 +67,11 @@ async function getCategories(env) {
 
 async function getImages(category, env) {
   try {
+    // Check if bucket is available
+    if (!env.MY_BUCKET) {
+      throw new Error('R2 bucket binding not available');
+    }
+    
     const options = {};
     
     // Filter by category prefix unless "all" is requested
@@ -83,7 +102,8 @@ async function getImages(category, env) {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: 'Failed to fetch images' }), {
+    console.error('Error fetching images:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch images', message: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
