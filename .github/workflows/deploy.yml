@@ -29,6 +29,20 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Create Pages-specific wrangler.toml
+        run: |
+          echo "# Cloudflare Pages configuration" > dist/wrangler.toml
+          echo "name = \"myportfolio\"" >> dist/wrangler.toml
+          echo "compatibility_date = \"2023-12-01\"" >> dist/wrangler.toml
+          echo "pages_build_output_dir = \"dist\"" >> dist/wrangler.toml
+          
+          # Add R2 bucket configuration
+          echo "" >> dist/wrangler.toml
+          echo "[[r2_buckets]]" >> dist/wrangler.toml
+          echo "binding = \"MY_BUCKET\"" >> dist/wrangler.toml
+          echo "bucket_name = \"myportfolio\"" >> dist/wrangler.toml
+          echo "preview_bucket_name = \"myportfolio\"" >> dist/wrangler.toml
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
