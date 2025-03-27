@@ -99,7 +99,7 @@ p {
     width: 100%;
     max-width: 500px;
     height: auto;
-    border-radius: 10px;
+    border-radius: 170px;
     object-fit: cover;
 }
 
@@ -130,7 +130,7 @@ p {
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 20px;
     margin-top: 30px;
 }
