@@ -531,71 +531,83 @@
         // Function to display metadata for the current image
         function displayMetadata(imgUrl) {
             const metadataContainer = document.getElementById('modalMetadata');
-            metadataContainer.innerHTML = '';
-            
-            // Extract filename from URL
-            const urlParts = imgUrl.split('/');
-            const filename = urlParts[urlParts.length - 1];
-            
-            // Clean any URL parameters
-            const cleanFilename = filename.split('?')[0];
-            
-            console.log('Looking for metadata for image:', cleanFilename);
-            
-            // More flexible matching logic for better cloud photo support
-            let metadata = null;
-            
-            // First try exact filename match
-            metadata = imageMetadata.find(item => item.filename === cleanFilename);
-            
-            // If not found, try matching by filepath
-            if (!metadata) {
-                metadata = imageMetadata.find(item => item.filepath && item.filepath.includes(cleanFilename));
-            }
-            
-            // If still not found, try matching without extension
-            if (!metadata) {
-                const filenameNoExt = cleanFilename.split('.')[0];
-                metadata = imageMetadata.find(item => {
-                    const itemFilename = item.filename.split('.')[0];
-                    return itemFilename === filenameNoExt;
-                });
-            }
-            
-            // Try matching by partial filename (cloud URL might have transformations)
-            if (!metadata) {
-                const filenameNoExt = cleanFilename.split('.')[0];
-                metadata = imageMetadata.find(item => {
-                    const itemFilename = item.filename.split('.')[0];
-                    return filenameNoExt.includes(itemFilename) || (itemFilename && itemFilename.includes(filenameNoExt));
-                });
-            }
-            
-            // Consider URL structure from Cloudflare R2
-            if (!metadata && imgUrl.includes('amazonaws.com')) {
-                // For cloud images, extract the key part
-                const matches = imgUrl.match(/\/([^\/]+)\/([^\/]+)$/);
-                if (matches && matches.length >= 3) {
-                    const category = matches[1];
-                    const cloudFilename = matches[2].split('?')[0];
-                    console.log('Cloud image detected. Category:', category, 'Filename:', cloudFilename);
-                    
-                    // Try matching with this information
-                    metadata = imageMetadata.find(item => 
-                        (item.filename === cloudFilename) ||
-                        (item.filepath && item.filepath.includes(`${category}/${cloudFilename}`))
-                    );
+            metadataContainer.innerHTML = ''; // Clear previous metadata
+
+            let matchKey = '';
+            let searchFilename = '';
+
+            try {
+                // Parse the URL to handle potential complexity (pre-signed URLs, etc.)
+                const parsedUrl = new URL(imgUrl);
+                
+                // Extract the pathname (e.g., /<bucket-name>/photos/Hawaii/DSCF0998.JPG)
+                let pathname = parsedUrl.pathname;
+                
+                // Remove leading slash if present
+                if (pathname.startsWith('/')) {
+                    pathname = pathname.substring(1);
                 }
+                
+                // Assuming the R2 structure is <bucket-name>/<actual-key>
+                // Extract the actual key (e.g., photos/Hawaii/DSCF0998.JPG)
+                const pathParts = pathname.split('/');
+                if (pathParts.length > 1) {
+                    // Assuming the first part is the bucket name, remove it
+                    matchKey = pathParts.slice(1).join('/'); 
+                } else {
+                    matchKey = pathname; // Use the full pathname if no obvious bucket structure
+                }
+                
+                // Extract the filename from the key
+                searchFilename = matchKey.split('/').pop();
+                
+                console.log(`[displayMetadata] Processing URL: ${imgUrl}`);
+                console.log(`[displayMetadata] Extracted Key for matching: ${matchKey}`);
+                console.log(`[displayMetadata] Extracted Filename for matching: ${searchFilename}`);
+
+            } catch (e) {
+                // Fallback for potentially relative URLs or non-standard formats
+                console.warn(`[displayMetadata] Could not parse URL: ${imgUrl}. Using direct filename extraction.`);
+                const urlParts = imgUrl.split('/');
+                searchFilename = urlParts[urlParts.length - 1].split('?')[0]; // Get filename and remove query params
+                matchKey = searchFilename; // Use filename as key if URL parsing fails
+                console.log(`[displayMetadata] Fallback - Using Filename: ${searchFilename}`);
             }
             
+            if (!imageMetadata || imageMetadata.length === 0) {
+                 console.error("[displayMetadata] Metadata not loaded or empty!");
+                 metadataContainer.innerHTML = '<p class="no-metadata">Metadata not loaded</p>';
+                 return;
+            }
+
+            // Find the metadata entry
+            const metadata = imageMetadata.find(item => {
+                // Priority 1: Match against the full extracted key (e.g., photos/Hawaii/DSCF0998.JPG)
+                if (item.filepath === matchKey) {
+                     console.log(`[displayMetadata] Match found: key '${matchKey}' == metadata filepath '${item.filepath}'`);
+                     return true;
+                }
+                // Priority 2: Match against just the filename (e.g., DSCF0998.JPG)
+                if (item.filename === searchFilename) {
+                     console.log(`[displayMetadata] Match found: filename '${searchFilename}' == metadata filename '${item.filename}'`);
+                     return true;
+                }
+                // Priority 3: Check if metadata filepath contains the search filename (less precise)
+                if (item.filepath && item.filepath.endsWith(searchFilename)) {
+                     console.log(`[displayMetadata] Match found: filepath '${item.filepath}' ends with '${searchFilename}'`);
+                     return true;
+                }
+                return false;
+            });
+
             if (!metadata) {
-                console.log('No metadata found for:', cleanFilename);
+                console.log(`[displayMetadata] No metadata match found for key: '${matchKey}' or filename: '${searchFilename}'`);
                 metadataContainer.innerHTML = '<p class="no-metadata">No metadata available</p>';
                 return;
             }
-            
-            console.log('Found metadata:', metadata);
-            
+
+            console.log('[displayMetadata] Metadata found:', metadata);
+
             // Create camera section
             if (metadata.camera || metadata.model) {
                 const cameraSection = document.createElement('div');
