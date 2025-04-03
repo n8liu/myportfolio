@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Nathan Liu</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: block;
+            background-color: #222;
+            padding: 50px 0;
+        }
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #cccccc;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .about-content {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            align-items: flex-start;
+        }
+        .profile-photo {
+            flex: 0 0 250px;
+        }
+        .profile-photo img {
+            width: 100%;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+        .bio-text {
+            flex: 1;
+        }
+        .card-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+        .card {
+            flex: 1;
+            min-width: 300px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .card h3 {
+            margin-bottom: 15px;
+        }
+        .tools-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .tools-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .tool-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        .tool-icon:hover {
+            transform: translateY(-5px);
+        }
+        .tool-icon img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        @media (max-width: 768px) {
+            .about-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            .profile-photo {
+                max-width: 250px;
+                margin-bottom: 20px;
+            }
+            .card-container {
+                flex-direction: column;
+            }
+        }
+        
+        .projects-showcase {
+            margin-top: 60px;
+        }
+        
+        .projects-showcase h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .projects-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .project-card {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+        
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .project-card:hover .project-image img {
+            transform: scale(1.05);
+        }
+        
+        .project-content {
+            padding: 20px;
+        }
+        
+        .project-content h3 {
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .project-content p {
+            margin-bottom: 15px;
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+        
+        .project-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .skill-tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: white;
+        }
+        
+        .skill-tag.python {
+            background-color: #306998;
+        }
+        
+        .skill-tag.pandas {
+            background-color: #130654;
+        }
+        
+        .skill-tag.plotly {
+            background-color: #3F4F75;
+        }
+        
+        .skill-tag.tensorflow {
+            background-color: #FF6F00;
+        }
+        
+        .skill-tag.keras {
+            background-color: #D00000;
+        }
+        
+        .skill-tag.react {
+            background-color: #61DAFB;
+            color: #222;
+        }
+        
+        .skill-tag.node {
+            background-color: #3C873A;
+        }
+        
+        .skill-tag.mongodb {
+            background-color: #4DB33D;
+        }
+        
+        .project-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .project-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s ease;
+        }
+        
+        .github-link:hover {
+            color: #6e5494;
+        }
+        
+        .demo-link:hover {
+            color: #61DAFB;
+        }
+        
+        @media (max-width: 768px) {
+            .project-image {
+                height: 200px;
+            }
+            
+            .project-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="about-container">
+        <div class="header">
+            <h2>Introduction</h2>
+            <h1>About Me</h1>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+
+        <div class="about-content">
+            <div class="profile-photo">
+                <img src="assets/profile.jpeg" alt="Nathan Liu">
+            </div>
+            
+            <div class="bio-text">
+                <p>Hi!! I'm Nathan, a junior at UC Berkeley majoring in Data Science and Computer Science. Growing up in the Bay Area, I was inspired by the transformative power of technology in everyday life all around Silicon Valley. Now, as a Data Science major at UC Berkeley, I’m passionate about applying machine learning, data analytics, and automation to solve complex, real-world problems.
+
+                    My passions main focus is on natural language processing and data analytics which has evolved my interest through the last many years of technological innovation. My past projects have been focused on building and finding my personal interest in the field of technology. I am looking forward to refining my technical skills and getting hands-on experience in technology.</p>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Languages</h3>
+                <p>Python, Java, C/C++, SQL, HTML/CSS, JavaScript React Js, Next Js, Node Js</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>Education</h3>
+                <p>University of California Berkeley, Bachelor of Science in Data Science and Minor in Computer Science</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h3>Projects</h3>
+                <p>Built multiple projects covering a wide range of concepts such as data extraction, full-stack web development, and machine learning.</p>
+            </div>
+        </div>
+
+        <div class="tools-section">
+            <h3>Tools I Use:</h3>
+            <div class="tools-grid">
+                <div class="tool-icon">
+                    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg" alt="Git">
+                </div>
+                <div class="tool-icon">
+                    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/vscode/vscode-original.svg" alt="VS Code">
+                </div>
+                <div class="tool-icon">
+                    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/jupyter/jupyter-original.svg" alt="Jupyter">
+                </div>
+                <div class="tool-icon">
+                    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" alt="React">
+                </div>
+                <div class="tool-icon">
+                    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" alt="Node.js">
+                </div>
+                <div class="tool-icon">
+                    <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg" alt="Docker">
+                </div>
+            </div>
+        </div>
+
+        <div class="projects-showcase">
+            <h2>Featured Projects</h2>
+            
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://via.placeholder.com/600x340/222/666?text=Data+Analysis+Project" alt="Data Analysis Project">
+                    </div>
+                    <div class="project-content">
+                        <h3>Data Analysis Dashboard</h3>
+                        <p>Interactive dashboard for visualizing and analyzing large datasets with dynamic filtering capabilities.</p>
+                        
+                        <div class="project-skills">
+                            <span class="skill-tag python">Python</span>
+                            <span class="skill-tag pandas">Pandas</span>
+                            <span class="skill-tag plotly">Plotly</span>
+                        </div>
+                        
+                        <div class="project-links">
+                            <a href="https://github.com/n8liu/data-analysis-dashboard" target="_blank" class="github-link">
+                                <i class="fab fa-github"></i> View on GitHub
+                            </a>
+                            <a href="#" class="demo-link">
+                                <i class="fas fa-external-link-alt"></i> Live Demo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- Project 2 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://via.placeholder.com/600x340/222/666?text=ML+Project" alt="Machine Learning Project">
+                    </div>
+                    <div class="project-content">
+                        <h3>Image Classification Model</h3>
+                        <p>A deep learning model using convolutional neural networks to classify images with high accuracy.</p>
+                        
+                        <div class="project-skills">
+                            <span class="skill-tag tensorflow">TensorFlow</span>
+                            <span class="skill-tag python">Python</span>
+                            <span class="skill-tag keras">Keras</span>
+                        </div>
+                        
+                        <div class="project-links">
+                            <a href="https://github.com/n8liu/image-classification" target="_blank" class="github-link">
+                                <i class="fab fa-github"></i> View on GitHub
+                            </a>
+                            <a href="#" class="demo-link">
+                                <i class="fas fa-external-link-alt"></i> Research Paper
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project 3 -->
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="https://via.placeholder.com/600x340/222/666?text=Web+App" alt="Web Application Project">
+                    </div>
+                    <div class="project-content">
+                        <h3>Full-Stack Web Application</h3>
+                        <p>A responsive web application for managing tasks with user authentication and real-time updates.</p>
+                        
+                        <div class="project-skills">
+                            <span class="skill-tag react">React</span>
+                            <span class="skill-tag node">Node.js</span>
+                            <span class="skill-tag mongodb">MongoDB</span>
+                        </div>
+                        
+                        <div class="project-links">
+                            <a href="https://github.com/n8liu/task-manager-app" target="_blank" class="github-link">
+                                <i class="fab fa-github"></i> View on GitHub
+                            </a>
+                            <a href="#" class="demo-link">
+                                <i class="fas fa-external-link-alt"></i> Live Demo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

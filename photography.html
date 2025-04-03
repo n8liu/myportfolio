@@ -63,8 +63,10 @@
             justify-content: flex-start;
             padding: 1rem 0;
             width: 100%;
+            max-width: 1700px;
             max-height: calc(100vh - 180px); /* Adjust based on header and footer height */
             overflow-y: auto;
+            margin: 0 auto;
         }
         
         .loading-spinner {
@@ -107,12 +109,14 @@
         /* Gallery grid styles */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 5px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 4px;
             width: 100%;
             max-width: 1700px;
             margin: 0 auto;
-            padding: 0 10px;
+            padding: 2px;
+            justify-content: center;
+            justify-items: center;
         }
         
         .gallery-item {
@@ -123,6 +127,7 @@
             background-color: #1a1a1a;
             width: 350px;
             height: 350px;
+            margin: 0 auto;
         }
         
         .gallery-item img {
@@ -159,11 +164,62 @@
         }
         
         .modal-content {
-            max-width: 90%;
-            max-height: 90vh;
-            display: block;
+            max-width: 80%;
+            max-height: 85vh;
+            display: flex;
             margin: auto;
+        }
+        
+        .modal-image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 85vh;
             object-fit: contain;
+        }
+        
+        .modal-metadata {
+            width: 250px;
+            padding: 0 20px;
+            color: #999;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .metadata-section {
+            margin-bottom: 15px;
+        }
+        
+        .metadata-section h4 {
+            margin: 0 0 5px 0;
+            color: #ccc;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-bottom: 1px solid #333;
+            padding-bottom: 3px;
+        }
+        
+        .metadata-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 0.85rem;
+        }
+        
+        .metadata-label {
+            color: #777;
+        }
+        
+        .metadata-value {
+            color: #bbb;
+            text-align: right;
         }
         
         .close-modal {
@@ -182,6 +238,18 @@
         .close-modal:focus {
             color: #bbb;
             text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                flex-direction: column;
+                max-width: 95%;
+            }
+            
+            .modal-metadata {
+                width: 100%;
+                padding: 15px 0;
+            }
         }
     </style>
 </head>
@@ -212,7 +280,14 @@
         <!-- Image Modal -->
         <div id="imageModal" class="modal">
             <span class="close-modal">&times;</span>
-            <img class="modal-content" id="modalImage">
+            <div class="modal-content">
+                <div class="modal-image-container">
+                    <img class="modal-image" id="modalImage" src="" alt="Enlarged image">
+                </div>
+                <div class="modal-metadata" id="modalMetadata">
+                    <!-- Metadata will be loaded here -->
+                </div>
+            </div>
         </div>
     </main>
     
@@ -229,6 +304,7 @@
         // Global variables
         let currentCategory = 'all';
         let allImages = [];
+        let imageMetadata = [];
         
         // DOM elements
         const categoryNav = document.getElementById('category-nav');
@@ -261,6 +337,9 @@
             
             // Load images from the selected category (default is 'all')
             await loadImages(currentCategory);
+            
+            // Load metadata from JSON file
+            await loadMetadata();
         });
         
         // Function to load categories from the API
@@ -332,12 +411,36 @@
                 const images = await response.json();
                 allImages = images;
                 
+                // If no images found, use temp_images as fallback
+                if (images.length === 0) {
+                    console.log('No images found from API, using local temp_images as fallback');
+                    loadLocalImages();
+                    return;
+                }
+                
                 // Display images in the gallery
                 displayImages(images);
             } catch (error) {
                 console.error('Error loading images:', error);
-                showError('Failed to load images. Please try again later.');
+                loadLocalImages();
             }
+        }
+        
+        // Function to load local images from temp_images folder as fallback
+        function loadLocalImages() {
+            console.log('Loading local images from temp_images folder');
+            
+            // Local images in temp_images folder
+            const localImages = [
+                { url: 'temp_images/DSCF0998.JPG', name: 'Hawaii Photo 1' },
+                { url: 'temp_images/DSCF1025.JPG', name: 'Hawaii Photo 2' },
+                { url: 'temp_images/DSCF1085.JPG', name: 'Hawaii Photo 3' },
+                { url: 'temp_images/DSCF1131.JPG', name: 'Hawaii Photo 4' },
+                { url: 'temp_images/DSCF1134.JPG', name: 'Hawaii Photo 5' }
+            ];
+            
+            allImages = localImages;
+            displayImages(localImages);
         }
         
         // Function to display images in the gallery
@@ -418,7 +521,220 @@
         function openModal(imgUrl) {
             modal.style.display = 'flex';
             modalImg.src = imgUrl;
+            
+            // Find metadata for this image
+            displayMetadata(imgUrl);
+            
             document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+        }
+        
+        // Function to display metadata for the current image
+        function displayMetadata(imgUrl) {
+            const metadataContainer = document.getElementById('modalMetadata');
+            metadataContainer.innerHTML = '';
+            
+            // Extract filename from URL
+            const urlParts = imgUrl.split('/');
+            const filename = urlParts[urlParts.length - 1];
+            
+            // Clean any URL parameters
+            const cleanFilename = filename.split('?')[0];
+            
+            console.log('Looking for metadata for image:', cleanFilename);
+            
+            // More flexible matching logic for better cloud photo support
+            let metadata = null;
+            
+            // First try exact filename match
+            metadata = imageMetadata.find(item => item.filename === cleanFilename);
+            
+            // If not found, try matching by filepath
+            if (!metadata) {
+                metadata = imageMetadata.find(item => item.filepath && item.filepath.includes(cleanFilename));
+            }
+            
+            // If still not found, try matching without extension
+            if (!metadata) {
+                const filenameNoExt = cleanFilename.split('.')[0];
+                metadata = imageMetadata.find(item => {
+                    const itemFilename = item.filename.split('.')[0];
+                    return itemFilename === filenameNoExt;
+                });
+            }
+            
+            // Try matching by partial filename (cloud URL might have transformations)
+            if (!metadata) {
+                const filenameNoExt = cleanFilename.split('.')[0];
+                metadata = imageMetadata.find(item => {
+                    const itemFilename = item.filename.split('.')[0];
+                    return filenameNoExt.includes(itemFilename) || (itemFilename && itemFilename.includes(filenameNoExt));
+                });
+            }
+            
+            // Consider URL structure from Cloudflare R2
+            if (!metadata && imgUrl.includes('amazonaws.com')) {
+                // For cloud images, extract the key part
+                const matches = imgUrl.match(/\/([^\/]+)\/([^\/]+)$/);
+                if (matches && matches.length >= 3) {
+                    const category = matches[1];
+                    const cloudFilename = matches[2].split('?')[0];
+                    console.log('Cloud image detected. Category:', category, 'Filename:', cloudFilename);
+                    
+                    // Try matching with this information
+                    metadata = imageMetadata.find(item => 
+                        (item.filename === cloudFilename) ||
+                        (item.filepath && item.filepath.includes(`${category}/${cloudFilename}`))
+                    );
+                }
+            }
+            
+            if (!metadata) {
+                console.log('No metadata found for:', cleanFilename);
+                metadataContainer.innerHTML = '<p class="no-metadata">No metadata available</p>';
+                return;
+            }
+            
+            console.log('Found metadata:', metadata);
+            
+            // Create camera section
+            if (metadata.camera || metadata.model) {
+                const cameraSection = document.createElement('div');
+                cameraSection.className = 'metadata-section';
+                
+                const cameraTitle = document.createElement('h4');
+                cameraTitle.textContent = 'Camera';
+                cameraSection.appendChild(cameraTitle);
+                
+                if (metadata.camera && metadata.model) {
+                    addMetadataRow(cameraSection, 'Make', metadata.camera);
+                    addMetadataRow(cameraSection, 'Model', metadata.model);
+                } else if (metadata.camera) {
+                    addMetadataRow(cameraSection, 'Camera', metadata.camera);
+                } else {
+                    addMetadataRow(cameraSection, 'Model', metadata.model);
+                }
+                
+                if (metadata.lens) {
+                    addMetadataRow(cameraSection, 'Lens', metadata.lens);
+                }
+                
+                metadataContainer.appendChild(cameraSection);
+            }
+            
+            // Create settings section
+            if (metadata.aperture || metadata.shutterSpeed || metadata.iso || metadata.focalLength) {
+                const settingsSection = document.createElement('div');
+                settingsSection.className = 'metadata-section';
+                
+                const settingsTitle = document.createElement('h4');
+                settingsTitle.textContent = 'Settings';
+                settingsSection.appendChild(settingsTitle);
+                
+                if (metadata.aperture) {
+                    addMetadataRow(settingsSection, 'Aperture', formatAperture(metadata.aperture));
+                }
+                
+                if (metadata.shutterSpeed) {
+                    addMetadataRow(settingsSection, 'Shutter', formatShutterSpeed(metadata.shutterSpeed));
+                }
+                
+                if (metadata.iso) {
+                    addMetadataRow(settingsSection, 'ISO', metadata.iso);
+                }
+                
+                if (metadata.focalLength) {
+                    addMetadataRow(settingsSection, 'Focal Length', metadata.focalLength);
+                }
+                
+                metadataContainer.appendChild(settingsSection);
+            }
+            
+            // Create details section
+            const detailsSection = document.createElement('div');
+            detailsSection.className = 'metadata-section';
+            
+            const detailsTitle = document.createElement('h4');
+            detailsTitle.textContent = 'Details';
+            detailsSection.appendChild(detailsTitle);
+            
+            if (metadata.dateTaken) {
+                addMetadataRow(detailsSection, 'Date', formatDate(metadata.dateTaken));
+            }
+            
+            if (metadata.dimensions) {
+                addMetadataRow(detailsSection, 'Dimensions', `${metadata.dimensions.width} × ${metadata.dimensions.height}`);
+            }
+            
+            if (metadata.filesize) {
+                addMetadataRow(detailsSection, 'Size', formatFileSize(metadata.filesize));
+            }
+            
+            metadataContainer.appendChild(detailsSection);
+        }
+        
+        // Helper function to add a metadata row
+        function addMetadataRow(container, label, value) {
+            const row = document.createElement('div');
+            row.className = 'metadata-row';
+            
+            const labelElement = document.createElement('span');
+            labelElement.className = 'metadata-label';
+            labelElement.textContent = label;
+            
+            const valueElement = document.createElement('span');
+            valueElement.className = 'metadata-value';
+            valueElement.textContent = value;
+            
+            row.appendChild(labelElement);
+            row.appendChild(valueElement);
+            container.appendChild(row);
+        }
+        
+        // Helper function to format aperture
+        function formatAperture(aperture) {
+            return aperture.replace('f/f/', 'f/');
+        }
+        
+        // Helper function to format shutter speed
+        function formatShutterSpeed(shutterSpeed) {
+            if (shutterSpeed.includes('/')) {
+                return shutterSpeed + ' sec';
+            } else {
+                const decimalValue = parseFloat(shutterSpeed);
+                return decimalValue >= 1 ? shutterSpeed + ' sec' : '1/' + Math.round(1/decimalValue) + ' sec';
+            }
+        }
+        
+        // Helper function to format date
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const parts = dateStr.split(' ')[0].split(':');
+                return `${parts[1]}/${parts[2]}/${parts[0].substring(2)}`;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+        
+        // Helper function to format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        // Load metadata from JSON file
+        async function loadMetadata() {
+            try {
+                const response = await fetch('photos-metadata.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                imageMetadata = await response.json();
+                console.log('Metadata loaded:', imageMetadata.length, 'images');
+            } catch (error) {
+                console.error('Error loading metadata:', error);
+            }
         }
         
         // Close the modal when the × is clicked
