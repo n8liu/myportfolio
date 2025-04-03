@@ -32,6 +32,11 @@
             letter-spacing: 2px;
             margin: 0;
         }
+
+        .site-title:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
         
         .nav-menu {
             display: flex;
@@ -125,8 +130,8 @@
             border-radius: 5px;
             aspect-ratio: 1 / 1;
             background-color: #1a1a1a;
-            width: 350px;
-            height: 350px;
+            width: 420px;
+            height: 420px;
             margin: 0 auto;
         }
         
@@ -177,49 +182,12 @@
             align-items: center;
         }
         
-        .modal-image {
-            max-width: 100%;
-            max-height: 85vh;
-            object-fit: contain;
-        }
-        
-        .modal-metadata {
-            width: 250px;
-            padding: 0 20px;
-            color: #999;
-            font-size: 0.9rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .metadata-section {
-            margin-bottom: 15px;
-        }
-        
-        .metadata-section h4 {
-            margin: 0 0 5px 0;
-            color: #ccc;
-            font-size: 0.95rem;
-            font-weight: 500;
-            border-bottom: 1px solid #333;
-            padding-bottom: 3px;
-        }
-        
-        .metadata-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 3px;
-            font-size: 0.85rem;
-        }
-        
-        .metadata-label {
-            color: #777;
-        }
-        
-        .metadata-value {
-            color: #bbb;
-            text-align: right;
+        #modalImage {
+            display: block; /* Needed for margin auto to work */
+            max-width: 100%; /* Don't exceed container width */
+            max-height: 85vh; /* Don't exceed viewport height limit */
+            object-fit: contain; /* Scale while preserving aspect ratio */
+            margin: auto; /* Center horizontally if container is wider */
         }
         
         .close-modal {
@@ -244,11 +212,6 @@
             .modal-content {
                 flex-direction: column;
                 max-width: 95%;
-            }
-            
-            .modal-metadata {
-                width: 100%;
-                padding: 15px 0;
             }
         }
     </style>
@@ -281,12 +244,7 @@
         <div id="imageModal" class="modal">
             <span class="close-modal">&times;</span>
             <div class="modal-content">
-                <div class="modal-image-container">
-                    <img class="modal-image" id="modalImage" src="" alt="Enlarged image">
-                </div>
-                <div class="modal-metadata" id="modalMetadata">
-                    <!-- Metadata will be loaded here -->
-                </div>
+                <img id="modalImage" src="" alt="Modal Image">
             </div>
         </div>
     </main>
@@ -304,7 +262,6 @@
         // Global variables
         let currentCategory = 'all';
         let allImages = [];
-        let imageMetadata = [];
         
         // DOM elements
         const categoryNav = document.getElementById('category-nav');
@@ -337,9 +294,6 @@
             
             // Load images from the selected category (default is 'all')
             await loadImages(currentCategory);
-            
-            // Load metadata from JSON file
-            await loadMetadata();
         });
         
         // Function to load categories from the API
@@ -432,11 +386,12 @@
             
             // Local images in temp_images folder
             const localImages = [
-                { url: 'temp_images/DSCF0998.JPG', name: 'Hawaii Photo 1' },
-                { url: 'temp_images/DSCF1025.JPG', name: 'Hawaii Photo 2' },
-                { url: 'temp_images/DSCF1085.JPG', name: 'Hawaii Photo 3' },
-                { url: 'temp_images/DSCF1131.JPG', name: 'Hawaii Photo 4' },
-                { url: 'temp_images/DSCF1134.JPG', name: 'Hawaii Photo 5' }
+                { url: 'temp_images/DSCF2020.JPG', name: 'Hawaii Photo 1' },
+                { url: 'temp_images/DSCF2028.JPG', name: 'Hawaii Photo 2' },
+                { url: 'temp_images/DSCF2034.JPG', name: 'Hawaii Photo 3' },
+                { url: 'temp_images/DSCF2058.JPG', name: 'Hawaii Photo 4' },
+                { url: 'temp_images/DSCF2067.JPG', name: 'Hawaii Photo 5' },
+                { url: 'temp_images/DSCF2111.JPG', name: 'Hawaii Photo 5' }
             ];
             
             allImages = localImages;
@@ -519,234 +474,10 @@
         
         // Function to open the modal with the clicked image
         function openModal(imgUrl) {
-            modal.style.display = 'flex';
             modalImg.src = imgUrl;
-            
-            // Find metadata for this image
-            displayMetadata(imgUrl);
+            modal.style.display = 'flex';
             
             document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
-        }
-        
-        // Function to display metadata for the current image
-        function displayMetadata(imgUrl) {
-            const metadataContainer = document.getElementById('modalMetadata');
-            metadataContainer.innerHTML = ''; // Clear previous metadata
-
-            let matchKey = '';
-            let searchFilename = '';
-
-            try {
-                // Parse the URL to handle potential complexity (pre-signed URLs, etc.)
-                const parsedUrl = new URL(imgUrl);
-                
-                // Extract the pathname (e.g., /<bucket-name>/photos/Hawaii/DSCF0998.JPG)
-                let pathname = parsedUrl.pathname;
-                
-                // Remove leading slash if present
-                if (pathname.startsWith('/')) {
-                    pathname = pathname.substring(1);
-                }
-                
-                // Assuming the R2 structure is <bucket-name>/<actual-key>
-                // Extract the actual key (e.g., photos/Hawaii/DSCF0998.JPG)
-                const pathParts = pathname.split('/');
-                if (pathParts.length > 1) {
-                    // Assuming the first part is the bucket name, remove it
-                    matchKey = pathParts.slice(1).join('/'); 
-                } else {
-                    matchKey = pathname; // Use the full pathname if no obvious bucket structure
-                }
-                
-                // Extract the filename from the key
-                searchFilename = matchKey.split('/').pop();
-                
-                console.log(`[displayMetadata] Processing URL: ${imgUrl}`);
-                console.log(`[displayMetadata] Extracted Key for matching: ${matchKey}`);
-                console.log(`[displayMetadata] Extracted Filename for matching: ${searchFilename}`);
-
-            } catch (e) {
-                // Fallback for potentially relative URLs or non-standard formats
-                console.warn(`[displayMetadata] Could not parse URL: ${imgUrl}. Using direct filename extraction.`);
-                const urlParts = imgUrl.split('/');
-                searchFilename = urlParts[urlParts.length - 1].split('?')[0]; // Get filename and remove query params
-                matchKey = searchFilename; // Use filename as key if URL parsing fails
-                console.log(`[displayMetadata] Fallback - Using Filename: ${searchFilename}`);
-            }
-            
-            if (!imageMetadata || imageMetadata.length === 0) {
-                 console.error("[displayMetadata] Metadata not loaded or empty!");
-                 metadataContainer.innerHTML = '<p class="no-metadata">Metadata not loaded</p>';
-                 return;
-            }
-
-            // Find the metadata entry
-            const metadata = imageMetadata.find(item => {
-                // Priority 1: Match against the full extracted key (e.g., photos/Hawaii/DSCF0998.JPG)
-                if (item.filepath === matchKey) {
-                     console.log(`[displayMetadata] Match found: key '${matchKey}' == metadata filepath '${item.filepath}'`);
-                     return true;
-                }
-                // Priority 2: Match against just the filename (e.g., DSCF0998.JPG)
-                if (item.filename === searchFilename) {
-                     console.log(`[displayMetadata] Match found: filename '${searchFilename}' == metadata filename '${item.filename}'`);
-                     return true;
-                }
-                // Priority 3: Check if metadata filepath contains the search filename (less precise)
-                if (item.filepath && item.filepath.endsWith(searchFilename)) {
-                     console.log(`[displayMetadata] Match found: filepath '${item.filepath}' ends with '${searchFilename}'`);
-                     return true;
-                }
-                return false;
-            });
-
-            if (!metadata) {
-                console.log(`[displayMetadata] No metadata match found for key: '${matchKey}' or filename: '${searchFilename}'`);
-                metadataContainer.innerHTML = '<p class="no-metadata">No metadata available</p>';
-                return;
-            }
-
-            console.log('[displayMetadata] Metadata found:', metadata);
-
-            // Create camera section
-            if (metadata.camera || metadata.model) {
-                const cameraSection = document.createElement('div');
-                cameraSection.className = 'metadata-section';
-                
-                const cameraTitle = document.createElement('h4');
-                cameraTitle.textContent = 'Camera';
-                cameraSection.appendChild(cameraTitle);
-                
-                if (metadata.camera && metadata.model) {
-                    addMetadataRow(cameraSection, 'Make', metadata.camera);
-                    addMetadataRow(cameraSection, 'Model', metadata.model);
-                } else if (metadata.camera) {
-                    addMetadataRow(cameraSection, 'Camera', metadata.camera);
-                } else {
-                    addMetadataRow(cameraSection, 'Model', metadata.model);
-                }
-                
-                if (metadata.lens) {
-                    addMetadataRow(cameraSection, 'Lens', metadata.lens);
-                }
-                
-                metadataContainer.appendChild(cameraSection);
-            }
-            
-            // Create settings section
-            if (metadata.aperture || metadata.shutterSpeed || metadata.iso || metadata.focalLength) {
-                const settingsSection = document.createElement('div');
-                settingsSection.className = 'metadata-section';
-                
-                const settingsTitle = document.createElement('h4');
-                settingsTitle.textContent = 'Settings';
-                settingsSection.appendChild(settingsTitle);
-                
-                if (metadata.aperture) {
-                    addMetadataRow(settingsSection, 'Aperture', formatAperture(metadata.aperture));
-                }
-                
-                if (metadata.shutterSpeed) {
-                    addMetadataRow(settingsSection, 'Shutter', formatShutterSpeed(metadata.shutterSpeed));
-                }
-                
-                if (metadata.iso) {
-                    addMetadataRow(settingsSection, 'ISO', metadata.iso);
-                }
-                
-                if (metadata.focalLength) {
-                    addMetadataRow(settingsSection, 'Focal Length', metadata.focalLength);
-                }
-                
-                metadataContainer.appendChild(settingsSection);
-            }
-            
-            // Create details section
-            const detailsSection = document.createElement('div');
-            detailsSection.className = 'metadata-section';
-            
-            const detailsTitle = document.createElement('h4');
-            detailsTitle.textContent = 'Details';
-            detailsSection.appendChild(detailsTitle);
-            
-            if (metadata.dateTaken) {
-                addMetadataRow(detailsSection, 'Date', formatDate(metadata.dateTaken));
-            }
-            
-            if (metadata.dimensions) {
-                addMetadataRow(detailsSection, 'Dimensions', `${metadata.dimensions.width} × ${metadata.dimensions.height}`);
-            }
-            
-            if (metadata.filesize) {
-                addMetadataRow(detailsSection, 'Size', formatFileSize(metadata.filesize));
-            }
-            
-            metadataContainer.appendChild(detailsSection);
-        }
-        
-        // Helper function to add a metadata row
-        function addMetadataRow(container, label, value) {
-            const row = document.createElement('div');
-            row.className = 'metadata-row';
-            
-            const labelElement = document.createElement('span');
-            labelElement.className = 'metadata-label';
-            labelElement.textContent = label;
-            
-            const valueElement = document.createElement('span');
-            valueElement.className = 'metadata-value';
-            valueElement.textContent = value;
-            
-            row.appendChild(labelElement);
-            row.appendChild(valueElement);
-            container.appendChild(row);
-        }
-        
-        // Helper function to format aperture
-        function formatAperture(aperture) {
-            return aperture.replace('f/f/', 'f/');
-        }
-        
-        // Helper function to format shutter speed
-        function formatShutterSpeed(shutterSpeed) {
-            if (shutterSpeed.includes('/')) {
-                return shutterSpeed + ' sec';
-            } else {
-                const decimalValue = parseFloat(shutterSpeed);
-                return decimalValue >= 1 ? shutterSpeed + ' sec' : '1/' + Math.round(1/decimalValue) + ' sec';
-            }
-        }
-        
-        // Helper function to format date
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            try {
-                const parts = dateStr.split(' ')[0].split(':');
-                return `${parts[1]}/${parts[2]}/${parts[0].substring(2)}`;
-            } catch (e) {
-                return dateStr;
-            }
-        }
-        
-        // Helper function to format file size
-        function formatFileSize(bytes) {
-            if (bytes < 1024) return bytes + ' B';
-            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-            else return (bytes / 1048576).toFixed(1) + ' MB';
-        }
-        
-        // Load metadata from JSON file
-        async function loadMetadata() {
-            try {
-                const response = await fetch('photos-metadata.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                imageMetadata = await response.json();
-                console.log('Metadata loaded:', imageMetadata.length, 'images');
-            } catch (error) {
-                console.error('Error loading metadata:', error);
-            }
         }
         
         // Close the modal when the × is clicked

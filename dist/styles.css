@@ -105,7 +105,7 @@ p {
 
 /* Photography gallery page styles */
 .gallery-container {
-    padding: 50px 0;
+    padding: 50px 5px;
 }
 
 .gallery-header {
@@ -130,8 +130,8 @@ p {
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 5px;
     margin-top: 30px;
 }
 
