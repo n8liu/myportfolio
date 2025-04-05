@@ -89,34 +89,8 @@ p {
     transition: all 0.3s ease;
 }
 
-/* Default hover behavior */
 .social-icons a:hover {
     transform: translateY(-2px);
-}
-
-/* LinkedIn hover color */
-.social-icons a:hover .fa-linkedin {
-    color: #0077b5; /* LinkedIn blue */
-}
-
-/* Instagram hover color */
-.social-icons a:hover .fa-instagram {
-    background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-}
-
-/* GitHub hover color */
-.social-icons a:hover .fa-github {
-    color: #6e5494; /* GitHub purple */
-}
-
-/* Keep envelope default white but still allow the bounce effect */
-.social-icons a:hover .fa-envelope {
-    color: #cccccc;
 }
 
 .profile-image {
@@ -237,6 +211,23 @@ p {
     background-color: #2d2d2d;
     border-radius: 10px;
     padding: 30px;
+}
+
+/* Media query for smaller screens - reorder grid items */
+@media (max-width: 768px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    /* Reorder grid items - education first, then skills */
+    .education-section {
+        order: 1;
+    }
+    
+    .skills-section {
+        order: 2;
+    }
 }
 
 .skills-section h3, .education-section h3 {
@@ -498,15 +489,10 @@ p {
     color: #ffffff;
 }
 
-/* GitHub link with purple hover */
-.github-link:hover {
-    color: #8a63d2 !important; /* Purple color */
-}
-
 /* My Hobbies container styles */
 .myhobbies-container {
     width: 100%;
-    max-width: 950px;
+    max-width: 1025px;
     margin-top: 300px;
     margin-bottom: 300px;
     padding: 0 20px;
