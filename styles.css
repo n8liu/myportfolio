@@ -8,16 +8,20 @@
 body {
     background-color: #1e1e1e;
     color: #ffffff;
-    height: 100vh;
+    min-height: 185vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
 }
 
-.container {
+.main-container {
     width: 100%;
     max-width: 1200px;
     padding: 0 20px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .profile-content {
@@ -87,6 +91,7 @@ p {
 
 .social-icons a:hover {
     color: #cccccc;
+    transform: translateY(-2px);
 }
 
 .profile-image {
@@ -153,6 +158,87 @@ p {
     transform: scale(1.05);
 }
 
+/* About container styles */
+.about-container {
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 200px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.skills-section, .education-section {
+    background-color: #2d2d2d;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.skills-section h3, .education-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.skills-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.skill-tag {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #3a3a3a;
+    color: #cccccc;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.skill-tag:hover {
+    background-color: #4a4a4a;
+    transform: translateY(-2px);
+}
+
+.education-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.education-text h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.education-text p {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.education-logo {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.education-logo img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 50%;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .profile-content {
@@ -162,5 +248,22 @@ p {
     
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .education-content {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+    
+    .education-text p {
+        text-align: center;
+    }
+    
+    .education-logo {
+        margin-bottom: 20px;
     }
 }
