@@ -1,14 +1,44 @@
 # My Portfolio
 
-A personal portfolio website showcasing photography and development work, with dynamic image loading from Cloudflare R2.
+A personal portfolio website showcasing professional skills, projects, and photography, with a clean dark-themed design.
 
 ## Features
 
 - Responsive design for all screen sizes
+- Interactive tech stack showcase with logos and descriptions
+- Projects section highlighting development work
 - Dynamic photography gallery with category navigation
 - Image modal for fullscreen viewing
 - Integration with Cloudflare R2 for image storage
 - Automatic category detection based on folder structure in R2 bucket
+- Smooth scroll animations and transitions
+- Back-to-top button that appears when reaching the bottom of the page
+
+## Site Structure
+
+- **Main Section**: Introduction and profile
+- **About Section**: Skills and education information
+- **Tech Stack Section**: Showcase of programming languages, frameworks, and tools
+- **Projects Section**: Featured development projects
+- **Photography Section**: Gallery of photography work
+
+## Tech Stack
+
+The portfolio website features a comprehensive tech stack section that displays various programming languages, frameworks, libraries, and tools using a card-based grid layout. Each card includes:
+
+- Logo of the technology
+- Name displayed underneath
+- Hover effects for better user interaction
+
+Technologies are arranged from most frequently used to more specialized ones.
+
+## UI/UX Features
+
+- Dark theme with consistent color scheme (#1e1e1e background with light text)
+- Section spacing of 300px for better content separation
+- Fixed footer with social links that appears on scroll
+- Smooth scroll indicators and animations
+- Fade-in/fade-out back-to-top button at the bottom right when reaching end of page
 
 ## Local Development
 
@@ -78,8 +108,10 @@ A personal portfolio website showcasing photography and development work, with d
 
 ## File Structure
 
-- `index.html` - Main portfolio page
-- `photography.html` - Photography gallery page
+- `index.html` - Main portfolio page with all sections (about, tech stack, projects)
+- `photos.html` - Photography gallery page
+- `styles.css` - Main stylesheet for the entire website
+- `assets/` - Directory containing images and other static assets
 - `server.js` - Express server for local development
 - `functions/_middleware.js` - Cloudflare Pages Functions for API endpoints
 - `utils/cloudflare.js` - Utility functions for Cloudflare R2 interaction
