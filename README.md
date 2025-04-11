@@ -115,7 +115,3 @@ Technologies are arranged from most frequently used to more specialized ones.
 - `server.js` - Express server for local development
 - `functions/_middleware.js` - Cloudflare Pages Functions for API endpoints
 - `utils/cloudflare.js` - Utility functions for Cloudflare R2 interaction
-
-## License
-
-ISC
