@@ -80,7 +80,7 @@ p {
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 30px;
 }
 
 .social-icons a {
@@ -448,13 +448,34 @@ p {
 
 .project-links a {
     color: #ffffff;
-    font-size: 1.2rem;
+    font-size: 0.8rem;
     transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .project-links a:hover {
     color: #cccccc;
-    transform: translateY(-2px);
+    /* transform: translateY(-2px); */
+}
+
+.project-link-btn {
+    text-decoration: none;
+    color: #cccccc;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.project-link-btn i {
+    font-size: 1.1rem;
+}
+
+.project-link-btn:hover {
+    color: #ffffff;
+}
+
+/* GitHub link with purple hover */
+.github-link:hover {
+    color: #8a63d2 !important; /* Purple color */
 }
 
 /* My Hobbies container styles */
@@ -688,3 +709,9 @@ p {
         grid-template-columns: 1fr;
     }
 }
+
+.back-to-top-btn i {
+    font-size: 1.1rem;
+}
+
+/* End of file */
