@@ -1,0 +1,10 @@
+/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# Disable cache for CSS and JS
+*.css
+  Cache-Control: max-age=0, no-cache, must-revalidate
+*.js
+  Cache-Control: max-age=0, no-cache, must-revalidate
