@@ -33,6 +33,11 @@ async function getCategories() {
 
 // Helper function to format category names for display
 function formatCategoryName(name) {
+    // Special case for SouthKorea
+    if (name === 'SouthKorea') {
+        return 'SOUTH KOREA';
+    }
+    
     // Convert category names like "south_korea" to "SOUTH KOREA"
     return name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ').toUpperCase();
 }

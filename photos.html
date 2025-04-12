@@ -70,7 +70,7 @@
             padding: 1rem 0;
             width: 100%;
             max-width: 1700px;
-            max-height: calc(100vh - 180px); /* Adjust based on header and footer height */
+            max-height: calc(100vh); /* Adjust based on header and footer height */
             overflow-y: auto;
             margin: 0 auto;
         }
@@ -98,18 +98,45 @@
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 2rem 0;
+            gap: 55px;
+            margin: 1.8rem 0;
         }
         
         .social-links a {
             color: #ffffff;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             transition: opacity 0.3s ease;
         }
         
         .social-links a:hover {
             opacity: 0.7;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        /* LinkedIn hover color */
+        .social-links a:hover .fa-linkedin {
+            color: #0077b5; /* LinkedIn blue */
+        }
+        
+        /* Instagram hover color */
+        .social-links a:hover .fa-instagram {
+            background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+        
+        /* GitHub hover color */
+        .social-links a:hover .fa-github {
+            color: #6e5494; /* GitHub purple */
+        }
+        
+        /* Keep envelope hover style consistent */
+        .social-links a:hover .fa-envelope {
+            color: #cccccc;
         }
         
         /* Gallery grid styles */
@@ -120,7 +147,7 @@
             width: 100%;
             max-width: 1700px;
             margin: 0 auto;
-            padding: 2px;
+            padding: 1px;
             justify-content: center;
             justify-items: center;
         }
@@ -389,7 +416,10 @@
                 { url: 'photos/Hawaii/DSCF1085.JPG', name: 'Hawaii Photo 3' },
                 { url: 'photos/Hawaii/DSCF1131.JPG', name: 'Hawaii Photo 4' },
                 { url: 'photos/Hawaii/DSCF1134.JPG', name: 'Hawaii Photo 5' },
-                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' }
+                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
+                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
+                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
+                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
             ];
             
             allImages = localImages;
