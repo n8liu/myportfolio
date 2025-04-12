@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "build": "mkdir -p dist && cp -r *.html *.css *.js _headers dist/ && [ -d utils ] && cp -r utils dist/ || true && [ -d functions ] && cp -r functions dist/ || true && [ -d assets ] && cp -r assets dist/ || true",
     "serve": "cd dist && npx http-server -p 8080",
-    "deploy": "npm run build && npx wrangler pages deploy ./dist"
+    "deploy": "npm run build && source .env && npx wrangler pages deploy ./dist"
   },
   "keywords": [],
   "author": "",
