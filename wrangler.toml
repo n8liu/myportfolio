@@ -7,3 +7,12 @@ pages_build_output_dir = "dist"
 binding = "MY_BUCKET"
 bucket_name = "myportfolio"
 preview_bucket_name = "myportfolio"
+
+[durable_objects]
+bindings = [
+  { name = "VIEWER_COUNTER", class_name = "ViewerCounter" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ViewerCounter"]

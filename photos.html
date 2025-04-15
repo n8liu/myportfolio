@@ -213,6 +213,16 @@
             text-decoration: none;
             cursor: pointer;
         }
+        
+        .live-count-container {
+            position: fixed;
+            bottom: 20px;
+            left: 30px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -613,5 +623,9 @@
             }
         });
     </script>
+    <div class="live-count-container" style="position: fixed; bottom: 18px; right: 10px; padding: 5px 10px; border-radius: 20px; font-size: 14px;">
+        <span><i class="fas fa-eye"></i> <span class="viewer-count">0</span></span>
+    </div>
+    <script src="viewers.js"></script>
 </body>
 </html>

@@ -1,53 +1,95 @@
 # My Portfolio
 
-A personal portfolio website showcasing professional skills, projects, and photography, with a clean dark-themed design.
+A personal portfolio website showcasing professional skills, projects, and photography with a clean dark-themed design.
+
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Local Development](#local-development)
+- [Deployment](#deployment)
+- [Image Management](#image-management)
+
+## Overview
+
+This portfolio website includes:
+- Professional showcase of skills and projects
+- Dynamic photography gallery with EXIF data
+- Responsive design with a modern dark-themed UI
+- Cloud integration with Cloudflare for hosting and storage
 
 ## Features
 
+### Interface
 - Responsive design for all screen sizes
-- Interactive tech stack showcase with logos and descriptions
-- Projects section highlighting development work
-- Dynamic photography gallery with category navigation
-- Image modal for fullscreen viewing
-- Integration with Cloudflare R2 for image storage
-- Automatic category detection based on folder structure in R2 bucket
+- Dark theme with consistent color scheme (#1e1e1e background with light text)
+- Section spacing of 300px for better content separation
 - Smooth scroll animations and transitions
+- Fixed footer with social links that appears on scroll
 - Back-to-top button that appears when reaching the bottom of the page
 
-## Site Structure
-
+### Content Sections
 - **Main Section**: Introduction and profile
 - **About Section**: Skills and education information
-- **Tech Stack Section**: Showcase of programming languages, frameworks, and tools
-- **Projects Section**: Featured development projects
-- **Photography Section**: Gallery of photography work
+- **Tech Stack Section**: Interactive showcase with logos and descriptions
+- **Projects Section**: Featured development work
+- **Photography Section**: Gallery with category navigation and EXIF data
+
+### Photography Features
+- Dynamic gallery with category navigation
+- Image modal for fullscreen viewing
+- EXIF data extraction for camera settings display
+- Automatic category detection based on folder structure
+- Responsive image gallery with category filtering
+- Real-time updates using Socket.io for collaborative viewing
 
 ## Tech Stack
 
-The portfolio website features a comprehensive tech stack section that displays various programming languages, frameworks, libraries, and tools using a card-based grid layout. Each card includes:
+### Core Technologies
+- **Frontend**: HTML5, CSS3, JavaScript
+- **Backend**: Express.js server for local development
+- **Cloud**: Cloudflare Pages and R2 for deployment and storage
+- **Real-time**: Socket.io for live updates
+- **Storage**: AWS SDK for S3-compatible storage interaction
+- **Image Processing**: ExifReader for metadata extraction
 
+### UI Components
+Each tech stack item is displayed in a card-based grid layout featuring:
 - Logo of the technology
 - Name displayed underneath
-- Hover effects for better user interaction
+- Hover effects for better interaction
 
 Technologies are arranged from most frequently used to more specialized ones.
 
-## UI/UX Features
+## Project Structure
 
-- Dark theme with consistent color scheme (#1e1e1e background with light text)
-- Section spacing of 300px for better content separation
-- Fixed footer with social links that appears on scroll
-- Smooth scroll indicators and animations
-- Fade-in/fade-out back-to-top button at the bottom right when reaching end of page
+### Key Files
+- `index.html` - Main portfolio page with all sections
+- `photos.html` - Photography gallery page
+- `styles.css` - Main stylesheet
+- `script.js` - Main JavaScript functionality
+- `viewers.js` - Image viewing and modal functionality
+- `server.js` - Express server for local development
+
+### Directories
+- `assets/` - Images and other static assets
+- `functions/` - Cloudflare Pages Functions for API endpoints
+- `utils/` - Utility functions for Cloudflare R2 interaction
+- `resize/` - Scripts for processing and resizing images
+- `dist/` - Build directory for deployment
 
 ## Local Development
 
-1. Clone the repository
-2. Install dependencies:
-   ```
+1. **Clone the repository**
+
+2. **Install dependencies**
+   ```bash
    npm install
    ```
-3. Create a `.env` file in the root directory with your Cloudflare R2 credentials:
+
+3. **Configure environment**
+   Create a `.env` file in the root directory with your Cloudflare R2 credentials:
    ```
    R2_ACCOUNT_ID=your-cloudflare-account-id
    R2_ACCESS_KEY_ID=your-r2-access-key
@@ -55,67 +97,51 @@ Technologies are arranged from most frequently used to more specialized ones.
    R2_BUCKET_NAME=myportfolio
    R2_ENDPOINT=https://{account_id}.r2.cloudflarestorage.com
    ```
-4. Start the development server:
-   ```
+
+4. **Start development server**
+   ```bash
    npm run dev
    ```
 
-## Deployment to Cloudflare Pages
+## Deployment
 
-### Prerequisites
+### Cloudflare Pages Setup
 
-1. Install Cloudflare Wrangler CLI:
-   ```
-   npm install -g wrangler
-   ```
-2. Login to Cloudflare:
-   ```
-   wrangler login
+1. **Install dependencies** (includes Wrangler CLI)
+   ```bash
+   npm install
    ```
 
-### Deployment Steps
-
-1. Build the static site:
+2. **Login to Cloudflare**
+   ```bash
+   npx wrangler login
    ```
+
+3. **Build the site**
+   ```bash
    npm run build
    ```
 
-2. Deploy to Cloudflare Pages:
-   ```
+4. **Deploy to Cloudflare Pages**
+   ```bash
    npm run deploy
    ```
-   
-   Alternatively, you can manually deploy:
-   ```
-   wrangler pages deploy dist
-   ```
+   Note: The deploy script sources environment variables from the .env file.
 
-3. Configure Environment Variables in Cloudflare Pages Dashboard:
-   - Go to your Cloudflare Pages project settings
+5. **Configure Environment Variables**
+   In Cloudflare Pages Dashboard:
+   - Go to your project settings
    - Navigate to "Settings" > "Environment variables"
-   - Add the following variables:
-     - `R2_ACCOUNT_ID`
-     - `R2_ACCESS_KEY_ID`
-     - `R2_SECRET_ACCESS_KEY`
-     - `R2_BUCKET_NAME`
-     - `R2_ENDPOINT`
+   - Add: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT`
 
-### Using Cloudflare R2
+## Image Management
 
-1. Create a Cloudflare R2 bucket named "myportfolio" (or use your custom name and update config)
+### Cloudflare R2 Setup
+1. Create a Cloudflare R2 bucket named "myportfolio" (or customize and update config)
 2. Organize photos in folders to create categories (e.g., "california/beach.jpg", "japan/tokyo.jpg")
-3. The page will automatically detect these folders and create navigation categories
+3. The site will automatically detect these folders and create navigation categories
 
-## File Structure
-
-- `index.html` - Main portfolio page with all sections (about, tech stack, projects)
-- `photos.html` - Photography gallery page
-- `styles.css` - Main stylesheet for the entire website
-- `assets/` - Directory containing images and other static assets
-- `server.js` - Express server for local development
-- `functions/_middleware.js` - Cloudflare Pages Functions for API endpoints
-- `utils/cloudflare.js` - Utility functions for Cloudflare R2 interaction
-
-## License
-
-ISC
+### Image Processing
+- Automatic resizing for optimized loading
+- EXIF data extraction for displaying camera settings
+- Category-based organization for the gallery

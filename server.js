@@ -1,6 +1,10 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 require('dotenv').config();
 
@@ -12,6 +16,26 @@ app.use(express.static(__dirname));
 
 // Add JSON body parser
 app.use(express.json());
+
+// Track connected users
+let connectedUsers = 0;
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+    // Increment the count when a user connects
+    connectedUsers++;
+    // Broadcast the updated count to all clients
+    io.emit('viewerCount', connectedUsers);
+    
+    console.log('User connected - Current viewers:', connectedUsers);
+    
+    // When user disconnects, decrement the count
+    socket.on('disconnect', () => {
+        connectedUsers--;
+        io.emit('viewerCount', connectedUsers);
+        console.log('User disconnected - Current viewers:', connectedUsers);
+    });
+});
 
 // Route for the home page
 app.get('/', (req, res) => {
@@ -48,6 +72,11 @@ app.get('/api/images/:category?', async (req, res) => {
     }
 });
 
+// API endpoint to get the current viewer count
+app.get('/api/viewers', (req, res) => {
+    res.json({ count: connectedUsers });
+});
+
 // Route for any other pages - will serve directly from static files
 // This handles photography.html and other pages you might add
 
@@ -57,7 +86,7 @@ app.use((req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
     console.log(`Press Ctrl+C to stop the server`);
 });

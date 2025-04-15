@@ -250,19 +250,29 @@
     
     <footer class="footer">
         <div class="footer-content">
-            <div class="social-icons">
-                <a href="https://www.linkedin.com/in/nathan-dtliu/" target="_blank"><i class="fab fa-linkedin"></i></a>
-                <a href="https://www.instagram.com/n8.liu/" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.github.com/n8liu" target="_blank" class="github-link"><i class="fab fa-github"></i></a>
-                <a href="mailto:nathan.dtliu@gmail.com"><i class="fas fa-envelope"></i></a>
+            <div class="footer-left">
+                <div class="live-count-container">
+                    <span><i class="fas fa-eye"></i> <span class="viewer-count">0</span></span>
+                </div>
             </div>
-            <button id="back-to-top-btn" class="back-to-top-btn" title="Back to Top">
-                <span>Back to Top</span> <i class="fas fa-arrow-up"></i>
-            </button>
+            <div class="footer-center">
+                <div class="social-icons">
+                    <a href="https://www.linkedin.com/in/nathan-dtliu/" target="_blank"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/n8.liu/" target="_blank"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.github.com/n8liu" target="_blank" class="github-link"><i class="fab fa-github"></i></a>
+                    <a href="mailto:nathan.dtliu@gmail.com"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-right">
+                <button id="back-to-top-btn" class="back-to-top-btn" title="Back to Top">
+                    <span>Back to Top</span> <i class="fas fa-arrow-up"></i>
+                </button>
+            </div>
         </div>
     </footer>
 
     <script src="script.js"></script>
+    <script src="viewers.js"></script>
     <script>
         // JavaScript to handle footer visibility when scrolling
         window.addEventListener('scroll', function() {
@@ -272,7 +282,7 @@
             const backToTopBtn = document.getElementById('back-to-top-btn');
             
             // Show/hide footer
-            if (window.scrollY > 700) {
+            if (window.scrollY > 800) {
                 footer.classList.add('visible');
             } else {
                 footer.classList.remove('visible');
