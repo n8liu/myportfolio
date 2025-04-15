@@ -12,6 +12,7 @@ A personal portfolio website showcasing professional skills, projects, and photo
 - [Image Management](#image-management)
 - [Live Viewer Count](#live-viewer-count)
 - [Durable Objects & Cloudflare Configuration](#durable-objects--cloudflare-configuration)
+- [Analytics & Statistics](#analytics--statistics)
 - [How to Deploy](#how-to-deploy)
 
 ## Overview
@@ -42,7 +43,7 @@ This portfolio website includes:
 ### Photography Features
 - Dynamic gallery with category navigation
 - Image modal for fullscreen viewing
-- EXIF data extraction for camera settings display
+- EXIF data extraction for displaying camera settings
 - Automatic category detection based on folder structure
 - Responsive image gallery with category filtering
 - Real-time updates using Socket.io for collaborative viewing
@@ -185,6 +186,30 @@ This portfolio features a real-time viewer count displayed on every page. The vi
   new_sqlite_classes = [ "SessionTracker" ]
   ```
 - Durable Object classes must be exported from your Worker entrypoint.
+
+## Analytics & Statistics (2025)
+
+The portfolio now includes a robust statistics dashboard at `database.html`, powered by Cloudflare Durable Objects:
+
+- **Page Views:** Tracks total and daily page views across the site.
+- **Unique Visitors:** Tracks unique visitors (by IP) and unique counts per day.
+- **Resume Button Clicks:** Tracks how many times the resume button is clicked.
+- **Live Graph:** Interactive Chart.js graph visualizes views and unique viewers for the past 7 days.
+- **24-Hour Stats:** Displays views and unique viewers in the last 24 hours.
+- **API Endpoints:**
+  - `/api/total`, `/api/total/requests24h`, `/api/total/history7d` — Total views, last 24h, and 7-day history
+  - `/api/unique/count`, `/api/unique/visitors24h`, `/api/unique/history7d` — Unique visitors, last 24h, and 7-day history
+  - `/api/resume/count` — Resume button clicks
+
+**How it works:**
+- Stats are tracked using Durable Objects and displayed in real time on the dashboard.
+- The backend aggregates and serves analytics data for the frontend to visualize.
+
+## Quick Start for Stats Dashboard
+
+1. Deploy the Worker with `npx wrangler deploy` to enable analytics endpoints.
+2. Visit `database.html` to view real-time stats and trends.
+3. All analytics are privacy-friendly (no cookies, no personal data stored).
 
 ## How to Deploy
 
