@@ -315,5 +315,20 @@
             });
         });
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      async function updateViewerCount() {
+        try {
+          const res = await fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers');
+          const data = await res.json();
+          document.querySelector('.viewer-count').textContent = data.count;
+        } catch (e) {
+          document.querySelector('.viewer-count').textContent = '?';
+        }
+      }
+      updateViewerCount();
+      setInterval(updateViewerCount, 10000);
+    });
+    </script>
 </body>
 </html>
