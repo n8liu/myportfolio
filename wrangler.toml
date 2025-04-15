@@ -16,4 +16,8 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = [ "ViewerCounter", "SessionTracker" ]
+new_sqlite_classes = [ "ViewerCounter" ]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = [ "SessionTracker" ]

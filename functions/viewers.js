@@ -18,18 +18,16 @@ export class ViewerCounter {
     if (url.pathname.startsWith('/api/viewers')) {
       if (last === "connect") {
         this.viewers++;
-        if (this.viewers > 90) {
-          this.viewers = 0;
-        }
-        await this.state.storage.put("viewers", this.viewers);
       } else if (last === "disconnect") {
         this.viewers = Math.max(0, this.viewers - 1);
-        await this.state.storage.put("viewers", this.viewers);
       } else if (last === "reset") {
         this.viewers = 0;
-        await this.state.storage.put("viewers", this.viewers);
       }
-      // Always return the current count
+      // Always check and reset if over 90
+      if (this.viewers > 90) {
+        this.viewers = 0;
+      }
+      await this.state.storage.put("viewers", this.viewers);
       return new Response(JSON.stringify({ count: this.viewers }), {
         headers: {
           "Content-Type": "application/json",
