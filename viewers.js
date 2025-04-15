@@ -1,7 +1,7 @@
 /**
  * Live Viewer Counter
  * Works in both local Express server (Socket.io) and 
- * production Cloudflare Pages (with Durable Objects) environments
+ * production Cloudflare Pages (with Durable Objects) environments.
  */
 
 class ViewerCounter {
