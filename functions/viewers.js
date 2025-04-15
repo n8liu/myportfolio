@@ -12,14 +12,15 @@ export class ViewerCounter {
   // Handle request to increment or get the count
   async fetch(request) {
     const url = new URL(request.url);
-    const path = url.pathname.split('/').pop();
+    // Robust path parsing for connect/disconnect
+    const segments = url.pathname.replace(/^\/+|\/+$/g, '').split('/');
+    const last = segments[segments.length - 1];
 
-    // Always use a single instance for global count
     if (url.pathname.startsWith('/api/viewers')) {
-      if (path === "connect") {
+      if (last === "connect") {
         this.viewers++;
         await this.state.storage.put("viewers", this.viewers);
-      } else if (path === "disconnect") {
+      } else if (last === "disconnect") {
         this.viewers = Math.max(0, this.viewers - 1);
         await this.state.storage.put("viewers", this.viewers);
       }
