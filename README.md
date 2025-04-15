@@ -14,6 +14,7 @@ A personal portfolio website showcasing professional skills, projects, and photo
 - [Durable Objects & Cloudflare Configuration](#durable-objects--cloudflare-configuration)
 - [Analytics & Statistics](#analytics--statistics)
 - [How to Deploy](#how-to-deploy)
+- [Technical Tools, Skills, and Rationale](#technical-tools-skills-and-rationale)
 
 ## Overview
 
@@ -216,3 +217,44 @@ The portfolio now includes a robust statistics dashboard at `database.html`, pow
 1. Update your code and configuration as needed.
 2. Run `npx wrangler deploy` to deploy to Cloudflare Workers.
 3. The viewer count will be live and visible on all pages with the integration.
+
+## Technical Tools, Skills, and Rationale
+
+This project leverages a modern, cloud-native stack to deliver a fast, scalable, and interactive portfolio experience. Below is a list of all major tools, technologies, and skills used, along with the reasons for their selection:
+
+### Frontend
+- **HTML5 & CSS3**: Foundation for semantic, accessible, and responsive web design.
+- **JavaScript (Vanilla)**: Lightweight interactivity and DOM manipulation without heavy frameworks, ensuring fast load times.
+- **Chart.js**: Used for rendering interactive, visually appealing analytics graphs on the stats dashboard. Chosen for its simplicity and flexibility.
+- **Responsive Design**: Custom CSS and layout techniques ensure the site works on all devices.
+
+### Backend & Cloud
+- **Cloudflare Workers**: Serverless JavaScript runtime at the edge, providing low-latency API endpoints and backend logic. Chosen for scalability and global reach.
+- **Cloudflare Durable Objects**: Used for real-time stateful analytics (viewers, unique visitors, button clicks). Enables atomic counters and time-based stats without a traditional database.
+- **Cloudflare R2**: Object storage for hosting images and static assets, chosen for its S3 compatibility and no-egress-fee model.
+- **Cloudflare D1 (future-ready)**: SQL database option for advanced analytics and relational data, considered for future scalability.
+- **wrangler**: CLI tool for deploying and managing Cloudflare resources. Used for seamless build and deployment workflows.
+
+### DevOps & Deployment
+- **Git & GitHub**: Source control, collaboration, and deployment automation.
+- **GitHub Actions (optional)**: For CI/CD automation and integration with Cloudflare deployments.
+
+### Real-Time & Analytics
+- **Durable Objects (ViewerCounter, TotalCounter, ResumeCounter, UniqueVisitors)**: Track live viewers, page views, resume clicks, and unique visitors with atomic consistency and time-based queries.
+- **Custom API Endpoints**: Serve analytics data to the frontend for live display and graphing.
+
+### Image Processing
+- **ExifReader**: Extracts camera metadata (EXIF) from uploaded photos, allowing for rich photography features.
+- **Responsive Gallery**: Custom JavaScript and CSS for category filtering, modal viewing, and navigation.
+
+### Security & Privacy
+- **CORS Headers**: All API endpoints include proper CORS headers for secure cross-origin requests.
+- **No Cookies/Tracking Scripts**: All analytics are privacy-friendly, using only IP-based uniqueness and no persistent user tracking.
+
+### Reasons for Choices
+- **Cloudflare Stack**: Chosen for performance, cost-effectiveness, and edge deployment.
+- **Durable Objects**: Enable real-time, atomic counters and analytics without the complexity of managing databases.
+- **Chart.js**: Provides beautiful, interactive charts with minimal setup.
+- **Vanilla JS & CSS**: Ensures maximum compatibility, minimal bloat, and fast load times.
+- **R2 Storage**: Ideal for static assets and images, with global distribution and zero egress fees.
+- **EXIF & Gallery Features**: Enhance the photography section with technical depth and interactivity.
