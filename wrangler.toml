@@ -11,7 +11,10 @@ preview_bucket_name = "myportfolio"
 [durable_objects]
 bindings = [
   { name = "VIEWER_COUNTER", class_name = "ViewerCounter" },
-  { name = "SESSION_TRACKER", class_name = "SessionTracker" }
+  { name = "SESSION_TRACKER", class_name = "SessionTracker" },
+  { name = "TOTAL_COUNTER", class_name = "TotalCounter" },
+  { name = "RESUME_COUNTER", class_name = "ResumeCounter" },
+  { name = "UNIQUE_VISITORS", class_name = "UniqueVisitors" }
 ]
 
 [[migrations]]
@@ -21,3 +24,15 @@ new_sqlite_classes = [ "ViewerCounter" ]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = [ "SessionTracker" ]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = [ "TotalCounter" ]
+
+[[migrations]]
+tag = "v4"
+new_sqlite_classes = [ "ResumeCounter" ]
+
+[[migrations]]
+tag = "v5"
+new_sqlite_classes = [ "UniqueVisitors" ]

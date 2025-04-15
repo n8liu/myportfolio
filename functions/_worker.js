@@ -1,18 +1,45 @@
 import { ViewerCounter } from './viewers';
 import { SessionTracker } from './session_tracker';
+import { TotalCounter } from './total_counter';
+import { ResumeCounter } from './resume_counter';
+import { UniqueVisitors } from './unique_visitors';
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-
     if (url.pathname.startsWith('/api/viewers')) {
       const id = env.VIEWER_COUNTER.idFromName("global");
       const obj = env.VIEWER_COUNTER.get(id);
       return obj.fetch(request);
     }
-
+    else if (url.pathname.startsWith('/api/resume')) {
+      const id = env.RESUME_COUNTER.idFromName('global');
+      const obj = env.RESUME_COUNTER.get(id);
+      return obj.fetch(request);
+    }
+    else if (url.pathname.startsWith('/api/unique')) {
+      const id = env.UNIQUE_VISITORS.idFromName('global');
+      const obj = env.UNIQUE_VISITORS.get(id);
+      return obj.fetch(request);
+    }
+    else if (url.pathname.startsWith('/api/unique/visitors24h')) {
+      const id = env.UNIQUE_VISITORS.idFromName('global');
+      const obj = env.UNIQUE_VISITORS.get(id);
+      return obj.fetch(new Request(request.url.replace('/api/unique/visitors24h', '/api/unique/visitors24h'), request));
+    }
+    else if (url.pathname.startsWith('/api/total')) {
+      const id = env.TOTAL_COUNTER.idFromName("global");
+      const obj = env.TOTAL_COUNTER.get(id);
+      return obj.fetch(request);
+    }
+    else if (url.pathname.startsWith('/api/total/requests24h')) {
+      const id = env.TOTAL_COUNTER.idFromName("global");
+      const obj = env.TOTAL_COUNTER.get(id);
+      return obj.fetch(new Request(request.url.replace('/api/total/requests24h', '/api/total/requests24h'), request));
+    }
+    // Add routing for SessionTracker if needed in the future
     return new Response("Not found", { status: 404 });
   },
 };
 
-export { ViewerCounter, SessionTracker };
+export { ViewerCounter, SessionTracker, TotalCounter, ResumeCounter, UniqueVisitors };

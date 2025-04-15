@@ -23,10 +23,6 @@ export class ViewerCounter {
       } else if (last === "reset") {
         this.viewers = 0;
       }
-      // Always check and reset if over 90
-      if (this.viewers > 90) {
-        this.viewers = 0;
-      }
       await this.state.storage.put("viewers", this.viewers);
       return new Response(JSON.stringify({ count: this.viewers }), {
         headers: {

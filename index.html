@@ -21,7 +21,7 @@
                 
                 <div class="buttons">
                     <!-- <a href="photos.html" class="btn">Photography</a> -->
-                    <a href="assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn">Resume</a>
+                    <a href="assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn" id="resume-btn">Resume</a>
                 </div>
                 
                 <div class="social-icons">
@@ -271,6 +271,9 @@
         </div>
     </footer>
 
+    <!-- Invisible button in top right for database.html -->
+    <a href="database.html" class="invisible-db-btn" tabindex="-1" aria-label="Go to database stats"></a>
+
     <script src="script.js"></script>
     <script src="viewers.js"></script>
     <script>
@@ -314,11 +317,30 @@
                 behavior: 'smooth'
             });
         });
+
+        // Track resume clicks
+        document.getElementById('resume-btn').addEventListener('click', function() {
+            fetch('https://myportfolio.nathanliu528.workers.dev/api/resume/increment', { method: 'POST' });
+        });
     </script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Increment on connect
       fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers/connect');
+
+      // Only increment total page views if this is NOT a reload or back/forward
+      let isNewVisit = true;
+      if (performance.getEntriesByType) {
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (nav && (nav.type === "reload" || nav.type === "back_forward")) isNewVisit = false;
+      } else if (performance.navigation) {
+        if (performance.navigation.type === 1 || performance.navigation.type === 2) isNewVisit = false;
+      }
+      if (isNewVisit) {
+        fetch('https://myportfolio.nathanliu528.workers.dev/api/total/increment');
+        // Increment unique visitors Durable Object
+        fetch('https://myportfolio.nathanliu528.workers.dev/api/unique/increment');
+      }
 
       async function updateViewerCount() {
         try {

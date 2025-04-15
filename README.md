@@ -10,6 +10,9 @@ A personal portfolio website showcasing professional skills, projects, and photo
 - [Local Development](#local-development)
 - [Deployment](#deployment)
 - [Image Management](#image-management)
+- [Live Viewer Count](#live-viewer-count)
+- [Durable Objects & Cloudflare Configuration](#durable-objects--cloudflare-configuration)
+- [How to Deploy](#how-to-deploy)
 
 ## Overview
 
@@ -145,3 +148,46 @@ Technologies are arranged from most frequently used to more specialized ones.
 - Automatic resizing for optimized loading
 - EXIF data extraction for displaying camera settings
 - Category-based organization for the gallery
+
+## Live Viewer Count
+
+This portfolio features a real-time viewer count displayed on every page. The viewer count is powered by Cloudflare Durable Objects and updates automatically as users visit or leave the site.
+
+- **Durable Object:** `ViewerCounter` tracks the number of active viewers.
+- **Endpoints:**
+  - `/api/viewers/connect`: Increments the viewer count when a user visits a page.
+  - `/api/viewers/disconnect`: Decrements the viewer count when a user leaves.
+  - `/api/viewers`: Returns the current viewer count as JSON.
+  - `/api/viewers/reset`: Resets the viewer count to zero (manual endpoint).
+- **Frontend Integration:**
+  - The viewer count is displayed in the UI and updated every 10 seconds.
+  - JavaScript logic ensures the count is incremented/decremented on page load/unload.
+  - Implemented on both `index.html` and `photos.html`.
+- **Reset Logic:**
+  - The viewer count can be manually reset via the `/reset` endpoint.
+  - (Optional) You can add logic to automatically reset or cap the count if needed.
+
+## Durable Objects & Cloudflare Configuration
+
+- Durable Objects are configured in `wrangler.toml` with sequential migrations for each class.
+- Example:
+  ```toml
+  [durable_objects]
+  bindings = [
+    { name = "VIEWER_COUNTER", class_name = "ViewerCounter" },
+    { name = "SESSION_TRACKER", class_name = "SessionTracker" }
+  ]
+  [[migrations]]
+  tag = "v1"
+  new_sqlite_classes = [ "ViewerCounter" ]
+  [[migrations]]
+  tag = "v2"
+  new_sqlite_classes = [ "SessionTracker" ]
+  ```
+- Durable Object classes must be exported from your Worker entrypoint.
+
+## How to Deploy
+
+1. Update your code and configuration as needed.
+2. Run `npx wrangler deploy` to deploy to Cloudflare Workers.
+3. The viewer count will be live and visible on all pages with the integration.

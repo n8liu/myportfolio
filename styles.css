@@ -645,7 +645,7 @@ p {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #121212;
+    background-color: rgb(30 30 30 / 85%) ;
     backdrop-filter: blur(10px);
     padding: 15px 0;
     z-index: 1;
@@ -758,6 +758,18 @@ p {
 
 .back-to-top-btn i {
     font-size: 1.1rem;
+}
+
+/* Invisible button in the top right */
+.invisible-db-btn {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  z-index: 100;
+  cursor: pointer;
 }
 
 /* End of file */
