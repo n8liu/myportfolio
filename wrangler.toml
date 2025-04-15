@@ -1,7 +1,7 @@
 # Cloudflare Workers configuration
 name = "myportfolio"
 compatibility_date = "2023-12-01"
-pages_build_output_dir = "dist"
+main = "functions/_worker.js"
 
 [[r2_buckets]]
 binding = "MY_BUCKET"
@@ -15,4 +15,4 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["ViewerCounter"]
+new_sqlite_classes = [ "ViewerCounter" ]
