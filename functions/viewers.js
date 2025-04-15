@@ -16,9 +16,14 @@ export class ViewerCounter {
 
     // Always use a single instance for global count
     if (url.pathname.startsWith('/api/viewers')) {
-      // Increment on connect (or just on each fetch)
-      this.viewers++;
-      await this.state.storage.put("viewers", this.viewers);
+      if (path === "connect") {
+        this.viewers++;
+        await this.state.storage.put("viewers", this.viewers);
+      } else if (path === "disconnect") {
+        this.viewers = Math.max(0, this.viewers - 1);
+        await this.state.storage.put("viewers", this.viewers);
+      }
+      // Always return the current count
       return new Response(JSON.stringify({ count: this.viewers }), {
         headers: {
           "Content-Type": "application/json",

@@ -317,6 +317,9 @@
     </script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Increment on connect
+      fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers/connect');
+
       async function updateViewerCount() {
         try {
           const res = await fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers');
@@ -328,6 +331,11 @@
       }
       updateViewerCount();
       setInterval(updateViewerCount, 10000);
+
+      // Decrement on disconnect
+      window.addEventListener('beforeunload', function() {
+        navigator.sendBeacon('https://myportfolio.nathanliu528.workers.dev/api/viewers/disconnect');
+      });
     });
     </script>
 </body>
