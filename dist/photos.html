@@ -304,6 +304,26 @@
             
             // Load images from the selected category (default is 'all')
             await loadImages(currentCategory);
+            
+            // Increment on connect
+            fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers/connect');
+
+            async function updateViewerCount() {
+                try {
+                    const res = await fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers');
+                    const data = await res.json();
+                    document.querySelector('.viewer-count').textContent = data.count;
+                } catch (e) {
+                    document.querySelector('.viewer-count').textContent = '?';
+                }
+            }
+            updateViewerCount();
+            setInterval(updateViewerCount, 10000);
+
+            // Decrement on disconnect
+            window.addEventListener('beforeunload', function() {
+                navigator.sendBeacon('https://myportfolio.nathanliu528.workers.dev/api/viewers/disconnect');
+            });
         });
         
         // Function to load categories from the API

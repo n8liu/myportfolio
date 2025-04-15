@@ -24,6 +24,8 @@ Thumbs.db
 # Project specific
 photos_original/
 photos/
+dist/
+resize/
 
 # windsurf rules
 .windsurfrules
