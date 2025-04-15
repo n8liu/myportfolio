@@ -18,6 +18,9 @@ export class ViewerCounter {
     if (url.pathname.startsWith('/api/viewers')) {
       if (last === "connect") {
         this.viewers++;
+        if (this.viewers > 90) {
+          this.viewers = 0;
+        }
         await this.state.storage.put("viewers", this.viewers);
       } else if (last === "disconnect") {
         this.viewers = Math.max(0, this.viewers - 1);
