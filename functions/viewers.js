@@ -9,11 +9,10 @@ export class ViewerCounter {
     });
   }
 
-  // Handle request to increment or get the count
+  // Handle request to increment, decrement, reset, or get the count
   async fetch(request) {
     const url = new URL(request.url);
-    // Robust path parsing for connect/disconnect
-    const segments = url.pathname.replace(/^\/+|\/+$/g, '').split('/');
+    const segments = url.pathname.replace(/^\/+/g, '').split('/');
     const last = segments[segments.length - 1];
 
     if (url.pathname.startsWith('/api/viewers')) {
@@ -22,6 +21,9 @@ export class ViewerCounter {
         await this.state.storage.put("viewers", this.viewers);
       } else if (last === "disconnect") {
         this.viewers = Math.max(0, this.viewers - 1);
+        await this.state.storage.put("viewers", this.viewers);
+      } else if (last === "reset") {
+        this.viewers = 0;
         await this.state.storage.put("viewers", this.viewers);
       }
       // Always return the current count

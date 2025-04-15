@@ -10,9 +10,10 @@ preview_bucket_name = "myportfolio"
 
 [durable_objects]
 bindings = [
-  { name = "VIEWER_COUNTER", class_name = "ViewerCounter" }
+  { name = "VIEWER_COUNTER", class_name = "ViewerCounter" },
+  { name = "SESSION_TRACKER", class_name = "SessionTracker" }
 ]
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = [ "ViewerCounter" ]
+new_sqlite_classes = [ "ViewerCounter", "SessionTracker" ]

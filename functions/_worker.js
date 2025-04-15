@@ -1,4 +1,5 @@
 import { ViewerCounter } from './viewers';
+import { SessionTracker } from './session_tracker';
 
 export default {
   async fetch(request, env, ctx) {
@@ -14,4 +15,4 @@ export default {
   },
 };
 
-export { ViewerCounter };
+export { ViewerCounter, SessionTracker };
