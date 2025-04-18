@@ -7,6 +7,9 @@
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="styles.css">
     <style>
+      body {
+        min-height: 100vh;
+      }
       .stats-container {
         margin: 4rem auto;
         min-width: 900px;
@@ -15,12 +18,16 @@
         padding: 2rem 2.5rem;
         box-shadow: 0 2px 24px #0005;
         color: #fff;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
       }
       .stats-title {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 2rem;
         text-align: center;
+        margin-top: 8rem;
+        margin-bottom: 0rem;
+        font-size: 2rem;
+        font-weight: 600;
+        color: #ffffff;
       }
       .stat-row {
         display: flex;
@@ -36,11 +43,15 @@
         font-weight: bold;
         color: #fff;
       }
+      .stats-title a:hover {
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+      }
     </style>
 </head>
 <body>
+  <div class="stats-title"><a href="index.html" style="color:white;text-decoration:none;">Website Statistics</a></div>
   <div class="stats-container">
-    <div class="stats-title">Website Stats</div>
     <div class="stat-row">
       <span class="stat-label">Total Page Viewers:</span>
       <span class="stat-value" id="cf-total-views">Loading...</span>
@@ -60,9 +71,6 @@
     <div class="stat-row">
       <span class="stat-label">Resume Button Clicks:</span>
       <span class="stat-value" id="resume-clicks">Loading...</span>
-    </div>
-    <div style="text-align:center;margin-top:2.5rem;">
-      <a href="index.html" style="color:#89f;opacity:0.7;text-decoration:underline;">&larr; Back to Home</a>
     </div>
   </div>
   <div style="max-width:1400px;min-width:700px;margin:2rem auto 0 auto;">

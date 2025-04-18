@@ -14,7 +14,11 @@ bindings = [
   { name = "SESSION_TRACKER", class_name = "SessionTracker" },
   { name = "TOTAL_COUNTER", class_name = "TotalCounter" },
   { name = "RESUME_COUNTER", class_name = "ResumeCounter" },
-  { name = "UNIQUE_VISITORS", class_name = "UniqueVisitors" }
+  { name = "UNIQUE_VISITORS", class_name = "UniqueVisitors" },
+  { name = "INSTAGRAM_COUNTER", class_name = "InstagramCounter" },
+  { name = "GITHUB_COUNTER", class_name = "GitHubCounter" },
+  { name = "EMAIL_COUNTER", class_name = "EmailCounter" },
+  { name = "LINKEDIN_COUNTER", class_name = "LinkedInCounter" }
 ]
 
 [[migrations]]
@@ -36,3 +40,7 @@ new_sqlite_classes = [ "ResumeCounter" ]
 [[migrations]]
 tag = "v5"
 new_sqlite_classes = [ "UniqueVisitors" ]
+
+[[migrations]]
+tag = "v6"
+new_sqlite_classes = [ "InstagramCounter", "GitHubCounter", "EmailCounter", "LinkedInCounter" ]

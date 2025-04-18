@@ -220,7 +220,7 @@ p {
 }
 
 .skills-section, .education-section {
-    background-color: #2d2d2d;
+    background: rgba(30, 30, 30, 0.7);
     border-radius: 10px;
     padding: 30px;
 }
@@ -324,7 +324,7 @@ p {
 }
 
 .tech-card {
-    background-color: #2d2d2d;
+    background: rgba(30, 30, 30, 0.7);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 25px 15px;
@@ -408,7 +408,7 @@ p {
 }
 
 .project-card {
-    background-color: #2d2d2d;
+    background: rgba(30, 30, 30, 0.7);
     border-radius: 10px;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -490,6 +490,7 @@ p {
     display: flex;
     align-items: center;
     gap: 5px;
+    scroll-behavior: smooth;
 }
 
 .project-link-btn i {
@@ -527,7 +528,7 @@ p {
 }
 
 .hobby-card {
-    background-color: #2d2d2d;
+    background: rgba(30, 30, 30, 0.7);
     border-radius: 10px;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -613,6 +614,50 @@ p {
 
 .photo-btn i {
     font-size: 0.9rem;
+}
+
+/* Relevant Classes Section */
+.relevant-classes-container {
+    margin-top: 300px;
+    margin-bottom: 300px;
+    max-width: 900px;
+    background: rgba(30, 30, 30, 0.7);
+    border-radius: 18px;
+    padding: 32px 28px 18px 28px;
+    box-shadow: 0 2px 16px 0 rgba(50, 50, 50, 0.13);
+    text-align: center;
+}
+
+.relevant-classes-container h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    color: #ffe7a0;
+}
+
+.relevant-classes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.class-tag {
+    background: #222;
+    color: #ffe7a0;
+    border-radius: 12px;
+    padding: 7px 16px;
+    font-size: 0.97rem;
+    font-weight: 500;
+    margin-bottom: 7px;
+    border: 1px solid #2d2d2d;
+    transition: background 0.2s, color 0.2s;
+}
+
+.class-tag:hover {
+    background: #ffe7a0;
+    color: #222;
 }
 
 /* Live Viewer Count */
@@ -772,4 +817,137 @@ p {
   cursor: pointer;
 }
 
-/* End of file */
+/* Email Icon Tooltip */
+.email-icon {
+    position: relative;
+    display: inline-block;
+    transition: transform 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+.email-icon:hover {
+    transform: translateY(-2px) scale(1.11);
+}
+
+.contact-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: max-content;
+    color: #ffe7a0;
+    text-align: center;
+    border-radius: 8px;
+    padding: 5px 14px;
+    position: absolute;
+    left: 50%;
+    top: 38px;
+    transform: translateX(-50%) scale(0.95);
+    font-size: 0.7rem;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 2px 10px rgba(255, 231, 160, 0.13);
+    z-index: 10;
+    transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1),
+                transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                visibility 0.22s;
+}
+
+.email-icon:hover .contact-tooltip,
+.email-icon:focus .contact-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+}
+
+.github-link, .social-link.github {
+    position: relative;
+}
+
+.github-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: max-content;
+    color: #7c3aed;
+    text-align: center;
+    border-radius: 8px;
+    padding: 5px 14px;
+    position: absolute;
+    left: 50%;
+    top: 38px;
+    transform: translateX(-50%) scale(0.95);
+    font-size: 0.75rem;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 2px 10px rgba(124, 58, 237, 0.13);
+    z-index: 10;
+    transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1),
+                transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                visibility 0.22s;
+}
+
+.github-link:hover .github-tooltip,
+.github-link:focus .github-tooltip,
+.social-link.github:hover .github-tooltip,
+.social-link.github:focus .github-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+}
+
+.linkedin-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: max-content;
+    color: #0a66c2;
+    text-align: center;
+    border-radius: 8px;
+    padding: 5px 14px;
+    position: absolute;
+    left: 50%;
+    top: 38px;
+    transform: translateX(-50%) scale(0.95);
+    font-size: 0.75rem;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 2px 10px rgba(10, 102, 194, 0.13);
+    z-index: 10;
+    transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1),
+                transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                visibility 0.22s;
+}
+
+.social-link.linkedin:hover .linkedin-tooltip,
+.social-link.linkedin:focus .linkedin-tooltip,
+.footer-center .social-icons a[href*="linkedin"]:hover .linkedin-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+}
+
+.instagram-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: max-content;
+    color: #e1306c;
+    text-align: center;
+    border-radius: 8px;
+    padding: 5px 14px;
+    position: absolute;
+    left: 50%;
+    top: 38px;
+    transform: translateX(-50%) scale(0.95);
+    font-size: 0.75rem;
+    font-weight: 500;
+    pointer-events: none;
+    box-shadow: 0 2px 10px rgba(225, 48, 108, 0.13);
+    z-index: 10;
+    transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1),
+                transform 0.22s cubic-bezier(0.4,0,0.2,1),
+                visibility 0.22s;
+}
+
+.social-link.instagram:hover .instagram-tooltip,
+.social-link.instagram:focus .instagram-tooltip,
+.footer-center .social-icons a[href*="instagram"]:hover .instagram-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08);
+}
