@@ -17,7 +17,7 @@ body {
      #513989 calc(var(--d) - 2px), 
      #121212 var(--d)
    ) 
-   0 0 / 50px 50px fixed;
+   15px 15px / 50px 50px fixed;
    background-color: #121212;
     color: #ffffff;
     min-height: 310vh;
@@ -618,8 +618,8 @@ p {
 
 /* Relevant Classes Section */
 .relevant-classes-container {
-    margin-top: 300px;
-    margin-bottom: 300px;
+    margin-top: 400px;
+    margin-bottom: 350px;
     max-width: 900px;
     background: rgba(30, 30, 30, 0.7);
     border-radius: 18px;
@@ -682,6 +682,20 @@ p {
 .viewer-count {
     font-weight: bold;
     margin: 0 3px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  /* Hide viewer count on smaller screens */
+  .viewer-count {
+    display: none; /* Hide the number itself */
+  }
+
+  /* Hide the eye icon as well by targeting the parent span */
+  .viewer-count-container, /* If you add this class to the parent span */
+  span:has(.viewer-count) { /* More general selector if no specific class */
+    display: none;
+  }
 }
 
 /* Footer styles */
