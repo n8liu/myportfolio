@@ -101,8 +101,25 @@ p {
     transition: all 0.3s ease;
 }
 
-.social-icons a:hover {
-    transform: translateY(-2px);
+/* Brand colors and hover effects */
+.social-link.linkedin:hover {
+    color: #0077b5;
+    transform: scale(1.1);
+}
+
+.social-link.instagram:hover {
+    color: #e4405f;
+    transform: scale(1.1);
+}
+
+.social-link.github:hover {
+    color: #7c3aed;
+    transform: scale(1.1);
+}
+
+.social-link.email-icon:hover {
+    color: #ea4335;
+    transform: scale(1.1);
 }
 
 .profile-image {
@@ -964,4 +981,40 @@ p {
     visibility: visible;
     opacity: 1;
     transform: translateX(-50%) scale(1.08);
+}
+
+/* Scroll Indicator Navigation */
+.scroll-indicator-nav {
+    position: fixed;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 1000;
+}
+
+.scroll-dot {
+    width: 30px;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.scroll-dot:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.scroll-dot.active {
+    width: 50px;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Hide scroll indicator on mobile */
+@media (max-width: 768px) {
+    .scroll-indicator-nav {
+        display: none;
+    }
 }
