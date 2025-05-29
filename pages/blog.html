@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nathan Liu - Blog</title>
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            --d: 2px;
+            background: radial-gradient(
+                circle at var(--d) var(--d),
+                #513989 calc(var(--d) - 2px),
+                #121212 var(--d)
+            ) 15px 15px / 50px 50px fixed;
+            background-color: #121212;
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 16px 60px 16px;
+        }
+        .blog-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .blog-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .blog-header p {
+            color: #cccccc;
+            font-size: 1.1rem;
+        }
+        .blog-list {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        .blog-card {
+            background: rgba(30, 30, 30, 0.7);
+            border: 1.5px solid #3a3a3a;
+            border-radius: 14px;
+            padding: 28px 24px 22px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .blog-card:hover {
+            border-color: #513989;
+            box-shadow: 0 4px 16px rgba(81,57,137,0.13);
+        }
+        .blog-title {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #ffe7a0;
+        }
+        .blog-date {
+            font-size: 0.95rem;
+            color: #aaa;
+            margin-bottom: 14px;
+        }
+        .blog-desc {
+            font-size: 1.05rem;
+            color: #e0e0e0;
+            margin-bottom: 18px;
+        }
+        .read-more {
+            color: #513989;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .read-more:hover {
+            color: #ffe7a0;
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px 4px 40px 4px;
+            }
+            .blog-header h1 {
+                font-size: 2rem;
+            }
+            .blog-card {
+                padding: 18px 8px 14px 8px;
+            }
+        }
+        .site-title:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blog-header">
+            <h1 class="site-title"><a href="/index.html" style="color: white; text-decoration: none;">Blog</a></h1>
+        </div>
+        <div class="blog-list">
+            <!-- Example blog post -->
+            <div class="blog-card">
+                <div class="blog-title">My Gym Routine</div>
+                <div class="blog-date">May 20, 2025</div>
+                <div class="blog-desc">My weekly gym routine and how I stay motivated, my progess, why I started, and how I stay consistent.</div>
+                <a href="blog/blog3.html" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <!-- <div class="blog-card">
+                <div class="blog-title">Youtube NLP Analysis</div>
+                <div class="blog-date">April 2, 2025</div>
+                <div class="blog-desc">My analysis of the top 1000 most viewed Youtube videos using NLP and the correlation between the video's views and words used in the title.</div>
+                <a href="blog/blog2.html" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+            </div> -->
+            <div class="blog-card">
+                <div class="blog-title">How I Built My Portfolio Website</div>
+                <div class="blog-date">March 24, 2025</div>
+                <div class="blog-desc">A behind-the-scenes look at the tech stack, design choices, and deployment process for my personal portfolio site.</div>
+                <a href="blog/blog1.html" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <!-- Add more blog-card divs for additional posts -->
+        </div>
+    </div>
+    
+</body>
+</html>

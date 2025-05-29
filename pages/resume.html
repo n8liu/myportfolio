@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nathan Liu - Resume</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Page transition styles */
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+        .resume-btn {
+            display: block;
+            margin: 24px auto;
+            padding: 10px 20px;
+            background-color: transparent;
+            color: white;
+            text-decoration: none;
+            border: 1px solid white;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: fit-content;
+        }
+        .resume-btn i {
+            margin-left: 5px;
+        }
+        
+        .resume-btn:hover {
+            background-color: white;
+            color: #1e1e1e;
+        }
+
+        .section {
+            min-width: 1200px;
+            max-width: 1200px;
+            margin: 150px auto 0 auto;
+            padding: 0 24px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .section-subtitle {
+            font-size: 1.15rem;
+            color: #bdbdbd;
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .resume-title-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 3.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: color 0.2s, transform 0.2s;
+            display: inline-block;
+            margin: 0 auto 18px auto;
+            margin-top: 100px;
+            text-align: center;
+        }
+        .resume-title-link:hover {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        .card {
+            /* background: rgba(30, 30, 30, 0.5); */
+            border: 1.5px solid #513989;
+            border-radius: 18px;
+            padding: 32px 40px;
+            margin-bottom: 36px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+        }
+        .card-intro {
+            /* max-width: 1000px; */
+            margin: 0 auto 36px auto;
+        }
+        .achievements-grid {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .achievement-mini {
+            flex: 1 1 300px;
+            min-width: 280px;
+            /* background: rgba(30, 30, 30, 0.5); */
+            border: 1.5px solid #513989;
+            border-radius: 16px;
+            padding: 28px 28px 20px 28px;
+            margin-bottom: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .achievement-mini-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .achievement-mini-desc {
+            color: #bdbdbd;
+            font-size: 1rem;
+        }
+        .exp-section {
+            margin-top: 150px;
+        }
+        .exp-card {
+            /* background: rgba(30, 30, 30, 0.5); */
+            border: 1.5px solid #513989;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            position: relative;
+        }
+        .exp-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .exp-company {
+            color: #bdbdbd;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        .exp-badge {
+            position: absolute;
+            top: 28px;
+            right: 32px;
+            background: #232323;
+            color: #bdbdbd;
+            border-radius: 12px;
+            padding: 4px 16px;
+            font-size: 0.95rem;
+        }
+        .exp-card ul {
+            margin: 0 0 0 18px;
+            padding: 0;
+        }
+        .exp-card li {
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+        .edu-card {
+            /* background: rgba(30, 30, 30, 0.5); */
+            border: 1.5px solid #513989;
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            position: relative;
+        }
+        .edu-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .edu-company {
+            color: #bdbdbd;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .edu-badge {
+            position: absolute;
+            top: 28px;
+            right: 32px;
+            background: #232323;
+            color: #bdbdbd;
+            border-radius: 12px;
+            padding: 4px 16px;
+            font-size: 0.95rem;
+        }
+        .coursework-grid {
+            display: flex;
+            gap: 40px;
+            margin-top: 8px;
+        }
+        .coursework-grid ul {
+            margin: 0;
+            padding: 0 0 0 18px;
+            color: #bdbdbd;
+        }
+        .cert-section {
+            margin-top: 32px;
+        }
+        .cert-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .cert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .cert-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(81, 57, 137, 0.08);
+            border-radius: 12px;
+            padding: 14px 22px;
+            font-size: 1rem;
+        }
+        .cert-org {
+            color: #bdbdbd;
+            font-size: 0.98rem;
+        }
+        .cert-badge {
+            background: #232323;
+            color: #bdbdbd;
+            border-radius: 12px;
+            padding: 4px 16px;
+            font-size: 0.95rem;
+            margin-left: 12px;
+        }
+        .skills-section {
+            display: flex;
+            gap: 32px;
+            margin-top: 18px;
+            background: 0;
+        }
+        .skills-col {
+            flex: 1;
+        }
+        .skills-subtitle {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .skills-group {
+            margin-bottom: 18px;
+        }
+        .skills-label {
+            font-size: 1.02rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .skill-tag {
+            display: inline-block;
+            padding: 7px 16px;
+            background-color: #232323;
+            color: #bdbdbd;
+            border-radius: 20px;
+            font-size: 0.97rem;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+        }
+        .skill-tag:hover {
+            transition: scale 0.2s ease;
+        }
+        .soft-skills-list {
+            margin-top: 12px;
+        }
+        .soft-skills-list .soft-skill-group {
+            margin-bottom: 18px;
+        }
+        .soft-skill-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .soft-skill-desc {
+            color: #bdbdbd;
+            font-size: 1rem;
+        }
+        .interests-grid {
+            display: flex;
+            gap: 2px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 24px;
+            border: 1.5px solid #513989;
+            border-radius: 16px;
+            padding: 28px 28px 20px 28px;
+        }
+        .interest-card {
+            flex: 1 1 220px;
+            min-width: 200px;
+            /* background: rgba(30, 30, 30, 0.5); */
+            /* border: 1.5px solid #513989; */
+            border-radius: 16px;
+            padding: 28px 28px 20px 28px;
+            margin-bottom: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+        .interest-card.active {
+            background: #232323;
+        }
+        .interest-card:hover {
+            background: rgba(30, 30, 30, 0.5);
+            transition: background 0.2s ease;
+        }
+
+        .interest-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .interest-desc {
+            color: #bdbdbd;
+            font-size: 1rem;
+        }
+        .contact-section {
+            text-align: center;
+            margin-top: 150px;
+            margin-bottom: 150px;
+        }
+        .contact-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+        .contact-desc {
+            color: #bdbdbd;
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+        .contact-btns {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 18px;
+        }
+        .contact-btn {
+            padding: 12px 32px;
+            border-radius: 24px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            background: #232323;
+            color: #fff;
+            text-decoration: none;
+        }
+        @media (max-width: 900px) {
+            .skills-section {
+                flex-direction: column;
+                gap: 24px;
+            }
+            .coursework-grid {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .achievements-grid, .interests-grid {
+                flex-direction: column;
+                gap: 18px;
+            }
+        }
+        @media (max-width: 768px) {
+            .section {
+                min-width: unset;
+                max-width: 100%;
+                padding: 0 16px;
+                margin-top: 100px;
+            }
+
+            .resume-title-link {
+                font-size: 2.5rem;
+                margin-top: 100px;
+            }
+
+            .card, .achievement-mini, .exp-card, .edu-card {
+                padding: 20px;
+            }
+
+            .exp-badge, .edu-badge {
+                position: static;
+                display: inline-block;
+                margin-top: 8px;
+                margin-bottom: 12px;
+            }
+
+            .contact-btns {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .contact-btn {
+                width: 100%;
+                text-align: center;
+            }
+
+            .skills-tags {
+                gap: 8px;
+            }
+
+            .skill-tag {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .section {
+                margin-top: 80px;
+            }
+
+            .resume-title-link {
+                font-size: 2rem;
+                margin-top: 80px;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+
+            .section-subtitle {
+                font-size: 1rem;
+            }
+
+            .card-intro {
+                font-size: 0.95rem;
+            }
+
+            .exp-title, .edu-title {
+                font-size: 1.1rem;
+            }
+
+            .exp-company, .edu-company {
+                font-size: 0.95rem;
+            }
+
+            .exp-card li, .edu-card li {
+                font-size: 0.95rem;
+            }
+        }
+        .edu-card li {
+            margin-bottom: 18px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="section" style="margin-top: 48px;">
+        <div style="display: flex; justify-content: center;">
+            <a href="/" class="resume-title-link">RESUME</a>
+        </div>
+        <!-- <br> -->
+        <!-- <div class="section-subtitle">UC Berkeley student with a keen interest in addressing complex<br>problems and deriving significant insights through data analysis.</div> -->
+        <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="resume-btn">Resume <i class="fas fa-download"></i></a>
+        <br>
+        <div class="card card-intro">
+            <div style="font-size:1.18rem;font-weight:600;margin-bottom:12px;">Introduction</div>
+            <div style="color:#bdbdbd;line-height:1.7;">
+                Hi!! I'm Nathan, a junior at UC Berkeley majoring in Data Science & Computer Science. Growing up in the Bay Area, I was inspired by the transformative power of technology in everyday life all around Silicon Valley. Now, as a Data Science major at UC Berkeley, I'm passionate about applying machine learning, data analytics, and automation to solve complex, real-world problems.<br><br>
+                My passions main focus is on natural language processing and data analytics which has evolved my interest through the last many years of technological innovation. My past projects have been focused on building and finding my personal interest in the field of technology. I am looking forward to refining my technical skills and getting hands-on experience in technology.
+            </div>
+        </div>
+        <br>
+        <div class="section-title" style="margin-top:64px;">Key Achievements</div>
+        <br>
+        <div class="achievements-grid">
+            <div class="achievement-mini">
+                <div class="achievement-mini-title">Intern at Happy Lemon USA</div>
+                <div class="achievement-mini-desc">Improve cost efficiency by $80,000 annually, reduced inventory spending by 20%, and reduced labor costs by 30%.</div>
+            </div>
+            <div class="achievement-mini">
+                <div class="achievement-mini-title">Intern at CarbonSustain</div>
+                <div class="achievement-mini-desc">Working with a US-based startup in UC Berkeley to develop AI applications and frontend components for their sustainability platform.</div>
+            </div>
+            <div class="achievement-mini">
+                <div class="achievement-mini-title">Intern at L.A. Lucky</div>
+                <div class="achievement-mini-desc">Developed an automated operational data pipeline dashboard for real-time sales data reducing spending by 15% and forecasting future trends for business growth.</div>
+            </div>
+        </div>
+    </div>
+    <div class="section exp-section">
+        <div class="section-title">Experience</div>
+        <br>
+        <div class="exp-card">
+            <div class="exp-title">Data Engineer Intern</div>
+            <div class="exp-company">Carbon Sustain</div>
+            <span class="exp-badge">May 2025 - Present</span>
+            <ul>
+                <li>description</li>
+                <li>description</li>
+                <li>description</li>
+                <li>description</li>
+            </ul>
+        </div>
+        <div class="exp-card">
+            <div class="exp-title">Data Science Intern</div>
+            <div class="exp-company">L.A. Lucky Import & Export Inc.</div>
+            <span class="exp-badge">Jan. 2025 - May 2025</span>
+            <ul>
+                <li>description</li>
+                <li>description</li>
+                <li>description</li>
+                <li>description</li>
+            </ul>
+        </div>
+        <div class="exp-card">
+            <div class="exp-title">Operations Data Analyst Intern</div>
+            <div class="exp-company">Happy Lemon USA</div>
+            <span class="exp-badge">June 2024 - Sept. 2024</span>
+            <ul>
+                <li>Implemented a centralized SQL database for 100+ SKUs, integrating sales, inventory, and POS data. Achieved
+                    real-time operational tracking, reduced report generation by 50%.</li>
+                <li>Engineered a robust data pipeline using Python (Pandas, mysql.connector) to automate the daily aggregation and
+                    integration of 200+ records from POS and stock systems.</li>
+                <li>Developed monthly critical reports and visualizations using Python (Seaborn) to provide actionable operational
+                    insights which enhanced owner's understanding of sales trends.</li>
+                <li>Conducted in-depth SQL and Python analysis, identifying key trends that contributed to an estimated 15%
+                    reduction in inventory spending, equating to roughly $80,000 in annualized savings.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">Education</div>
+        <br>
+        <div class="edu-card">
+            <div class="edu-title">Bachelor's in Data Science & Computer Science</div>
+            <div class="edu-company">University of California, Berkeley</div>
+            <span class="edu-badge">2023 - 2026 (Expected)</span>
+            <div style="margin-top: 10px; color: #bdbdbd;">Currently in my third year with a focus on Machine Learning, Software Engineering, and Data Science.</div>
+            <div style="margin-top: 16px;">
+                <b>Relevant Coursework:</b>
+                <div class="coursework-grid">
+                    <ul>
+                        <li>CS 61A: Computer Programs</li>
+                        <li>CS 61B: Data Structures and Algorithms</li>
+                        <li>CS 61C: Machine Structures</li>
+                        <li>CS 70: Discrete Probability Theory</li>
+                    </ul>
+                    <ul>
+                        <li>CS 170: Efficient Algorithms and Intractable Problems</li>
+                        <li>CS 198: Introduction to Full-Stack Development</li>
+                        <li>EECS 127: Optimization Models in Engineering</li>
+                        <li>DATA 100: Principles of Data Science</li>
+                    </ul>
+                    <ul>
+                        <li>DATA 101: Data Engineering</li>
+                        <li>DATA 140: Probability for Data Science</li>
+                        <li>IEOR 162: Linear Programming and Network Flows</li>
+                        <li>MATH 54: Linear Algebra and Differential Equations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">Skills</div>
+        <br>
+        <div class="card" style="padding: 32px 32px;">
+            <div class="skills-section">
+                <div class="skills-col">
+                    <div class="skills-subtitle">Technical Skills</div>
+                    <div class="skills-group">
+                        <div class="skills-label">Programming Languages</div>
+                        <div class="skills-tags">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">Java</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">C/C++</span>
+                            <span class="skill-tag">SQL</span>
+                            <span class="skill-tag">TypeScript</span>
+                        </div>
+                    </div>
+                    <div class="skills-group">
+                        <div class="skills-label">Data Science & ML</div>
+                        <div class="skills-tags">
+                            <span class="skill-tag">PyTorch</span>
+                            <span class="skill-tag">Scikit-learn</span>
+                            <span class="skill-tag">Pandas</span>
+                            <span class="skill-tag">NumPy</span>
+                            <span class="skill-tag">Matplotlib</span>
+                        </div>
+                    </div>
+                    <div class="skills-group">
+                        <div class="skills-label">Web Development</div>
+                        <div class="skills-tags">
+                            <span class="skill-tag">React.js</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">Express.js</span>
+                            <span class="skill-tag">MongoDB</span>
+                            <span class="skill-tag">PostgreSQL</span>
+                            <span class="skill-tag">Tailwind</span>
+                            <span class="skill-tag">RESTful APIs</span>
+                            <span class="skill-tag">HTML/CSS</span>
+                        </div>
+                    </div>
+                    <div class="skills-group">
+                        <div class="skills-label">Developer Tools</div>
+                        <div class="skills-tags">
+                            <span class="skill-tag">Git</span>
+                            <span class="skill-tag">AWS</span>
+                            <span class="skill-tag">GCP</span>
+                            <span class="skill-tag">Cloudflare</span>
+                            <span class="skill-tag">Docker</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skills-col">
+                    <div class="skills-subtitle">Soft Skills</div>
+                    <div class="soft-skills-list">
+                        <div class="soft-skill-group">
+                            <div class="soft-skill-title">Leadership</div>
+                            <div class="soft-skill-desc">Experienced in team management, project deligation, and mentoring new employees.</div>
+                        </div>
+                        <div class="soft-skill-group">
+                            <div class="soft-skill-title">Problem Solving</div>
+                            <div class="soft-skill-desc">Strong analytical thinking and creative approach to solving complex technical challenges.</div>
+                        </div>
+                        <div class="soft-skill-group">
+                            <div class="soft-skill-title">Communication</div>
+                            <div class="soft-skill-desc">Skilled in presenting technical concepts to non-technical stakeholders and collaborative discussions.</div>
+                        </div>
+                        <div class="soft-skill-group">
+                            <div class="soft-skill-title">Adaptability</div>
+                            <div class="soft-skill-desc">Quick learner with the ability to adapt to new technologies and changing requirements.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">Interests</div>
+        <br>
+        <div class="interests-grid">
+            <div class="interest-card">
+                <div class="interest-title">Photography</div>
+                <div class="interest-desc">Capturing the moments, the people, and the places that I love.</div>
+            </div>
+            <div class="interest-card">
+                <div class="interest-title">Travel</div>
+                <div class="interest-desc">Exploring new places and experiencing diverse cultures.</div>
+            </div>
+            <div class="interest-card">
+                <div class="interest-title">Car Enthusiast</div>
+                <div class="interest-desc">I am really into JDM and would love to talk about it.</div>
+            </div>
+            <div class="interest-card">
+                <div class="interest-title">Gymmer</div>
+                <div class="interest-desc">This is my safe space for when I need to clear my head.</div>
+            </div>
+        </div>
+    </div>
+    <div class="section contact-section">
+        <div class="contact-title">Let's Connect</div>
+        <br>
+        <div class="contact-desc">Interested in collaborating? I'm always open to discussing new projects and opportunities.</div>
+        <div class="contact-btns">
+            <a href="mailto:nathan.dtliu@gmail.com" target="_blank" class="btn" id="resume-btn">Email Me</a>
+            <a href="https://cal.com/n8liu" target="_blank" class="btn" id="meeting-btn">Book a Meeting <i class="fas fa-arrow-up-right-from-square"></i></a>
+        </div>
+    </div>
+    <script>
+        // Page transition handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fade in the page
+            document.body.classList.add('loaded');
+
+            // Handle link clicks for page transitions
+            document.querySelectorAll('a').forEach(link => {
+                if (link.hostname === window.location.hostname && !link.hasAttribute('target')) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+                        
+                        // Fade out current page
+                        document.body.classList.remove('loaded');
+                        
+                        // Navigate to new page after fade out
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    });
+                }
+            });
+
+            // Handle back/forward navigation
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page is loaded from cache (back/forward navigation)
+                    document.body.classList.add('loaded');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

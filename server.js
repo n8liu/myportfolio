@@ -1,15 +1,20 @@
-const express = require('express');
-const path = require('path');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require('socket.io');
-const io = new Server(server);
-const PORT = process.env.PORT || 3000;
-require('dotenv').config();
+import express from 'express';
+import path from 'path';
+import http from 'http';
+import { Server as SocketIO } from 'socket.io';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { getCategories, getImagesFromCategory, getAllImages } from './utils/cloudflare.js';
 
-// Import Cloudflare R2 utility functions
-const { getCategories, getImagesFromCategory, getAllImages } = require('./utils/cloudflare');
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const server = http.createServer(app);
+const io = new SocketIO(server);
+const PORT = process.env.PORT || 3000;
 
 // Serve static files from the root directory
 app.use(express.static(__dirname));
@@ -39,7 +44,21 @@ io.on('connection', (socket) => {
 
 // Route for the home page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'pages', 'index.html'));
+});
+
+// Route for other HTML pages - handles clean URLs
+app.get('/:page', (req, res) => {
+    const page = req.params.page;
+    // Remove .html extension if present
+    const pageName = page.replace('.html', '');
+    // Try to serve the file from pages directory
+    res.sendFile(path.join(__dirname, 'pages', `${pageName}.html`), (err) => {
+        if (err) {
+            // If file not found, send 404
+            res.status(404).send('404: Page not found');
+        }
+    });
 });
 
 // API endpoint to get all image categories
@@ -76,9 +95,6 @@ app.get('/api/images/:category?', async (req, res) => {
 app.get('/api/viewers', (req, res) => {
     res.json({ count: connectedUsers });
 });
-
-// Route for any other pages - will serve directly from static files
-// This handles photography.html and other pages you might add
 
 // 404 route for any requests to non-existent files
 app.use((req, res) => {

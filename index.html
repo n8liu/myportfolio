@@ -6,10 +6,21 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Nathan Liu - Porfolio</title>
+    <title>Nathan Liu - Portfolio</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Page transition styles */
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
     <div class="scroll-indicator-nav">
@@ -24,12 +35,14 @@
         <div class="profile-content">
             <div class="text-content">
                 <h1>NATHAN LIU</h1>
-                <h2>DATA ANALYST</h2>
-                <p>I am a data science student at UC Berkeley, focused on solving real-world challenges through data analytics and machine learning.</p>
+                <h2><span class="animated-text"></span></h2>
+                <p>UC Berkeley student passionate about complex problem-solving and data-driven insights.</p>
+                    
                 
                 <div class="buttons">
                     <!-- <a href="photos.html" class="btn">Photography</a> -->
-                    <a href="assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn" id="resume-btn">Resume</a>
+                    <!-- <a href="/resume.html" class="btn" id="resume-btn">Resume</a> -->
+                    <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn" id="resume-btn">Resume</a>
                     <a href="https://cal.com/n8liu" target="_blank" class="btn" id="meeting-btn">Book a Meeting <i class="fas fa-arrow-up-right-from-square"></i></a>
                 </div>
                 
@@ -62,7 +75,7 @@
                         <span class="skill-tag">C/C++</span>
                         <span class="skill-tag">HTML/CSS</span>
                         <span class="skill-tag">JavaScript</span>
-                        <span class="skill-tag">Full Stack Development</span>
+                        <span class="skill-tag">Full-Stack Development</span>
                         <span class="skill-tag">Data Analyst</span>
                     </div>
                 </div>
@@ -198,6 +211,29 @@
         <div class="projects-grid">
             <div class="project-card">
                 <div class="project-image">
+                    <img src="assets/project5.png" alt="Project 5">
+                </div>
+                <div class="project-content">
+                    <h3>Flow (In Progress)</h3>
+                    <p>A unified full-stack email and calendar app built with React Native, MongoDB, and AWS.</p>
+                    <div class="project-tags">
+                        <span class="project-tag">JavaScript</span>
+                        <span class="project-tag">Node.js</span>
+                        <span class="project-tag">Express.js</span>
+                        <span class="project-tag">AWS</span>
+                        <span class="project-tag">GCP API</span>
+                        <span class="project-tag">HTML/CSS</span>
+                        <span class="project-tag">MongoDB</span>
+                        <span class="project-tag">Gemini API</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="" target="_blank" class="project-link-btn github-link"><i class="fab fa-github"></i> View on GitHub</a>
+                        <a href="" target="_blank" class="project-link-btn"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-image">
                     <img src="assets/project4.png" alt="Project 4">
                 </div>
                 <div class="project-content">
@@ -301,7 +337,7 @@
                         <span class="hobby-tag">Portrait</span>
                     </div> -->
                     <div class="hobby-link">
-                        <a href="photos.html" class="photo-btn">View Gallery <i class="fas fa-arrow-right"></i></a>
+                        <a href="/photos.html" class="photo-btn">View Gallery <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -332,7 +368,7 @@
     </footer>
 
     <!-- Invisible button in top right for database.html -->
-    <a href="database.html" class="invisible-db-btn" tabindex="-1" aria-label="Go to database stats"></a>
+    <a href="/database.html" class="invisible-db-btn" tabindex="-1" aria-label="Go to database stats"></a>
 
     <script src="script.js"></script>
     <script src="viewers.js"></script>
@@ -419,6 +455,74 @@
         navigator.sendBeacon('https://myportfolio.nathanliu528.workers.dev/api/viewers/disconnect');
       });
     });
+    </script>
+    <script>
+        // Text animation script
+        const roles = ['Machine Learning Engineer', 'Data Scientist', 'Software Engineer'];
+        const animatedText = document.querySelector('.animated-text');
+        let currentRoleIndex = 0;
+        let currentCharIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100; // Speed for typing
+        let deletingSpeed = 50; // Speed for deleting
+        let pauseTime = 2000; // Time to pause at full text
+
+        function typeText() {
+            const currentRole = roles[currentRoleIndex];
+            
+            if (isDeleting) {
+                // Deleting text
+                animatedText.textContent = currentRole.substring(0, currentCharIndex - 1);
+                currentCharIndex--;
+                typingSpeed = deletingSpeed;
+            } else {
+                // Typing text
+                animatedText.textContent = currentRole.substring(0, currentCharIndex + 1);
+                currentCharIndex++;
+                typingSpeed = 100;
+            }
+
+            if (!isDeleting && currentCharIndex === currentRole.length) {
+                // Finished typing, pause before deleting
+                isDeleting = true;
+                typingSpeed = pauseTime;
+            } else if (isDeleting && currentCharIndex === 0) {
+                // Finished deleting, move to next role
+                isDeleting = false;
+                currentRoleIndex = (currentRoleIndex + 1) % roles.length;
+                typingSpeed = 500; // Pause before typing next role
+            }
+
+            setTimeout(typeText, typingSpeed);
+        }
+
+        // Start the animation when the page loads
+        window.addEventListener('load', typeText);
+    </script>
+    <script>
+        // Page transition handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fade in the page
+            document.body.classList.add('loaded');
+
+            // Handle link clicks for page transitions
+            document.querySelectorAll('a').forEach(link => {
+                if (link.hostname === window.location.hostname) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+                        
+                        // Fade out current page
+                        document.body.classList.remove('loaded');
+                        
+                        // Navigate to new page after fade out
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>

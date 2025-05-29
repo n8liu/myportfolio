@@ -1,0 +1,68 @@
+body {
+    /* diameter of the circle */
+   --d: 2px; 
+   
+   background : radial-gradient(
+     circle at 
+        var(--d) 
+        var(--d), 
+        
+     #513989 calc(var(--d) - 2px), 
+     #121212 var(--d)
+   ) 
+   15px 15px / 50px 50px fixed;
+   background-color: #121212;
+   color: #ffffff;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.container {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 40px 16px 60px 16px;
+}
+.blog-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffe7a0;
+    margin-bottom: 8px;
+}
+.blog-date {
+    font-size: 1.05rem;
+    color: #aaa;
+    margin-bottom: 24px;
+}
+.blog-content {
+    font-size: 1.15rem;
+    color: #e0e0e0;
+    line-height: 1.7;
+    margin-bottom: 40px;
+}
+.back-link {
+    display: inline-block;
+    color: #ffffff;
+    background: transparent;
+    border: 1.5px solid #fff;
+    border-radius: 4px;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.back-link:hover {
+    background-color: #fff;
+    color: #1e1e1e;
+    text-decoration: none;
+}
+@media (max-width: 600px) {
+    .container {
+        padding: 24px 4px 40px 4px;
+    }
+    .blog-title {
+        font-size: 1.4rem;
+    }
+} 

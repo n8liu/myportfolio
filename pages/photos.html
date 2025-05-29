@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nathan Liu - Photography</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Page transition styles */
+        body {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        body.loaded {
+            opacity: 1;
+        }
+
         body {
             padding: 0;
             margin: 0;
@@ -227,7 +237,7 @@
 </head>
 <body>
     <header class="site-header">
-        <h1 class="site-title"><a href="index.html" style="color: white; text-decoration: none;">NATHAN LIU</a></h1>
+        <h1 class="site-title"><a href="/" style="color: white; text-decoration: none;">NATHAN LIU</a></h1>
         
         <nav class="nav-menu" id="category-nav">
             <a href="#" class="active" data-category="all">ALL</a>
@@ -280,6 +290,9 @@
         
         // Wait for DOM to be loaded before fetching data
         document.addEventListener('DOMContentLoaded', async function() {
+            // Fade in the page
+            document.body.classList.add('loaded');
+
             // Add click handlers to all category links (including fallback ones)
             document.querySelectorAll('#category-nav a').forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -323,6 +336,24 @@
             // Decrement on disconnect
             window.addEventListener('beforeunload', function() {
                 navigator.sendBeacon('https://myportfolio.nathanliu528.workers.dev/api/viewers/disconnect');
+            });
+
+            // Handle link clicks for page transitions
+            document.querySelectorAll('a').forEach(link => {
+                if (link.hostname === window.location.hostname) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const href = this.getAttribute('href');
+                        
+                        // Fade out current page
+                        document.body.classList.remove('loaded');
+                        
+                        // Navigate to new page after fade out
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 300);
+                    });
+                }
             });
         });
         
