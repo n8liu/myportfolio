@@ -124,13 +124,22 @@ This portfolio website is a comprehensive showcase of my professional journey, f
    R2_ENDPOINT=https://{account_id}.r2.cloudflarestorage.com
    ```
 
-4. **Start development server**
+4. **Development Options**
+   
+   For development with auto-reload:
    ```bash
    npm run dev
    ```
+   
+   For production build testing:
+   ```bash
+   npm run build
+   npm run serve
+   ```
 
 5. **Access the site**
-   Open `http://localhost:3000` in your browser
+   - Development server: `http://localhost:3000`
+   - Production build: `http://localhost:8080`
 
 ## Deployment
 
@@ -148,11 +157,28 @@ This portfolio website is a comprehensive showcase of my professional journey, f
 
 3. **Build and Deploy**
    ```bash
+   # Build the project
    npm run build
+   
+   # Deploy to Cloudflare Pages
    npm run deploy
    ```
 
-4. **Configure Environment Variables**
+4. **Build Process**
+   The build script (`npm run build`) performs the following:
+   - Cleans the `dist` directory
+   - Creates a fresh `dist` directory
+   - Copies all necessary files:
+     - HTML, CSS, and JavaScript files
+     - Pages directory
+     - Blog directory
+     - Photos directory
+     - Assets directory
+     - Utils directory
+     - Functions directory
+     - Configuration files
+
+5. **Configure Environment Variables**
    In Cloudflare Pages Dashboard:
    - Add all required R2 environment variables
    - Configure build settings if needed
