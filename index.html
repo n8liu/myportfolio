@@ -506,13 +506,16 @@
         }
 
         // Start the animation when the page loads
-        window.addEventListener('load', typeText);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start the text animation immediately
+            typeText();
+            
+            // Fade in the page
+            document.body.classList.add('loaded');
+        });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Fade in the page
-            document.body.classList.add('loaded');
-
             // Handle site-title clicks for page transitions
             document.querySelector('.site-title a').addEventListener('click', function(e) {
                 e.preventDefault();
