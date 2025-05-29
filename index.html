@@ -337,7 +337,7 @@
                         <span class="hobby-tag">Portrait</span>
                     </div> -->
                     <div class="hobby-link">
-                        <a href="/pages/photos.html" class="photo-btn">View Gallery <i class="fas fa-arrow-right"></i></a>
+                        <a href="/pages/photos.html" class="photo-btn" id="gallery-link">View Gallery <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -404,6 +404,15 @@
             } else {
                 backToTopBtn.classList.remove('visible');
             }
+        });
+
+        // Add fade transition for gallery link
+        document.getElementById('gallery-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.body.classList.remove('loaded');
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 300);
         });
 
         document.getElementById('back-to-top-btn').addEventListener('click', function() {
