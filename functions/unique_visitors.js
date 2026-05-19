@@ -21,8 +21,18 @@ export class UniqueVisitors {
       }
       let now = Date.now();
       await this.state.storage.put(ip, now);
+      
+      // Prune records older than 7 days to prevent storage leaks and DO memory limit issues
+      const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
       let all = await this.state.storage.list();
-      let count = all.size;
+      let count = 0;
+      for (let [key, lastSeen] of all.entries()) {
+        if (lastSeen < sevenDaysAgo) {
+          await this.state.storage.delete(key);
+        } else {
+          count++;
+        }
+      }
       return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
     } else if (url.pathname.endsWith('/visitors24h')) {
       let now = Date.now();

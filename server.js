@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
 
 // Route for the home page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Route for other HTML pages - handles clean URLs

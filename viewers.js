@@ -8,7 +8,9 @@ class ViewerCounter {
   constructor() {
     this.count = 0;
     this.counterElements = [];
-    this.isProduction = !window.location.hostname.includes('localhost');
+    this.isProduction = !window.location.hostname.includes('localhost') && 
+                        !window.location.hostname.includes('127.0.0.1') &&
+                        !window.location.hostname.includes('0.0.0.0');
     this.init();
   }
 
@@ -53,6 +55,23 @@ class ViewerCounter {
           console.error('Error disconnecting viewer:', error);
         }
       });
+
+      // Only increment total page views and unique visitors if this is NOT a reload or back/forward
+      let isNewVisit = true;
+      if (performance.getEntriesByType) {
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (nav && (nav.type === "reload" || nav.type === "back_forward")) {
+          isNewVisit = false;
+        }
+      } else if (performance.navigation) {
+        if (performance.navigation.type === 1 || performance.navigation.type === 2) {
+          isNewVisit = false;
+        }
+      }
+      if (isNewVisit) {
+        fetch('https://myportfolio.nathanliu528.workers.dev/api/total/increment', { method: 'POST' }).catch(() => {});
+        fetch('https://myportfolio.nathanliu528.workers.dev/api/unique/increment', { method: 'POST' }).catch(() => {});
+      }
     } catch (error) {
       console.error('Error connecting to viewer counter:', error);
     }

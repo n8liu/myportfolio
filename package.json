@@ -9,7 +9,12 @@
     "dev": "nodemon server.js",
     "build": "rm -rf dist && mkdir -p dist && cp -r *.html *.css *.js _headers dist/ && cp -r pages dist/ && cp -r blog dist/ && cp -r assets dist/ && cp -r utils dist/ && cp -r functions dist/",
     "serve": "cd dist && npx http-server -p 8080",
-    "deploy": "npm run build && source .env && npx wrangler pages deploy ./dist"
+    "deploy": "npm run build && source .env && npx wrangler pages deploy ./dist",
+    "downsize:90": "node utils/downsize-images.js photos --in-place --scale=90 --quality=82",
+    "downsize:dry": "node utils/downsize-images.js photos --in-place --scale=90 --quality=82 --dry-run",
+    "downsize:60:small": "node utils/downsize-images.js photos assets/photos_resized_60 --scale=60 --quality=75",
+    "analyze:images": "node utils/image-optimizer.js assets",
+    "analyze:photos": "node utils/image-optimizer.js photos"
   },
   "keywords": [],
   "author": "",

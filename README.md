@@ -1,11 +1,12 @@
-# My Portfolio 3.0
+# My Portfolio
 
-A modern, responsive personal portfolio website showcasing professional skills, projects, and photography with a clean dark-themed design. Built with Node.js, Express, and Cloudflare's edge computing platform.
+A personalized, minimalist retro OS-inspired personal portfolio website showcasing professional skills, projects, photography, and blog posts with a clean dual-theme design. Built with Node.js, Express, and Cloudflare's edge computing platform.
 
 ![Portfolio Preview](assets/preview.png)
 
 ## Table of Contents
 - [Overview](#overview)
+- [Design Aesthetics](#design-aesthetics)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -19,87 +20,81 @@ A modern, responsive personal portfolio website showcasing professional skills, 
 - [License](#license)
 - [Contact](#contact)
 
+---
+
 ## Overview
 
-This portfolio website is a comprehensive showcase of my professional journey, featuring:
-- Modern, responsive design with a dark theme
-- Real-time viewer count using Socket.IO
-- Dynamic photography gallery with EXIF data
-- Project showcase with interactive elements
-- Cloud integration with Cloudflare for hosting and storage
-- Analytics dashboard for tracking visitor statistics
-- UC Berkeley education and course highlights
+This portfolio website is a comprehensive, game-like retro workspace reflecting my journey as a UC Berkeley student, featuring:
+- **Retro OS Interface**: Minimalist top tabs layout mimicking classic desktop window chrome.
+- **Dynamic Blog Modal**: Dynamic inline blog post reader displaying articles inside a text-editor popup.
+- **Embedded Statistics**: A dedicated "Stats" panel displaying visitor telemetry using Chart.js.
+- **Photography Gallery**: Standalone windowed photo page with EXIF camera details.
+- **Dual-Theme Engine**: Seamless light and dark mode toggles with persistent `localStorage` states.
+
+---
+
+## Design Aesthetics
+
+Inspired by Carolyn Wang's portfolio layout and PostHog's retro-brutalist theme, the website features:
+*   A windowed workspace layout with classic operating system elements (title bar icons, path text, and bottom taskbars).
+*   High-contrast borders (`2px solid`), warm-hued background grids, and solid shadows.
+*   Modern web typography pairing (`Space Grotesk` and `Space Mono`).
+*   Smooth micro-interactions (flat buttons translating `1px` on hover and click).
+
+---
 
 ## Features
 
 ### Interface
-- Responsive design optimized for all screen sizes
-- Dark theme with consistent color scheme (#121212 background with light text)
-- Smooth scroll animations and transitions
-- Fixed footer with social links
-- Back-to-top button
-- Live viewer count display
-- Interactive tech stack showcase
-- Hover effects and micro-interactions
+- **Tab Switching**: Single-page application panel swap (`home`, `experience`, `projects`, `education`, `photography`, `blog`, `stats`) syncing URL hashes.
+- **Theme Toggle**: Real-time styling shifts matching preference indicators (light warm beige grids vs. dark charcoal canvases) caching settings locally.
+- **Live Viewer Count**: Real-time traffic indicators updated using Socket.IO.
+- **Responsive Layout**: Rescaling window dimensions and responsive layout queries for mobile interfaces.
 
 ### Content Sections
-- **Main Section**: Introduction and profile
-- **About Section**: Skills and education information
-- **Tech Stack Section**: Interactive showcase with logos
-- **Projects Section**: Featured development work
-- **Education Section**: UC Berkeley courses and achievements
-- **Photography Section**: Gallery with category navigation and EXIF data
-- **Analytics Dashboard**: Visitor statistics and trends
+- **Main Section**: Introduction and profile details.
+- **About Section**: Core competencies and skills.
+- **Tech Stack Section**: Logo grid for active languages and frameworks.
+- **Projects Section**: Interactive github/deployment retro cards.
+- **Education Section**: Highlighted UC Berkeley courses.
+- **Photography Section**: Curated category filters (landscape, urban, featured) loading metadata dynamically.
+- **Blog Section**: Modular cards pulling content instantly into a pop-up reader.
+- **Stats Section**: Integrated 7-day visitor history charts.
 
-### Photography Features
-- Dynamic gallery with category navigation
-- Image modal for fullscreen viewing
-- EXIF data extraction for camera settings
-- Automatic category detection
-- Responsive image gallery with filtering
-- Real-time updates using Socket.IO
-- Lazy loading for optimal performance
+---
 
 ## Tech Stack
 
 ### Core Technologies
-- **Frontend**: HTML5, CSS3, JavaScript
+- **Frontend**: HTML5, Vanilla CSS3, JavaScript (ES6)
+- **Charting**: Chart.js (v4)
 - **Backend**: Node.js, Express.js
 - **Real-time**: Socket.IO
-- **Cloud**: Cloudflare Pages, R2 Storage
-- **Image Processing**: ExifReader
-- **Storage**: AWS SDK (for R2 compatibility)
-- **Analytics**: Custom tracking system
+- **Cloud Infrastructure**: Cloudflare Pages, R2 Storage
+- **Image Processing**: ExifReader, ImageMagick
+- **Storage**: AWS SDK (R2 compatibility)
+- **Analytics API**: Cloudflare Durable Objects analytics pipeline
 
-### Development Tools
-- **Package Manager**: npm
-- **Development Server**: nodemon
-- **Build Tool**: Wrangler CLI
-- **Version Control**: Git
-- **Code Editor**: VS Code
-- **Browser Tools**: Chrome DevTools
+---
 
 ## Project Structure
 
 ### Key Files
-- `index.html` - Main portfolio page
-- `photos.html` - Photography gallery
-- `database.html` - Analytics dashboard
-- `styles.css` - Main stylesheet
-- `script.js` - Main JavaScript
-- `viewers.js` - Viewer count functionality
-- `server.js` - Express server
-- `wrangler.toml` - Cloudflare configuration
-- `_headers` - Security headers configuration
+- `index.html` - Main operating system workspace portal
+- `styles.css` - Theme layout definitions, variables, and animations
+- `script.js` - Tab routing, modal loading, stats charts, and theme listeners
+- `viewers.js` - Real-time visitor counts integration
+- `server.js` - Local testing server
+- `wrangler.toml` - Cloudflare Workers deployment config
 
 ### Directories
-- `assets/` - Static assets and images
-- `functions/` - Cloudflare Functions
-- `utils/` - Utility functions
-- `photos/` - Photography gallery images
-- `resize/` - Image processing scripts
-- `dist/` - Build directory
-- `.github/` - GitHub Actions workflows
+- `pages/` - Sub-pages (e.g. `photos.html`)
+- `blog/` - Markdown-derived HTML posts (`blog1.html`, `blog2.html`, etc.) and `blog-style.css`
+- `assets/` - Resized images, icons, and visual graphics
+- `functions/` - Cloudflare Pages serverless endpoints
+- `utils/` - S3 upload scripts and local ImageMagick processors
+
+---
 
 ## Local Development
 
@@ -115,165 +110,41 @@ This portfolio website is a comprehensive showcase of my professional journey, f
    ```
 
 3. **Configure environment**
-   Create a `.env` file with:
-   ```
-   R2_ACCOUNT_ID=your-cloudflare-account-id
-   R2_ACCESS_KEY_ID=your-r2-access-key
-   R2_SECRET_ACCESS_KEY=your-r2-secret-key
-   R2_BUCKET_NAME=myportfolio
-   R2_ENDPOINT=https://{account_id}.r2.cloudflarestorage.com
-   ```
+   Create a `.env` file in the root with your Cloudflare R2 credentials.
 
-4. **Development Options**
-   
-   For development with auto-reload:
+4. **Run the local dev server**
    ```bash
    npm run dev
    ```
-   
-   For production build testing:
+   Open `http://localhost:3000` in your browser.
+
+5. **Build and test production dist**
    ```bash
    npm run build
    npm run serve
    ```
+   Open `http://localhost:8080` in your browser.
 
-5. **Access the site**
-   - Development server: `http://localhost:3000`
-   - Production build: `http://localhost:8080`
+---
 
 ## Deployment
 
-### Cloudflare Pages Setup
+```bash
+# Build & deploy build directory to Cloudflare Pages
+npm run deploy
+```
 
-1. **Install Wrangler CLI**
-   ```bash
-   npm install -g wrangler
-   ```
-
-2. **Login to Cloudflare**
-   ```bash
-   npx wrangler login
-   ```
-
-3. **Build and Deploy**
-   ```bash
-   # Build the project
-   npm run build
-   
-   # Deploy to Cloudflare Pages
-   npm run deploy
-   ```
-
-4. **Build Process**
-   The build script (`npm run build`) performs the following:
-   - Cleans the `dist` directory
-   - Creates a fresh `dist` directory
-   - Copies all necessary files:
-     - HTML, CSS, and JavaScript files
-     - Pages directory
-     - Blog directory
-     - Photos directory
-     - Assets directory
-     - Utils directory
-     - Functions directory
-     - Configuration files
-
-5. **Configure Environment Variables**
-   In Cloudflare Pages Dashboard:
-   - Add all required R2 environment variables
-   - Configure build settings if needed
-   - Set up custom domains if desired
-
-## Image Management
-
-### Cloudflare R2 Setup
-1. Create an R2 bucket
-2. Organize photos in category folders
-3. Upload images with proper naming conventions
-4. Configure CORS settings for image access
-
-### Image Processing
-- Automatic resizing for optimization
-- EXIF data extraction
-- Category-based organization
-- Lazy loading implementation
-- WebP format conversion
-
-## Live Viewer Count
-
-The portfolio features a real-time viewer count powered by Socket.IO:
-- Updates automatically as users visit/leave
-- Displayed on all pages
-- Implemented using WebSocket connections
-- Updates every 10 seconds
-- Fallback mechanism for connection issues
+---
 
 ## Analytics & Statistics
 
-The analytics dashboard (`database.html`) provides:
-- Total page views
-- Unique visitors
-- Resume button clicks
-- 24-hour statistics
-- 7-day history graphs
-- Real-time updates
-- Visitor location data
-- Referral sources
+Telemetry is loaded from serverless backend APIs:
+*   `Total Views` / `Unique Visitors` / `Views (24h)`
+*   Dynamic 7-day traffic chart (automatically styled dynamically on theme changes)
+*   Resume download logs
 
-### API Endpoints
-- `/api/viewers` - Current viewer count
-- `/api/total` - Total page views
-- `/api/unique` - Unique visitor stats
-- `/api/resume` - Resume button clicks
-- `/api/location` - Visitor location data
-- `/api/referrals` - Referral source statistics
-
-## Technical Details
-
-### Performance Optimizations
-- Responsive image loading
-- Lazy loading for gallery images
-- Minified assets
-- Edge caching with Cloudflare
-- Code splitting
-- Asset preloading
-- Browser caching
-
-### Security Features
-- Environment variable protection
-- Secure API endpoints
-- Rate limiting
-- CORS configuration
-- Content Security Policy
-- XSS protection
-- HTTPS enforcement
-
-### Future Improvements
-- Enhanced analytics dashboard
-- More interactive projects section
-- Blog integration
-- Contact form with validation
-- Dark/Light theme toggle
-- Internationalization support
-- Progressive Web App features
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+---
 
 ## License
 
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-- LinkedIn: [n8liu](https://www.linkedin.com/in/n8liu/)
-- GitHub: [n8liu](https://github.com/n8liu)
-- Email: nathan.dtliu@gmail.com
-- Portfolio: [nathanliu.dev](https://nathanliu.dev)
+This project is licensed under the ISC License.

@@ -1,7 +1,13 @@
-const ExifReader = require('exifreader');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+import ExifReader from 'exifreader';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Extract metadata from an image file
@@ -139,7 +145,8 @@ function saveMetadataToJson(metadata, outputPath) {
 }
 
 // Command line interface
-if (require.main === module) {
+const isMain = process.argv[1] && (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url));
+if (isMain) {
     const args = process.argv.slice(2);
     const photosDir = args[0] || path.join(__dirname, '..', 'photos');
     const outputPath = args[1] || path.join(__dirname, '..', 'photos-metadata.json');
@@ -152,7 +159,7 @@ if (require.main === module) {
     });
 }
 
-module.exports = {
+export {
     extractImageMetadata,
     extractDirectoryMetadata,
     saveMetadataToJson

@@ -6,530 +6,540 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Nathan Liu - Portfolio</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Nathan Liu - UC Berkeley Data Science & Computer Science student passionate about machine learning, full-stack development, and data-driven solutions. View my projects, coursework, and photography.">
+    <meta name="keywords" content="Nathan Liu, Data Science, Computer Science, UC Berkeley, Machine Learning, Full Stack Developer, Portfolio, Software Engineer">
+    <meta name="author" content="Nathan Liu">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Nathan Liu - Data Science & Computer Science Portfolio">
+    <meta property="og:description" content="UC Berkeley student passionate about machine learning, data analytics, and full-stack development. Explore my projects and technical expertise.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nathanliu.dev">
+    <meta property="og:image" content="https://nathanliu.dev/assets/profile.jpeg">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Nathan Liu - Portfolio">
+    <meta name="twitter:description" content="UC Berkeley Data Science & CS student | Machine Learning | Full-Stack Development">
+    <meta name="twitter:image" content="https://nathanliu.dev/assets/profile.jpeg">
+    
+    <title>Nathan Liu - Data Science & Computer Science Portfolio</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Page transition styles */
-        body {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        body.loaded {
-            opacity: 1;
-        }
-    </style>
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Nathan Liu",
+      "url": "https://nathanliu.dev",
+      "image": "https://nathanliu.dev/assets/profile.jpeg",
+      "jobTitle": "Data Science & Computer Science Student",
+      "worksFor": {
+        "@type": "EducationalOrganization",
+        "name": "UC Berkeley"
+      },
+      "alumniOf": {
+        "@type": "EducationalOrganization",
+        "name": "University of California, Berkeley"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/in/n8liu/",
+        "https://github.com/n8liu",
+        "https://www.instagram.com/n8.liu/"
+      ],
+      "knowsAbout": ["Machine Learning", "Data Science", "Full Stack Development", "Python", "JavaScript", "Computer Science"],
+      "email": "nathan.dtliu@gmail.com"
+    }
+    </script>
 </head>
 <body>
-    <div class="scroll-indicator-nav">
-        <div class="scroll-dot" data-section="main"></div>
-        <div class="scroll-dot" data-section="about"></div>
-        <div class="scroll-dot" data-section="classes"></div>
-        <div class="scroll-dot" data-section="tech"></div>
-        <div class="scroll-dot" data-section="projects"></div>
-        <div class="scroll-dot" data-section="hobbies"></div>
-    </div>
-    <div class="main-container">
-        <div class="profile-content">
-            <div class="text-content">
-                <h1>NATHAN LIU</h1>
-                <h2><span class="animated-text"></span></h2>
-                <p>UC Berkeley student passionate about complex problem-solving and data-driven insights.</p>
-                    
-                
-                <div class="buttons">
-                    <!-- <a href="photos.html" class="btn">Photography</a> -->
-                    <!-- <a href="/resume.html" class="btn" id="resume-btn">Resume</a> -->
-                    <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn" id="resume-btn">Resume</a>
-                    <a href="https://cal.com/n8liu" target="_blank" class="btn" id="meeting-btn">Book a Meeting <i class="fas fa-arrow-up-right-from-square"></i></a>
-                </div>
-                
-                <div class="social-icons">
-                    <a href="https://www.linkedin.com/in/n8liu/" class="social-link linkedin" target="_blank"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/n8.liu/" class="social-link instagram" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.github.com/n8liu" class="social-link github" target="_blank"><i class="fab fa-github"></i></a>
-                    <a href="mailto:nathan.dtliu@gmail.com" class="social-link email-icon" target="_blank"><i class="fas fa-envelope"></i></a>
-                </div>
+    <!-- Top Navigation Tabs (Carolyn Wang Style) -->
+    <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="#home" class="nav-tab active" data-tab="home">home</a>
+        <a href="#experience" class="nav-tab" data-tab="experience">experience</a>
+        <a href="#projects" class="nav-tab" data-tab="projects">projects</a>
+        <a href="#education" class="nav-tab" data-tab="education">education</a>
+        <a href="#photography" class="nav-tab" data-tab="photography">photography</a>
+        <a href="#blog" class="nav-tab" data-tab="blog">blog</a>
+        <a href="#stats" class="nav-tab" data-tab="stats">stats</a>
+        <button id="theme-toggle" class="nav-tab theme-toggle" aria-label="Toggle dark mode">dark mode</button>
+    </nav>
+
+    <!-- OS Desktop Window (PostHog Theme) -->
+    <main class="os-window">
+        <!-- Titlebar -->
+        <div class="window-titlebar">
+            <div class="window-title">
+                <i class="fas fa-terminal"></i> <span id="window-path-text">C:\nathan\portfolio\home.md</span>
             </div>
-            
-            <div class="profile-image">
-                <img src="assets/profile.jpeg" alt="Nathan Liu">
+            <div class="window-controls">
+                <button class="win-btn" aria-label="Minimize">_</button>
+                <button class="win-btn minmax" aria-label="Maximize">口</button>
+                <button class="win-btn close" aria-label="Close">X</button>
             </div>
         </div>
-        <div class="scroll-indicator">
-            <i class="fas fa-chevron-down bounce"></i>
+
+        <!-- Menu Bar -->
+        <div class="window-menubar">
+            <div class="menu-item" onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with love and retro vibes.')">File</div>
+            <div class="menu-item" onclick="alert('This document is read-only.')">Edit</div>
+            <div class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</div>
+            <div class="menu-item" onclick="document.querySelector('[data-tab=\'stats\']').click()">Tools</div>
+            <div class="menu-item" onclick="alert('Email nathan.dtliu@gmail.com for help.')">Help</div>
         </div>
-    </div>
-    
-    <div class="about-container">
-        <div class="about-content">
-            <div class="about-grid">
-                <div class="skills-section">
-                    <h3>Skills</h3>
-                    <div class="skills-grid">
-                        <span class="skill-tag">Python</span>
-                        <span class="skill-tag">Java</span>
-                        <span class="skill-tag">SQL</span>
-                        <span class="skill-tag">C/C++</span>
-                        <span class="skill-tag">HTML/CSS</span>
-                        <span class="skill-tag">JavaScript</span>
-                        <span class="skill-tag">Full-Stack Development</span>
-                        <span class="skill-tag">Data Analyst</span>
-                    </div>
-                </div>
-                
-                <div class="education-section">
-                    <h3>Education</h3>
-                    <div class="education-content">
-                        <div class="education-text">
-                            <h4>B.A. Data Science & Computer Science</h4>
-                            <p>University of California, Berkeley</p>
-                            <p>Expected Graduation: May 2026</p>
-                            <p>GPA: 3.84</p>
+
+        <!-- Body Content -->
+        <div class="window-body">
+            <!-- HOME PANEL -->
+            <section id="panel-home" class="panel active">
+                <div class="home-grid">
+                    <div class="bio-text">
+                        <h1>hi! i'm nathan 👋</h1>
+                        <p>i'm an undergraduate at <a href="https://www.berkeley.edu" target="_blank" rel="noopener noreferrer">uc berkeley</a> (go bears!) studying computer science & data science. my academic interests lie in machine learning, full-stack web development, and data engineering pipelines.</p>
+                        <p>currently, i'm focused on building scalable cloud-native architectures, designing data-driven systems, and looking for internship opportunities. beyond writing code, i'm an avid photographer capturing urban structures and natural landscapes.</p>
+                        <p>in my free time, i like to go on a <a href="#photography" onclick="document.querySelector('[data-tab=\'photography\']').click()">sidequest with my camera</a>, hit the gym to clear my head, or talk about JDM cars.</p>
+                        
+                        <div class="project-actions" style="margin-top: 1.5rem;">
+                            <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn-retro primary" id="resume-btn">resume.pdf <i class="fas fa-download"></i></a>
+                            <a href="https://cal.com/n8liu" target="_blank" class="btn-retro">book a meeting <i class="fas fa-arrow-up-right-from-square"></i></a>
                         </div>
-                        <div class="education-logo">
-                            <img src="assets/berkeleylogo.png" alt="UC Berkeley Logo">
+
+                        <div class="social-links">
+                            <a href="https://www.linkedin.com/in/n8liu/" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.github.com/n8liu" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="https://www.instagram.com/n8.liu/" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="mailto:nathan.dtliu@gmail.com" class="social-btn" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                        </div>
+
+                        <div class="last-updated">
+                            last updated on may 19, 2026. built with retro-minimalist energy.
+                        </div>
+                    </div>
+                    <div class="profile-pic-container">
+                        <div class="profile-pic-frame">
+                            <img src="assets/profile.jpeg" alt="Nathan Liu Profile Picture">
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <!-- EXPERIENCE PANEL -->
+            <section id="panel-experience" class="panel">
+                <div class="experience-list">
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Data Engineer Intern</h3>
+                            <span class="retro-badge">May 2025 - Aug. 2025</span>
+                        </div>
+                        <div class="card-subtitle">Carbon Sustain • Berkeley, CA</div>
+                        <ul class="card-bullets">
+                            <li>Built a real-time LLM decisioning pipeline on AWS (Kinesis, Lambda, Step Functions) to process 100k events/day which enforced schema-validated JSON outputs and wrote full traces to S3 for auditability and replay.</li>
+                            <li>Improved platform reliability by adding idempotency keys in DynamoDB and CloudWatch alarms to reduce failed executions and eliminated release-related deployment failures by 33%.</li>
+                            <li>Cut dashboard data retrieval time by 80% by rewriting high-cost joins, adding composite indexes, and implementing cursor pagination in Django/PostgreSQL APIs.</li>
+                        </ul>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Software Engineer</h3>
+                            <span class="retro-badge">Jan 2025 - Aug. 2025</span>
+                        </div>
+                        <div class="card-subtitle">UnifIBD • Remote (San Jose, CA)</div>
+                        <ul class="card-bullets">
+                            <li>Prototyped a mobile CI/CD pipeline with GitHub Actions, automating deployments to TestFlight + Google Play, which cut manual release times from hours to minutes.</li>
+                            <li>Deployed a native-feel, in-app chat interface that integrated with Google’s Dialogflow API to provide real-time AI support, reducing manual support ticket volume by 33%.</li>
+                            <li>Built a Django backend and admin CMS that enabled marketing to update in-app content without requiring an app store submission.</li>
+                        </ul>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Data Science Intern</h3>
+                            <span class="retro-badge">Jun. 2024 - Aug. 2024</span>
+                        </div>
+                        <div class="card-subtitle">L.A. Lucky Import & Export Inc. • Los Angeles, CA</div>
+                        <ul class="card-bullets">
+                            <li>Built a near-real-time SAP inventory sync for 3,647+ SKUs using incremental pulls and upserts into Postgres which reduced manual entry by 80% and enabled automated invoicing for 100% of customers.</li>
+                            <li>Rebuilt a legacy platform (Django REST, JWT, React) and improved performance 80% by reducing payload size and adding server-side caching.</li>
+                            <li>Built a Docker-based CI/CD workflow to deploy ETL/ELT jobs automatically, streamlining legacy database migration and improving pipeline reliability.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROJECTS PANEL -->
+            <section id="panel-projects" class="panel">
+                <div class="projects-grid">
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Flow</h3>
+                            <span class="retro-badge">Active</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Unified full-stack email and calendar mobile app utilizing AI sorting, multi-account syncing, and metadata indexing.</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">React Native</span>
+                            <span class="tech-pill">Node.js</span>
+                            <span class="tech-pill">MongoDB</span>
+                            <span class="tech-pill">AWS</span>
+                            <span class="tech-pill">Gemini</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                        </div>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Clickbait Classifier</h3>
+                            <span class="retro-badge">Completed</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on 18K social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set, outperforming a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">PyTorch</span>
+                            <span class="tech-pill">Pandas</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                        </div>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">ItineraryAI</h3>
+                            <span class="retro-badge">Completed</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built a chat-based travel concierge that generates structured itineraries from a single prompt and shipped a web dashboard for trip planning (budgets, maps, calendar sync).</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">LangChain</span>
+                            <span class="tech-pill">FastAPI</span>
+                            <span class="tech-pill">JavaScript</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                        </div>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">The IBD Digest</h3>
+                            <span class="retro-badge">Completed</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion app for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent onboarding and local state persistence.</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">Flutter</span>
+                            <span class="tech-pill">Dart</span>
+                            <span class="tech-pill">Provider</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                        </div>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">SimplyMail</h3>
+                            <span class="retro-badge">Completed</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high performance, clean visual interfaces, and secure Gmail API integrations.</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">JavaScript</span>
+                            <span class="tech-pill">Firebase</span>
+                            <span class="tech-pill">Gmail API</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu/SimplyMail" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i> demo</a>
+                        </div>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Spotify Analytics</h3>
+                            <span class="retro-badge">Completed</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard showing profile insights, favorite genres, and user recommendations.</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">Flask</span>
+                            <span class="tech-pill">Spotify API</span>
+                            <span class="tech-pill">Pandas</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                        </div>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Pokédex API</h3>
+                            <span class="retro-badge">Completed</span>
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fast cached Express middleware client providing interactive Pokemon lookups and type analytics.</p>
+                        <div class="tech-badges">
+                            <span class="tech-pill">TypeScript</span>
+                            <span class="tech-pill">Express</span>
+                            <span class="tech-pill">PokeAPI</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/n8liu/pokedexAPI" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://pokedexapi-57916.web.app/" class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i> demo</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EDUCATION PANEL -->
+            <section id="panel-education" class="panel">
+                <div class="education-grid">
+                    <div class="retro-card" style="margin-bottom: 0;">
+                        <div class="card-header">
+                            <h3 class="card-title">University of California, Berkeley</h3>
+                            <span class="retro-badge">Class of 2026</span>
+                        </div>
+                        <div class="card-subtitle">Bachelor of Arts in Data Science & Computer Science</div>
+                        <p style="margin-bottom: 0.5rem;"><strong>GPA:</strong> 3.84</p>
+                        <p><strong>Focus:</strong> Machine Learning, Software Engineering, & Database Architectures.</p>
+                    </div>
+
+                    <div class="course-groups">
+                        <div class="course-group">
+                            <h3>Computer Science</h3>
+                            <div class="course-pills">
+                                <span class="course-pill" title="Computer Security">CS 161</span>
+                                <span class="course-pill" title="Operating Systems and Systems Programming">CS 162</span>
+                                <span class="course-pill" title="Efficient Algorithms and Intractable Problems">CS 170</span>
+                                <span class="course-pill" title="Introduction to Database Systems">CS 186</span>
+                                <span class="course-pill" title="Introduction to Artificial Intelligence">CS 188</span>
+                                <span class="course-pill" title="Introduction to Machine Learning">CS 189</span>
+                                <span class="course-pill" title="Introduction to Full-Stack Development">CS 198</span>
+                            </div>
+                        </div>
+
+                        <div class="course-group">
+                            <h3>Data Science</h3>
+                            <div class="course-pills">
+                                <span class="course-pill" title="Foundations of Data Science">DATA 8</span>
+                                <span class="course-pill" title="Principles of Data Science">DATA 100</span>
+                                <span class="course-pill" title="Data Engineering">DATA C101</span>
+                                <span class="course-pill" title="Human Contexts and Ethics of Data">DATA C104</span>
+                                <span class="course-pill" title="Probability for Data Science">DATA 140</span>
+                            </div>
+                        </div>
+
+                        <div class="course-group">
+                            <h3>Engineering & Analytics</h3>
+                            <div class="course-pills">
+                                <span class="course-pill" title="Optimization Models in Engineering">EECS 127</span>
+                                <span class="course-pill" title="Natural Language Processing">INFO 159</span>
+                                <span class="course-pill" title="Linear Programming and Network Flows">IEOR 162</span>
+                            </div>
+                        </div>
+
+                        <div class="course-group">
+                            <h3>Physics</h3>
+                            <div class="course-pills">
+                                <span class="course-pill" title="Physics for Scientists and Engineers I">PHYSICS 7A</span>
+                                <span class="course-pill" title="Physics for Scientists and Engineers II">PHYSICS 7B</span>
+                                <span class="course-pill" title="Physics for Scientists and Engineers III">PHYSICS 7C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PHOTOGRAPHY PANEL -->
+            <section id="panel-photography" class="panel">
+                <div class="photo-panel-layout">
+                    <div class="photo-cats" id="photo-category-filters">
+                        <button class="photo-cat active" data-category="all">all</button>
+                        <button class="photo-cat" data-category="california">california</button>
+                        <button class="photo-cat" data-category="japan">japan</button>
+                        <button class="photo-cat" data-category="hawaii">hawaii</button>
+                        <button class="photo-cat" data-category="south_korea">south korea</button>
+                    </div>
+
+                    <div class="photo-grid-layout" id="portfolio-photo-grid">
+                        <!-- Loaded dynamically or displays placeholder cards initially -->
+                        <div class="photo-card" onclick="openFallbackPhoto('featured')">
+                            <img src="assets/featured-photo.png" alt="Featured Photo">
+                        </div>
+                        <div class="photo-card" onclick="openFallbackPhoto('landscape')">
+                            <img src="assets/landscape-photo.png" alt="Landscape Photo">
+                        </div>
+                        <div class="photo-card" onclick="openFallbackPhoto('urban')">
+                            <img src="assets/urban-photo.png" alt="Urban Photo">
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <a href="/pages/photos.html" class="btn-retro" id="full-gallery-btn"><i class="fas fa-images"></i> View Full Gallery Page</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BLOG PANEL -->
+            <section id="panel-blog" class="panel">
+                <div class="experience-list">
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Why I Love Data Science</h3>
+                            <span class="retro-badge">April 2, 2025</span>
+                        </div>
+                        <p style="margin-bottom: 1rem;">A reflection on why data science excites me, statistical insights, and the power of data visualization.</p>
+                        <a href="blog/blog2.html" class="btn-retro read-blog-btn"><i class="fas fa-book-open"></i> Read Post</a>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">My Gym Routine</h3>
+                            <span class="retro-badge">May 20, 2025</span>
+                        </div>
+                        <p style="margin-bottom: 1rem;">My weekly gym routine, tracking consistency, personal milestones, and how working out helps clear my head from coding.</p>
+                        <a href="blog/blog3.html" class="btn-retro read-blog-btn"><i class="fas fa-book-open"></i> Read Post</a>
+                    </div>
+
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <h3 class="card-title">How I Built My Portfolio Website</h3>
+                            <span class="retro-badge">March 24, 2025</span>
+                        </div>
+                        <p style="margin-bottom: 1rem;">A breakdown of my serverless tech stack, custom Durable Objects trackers, R2 integration, and design decisions.</p>
+                        <a href="blog/blog1.html" class="btn-retro read-blog-btn"><i class="fas fa-book-open"></i> Read Post</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATS PANEL -->
+            <section id="panel-stats" class="panel">
+                <div class="stats-layout">
+                    <div class="stats-cards-grid">
+                        <div class="stat-card">
+                            <span class="label">Total Views</span>
+                            <div class="value" id="cf-total-views">Loading...</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="label">Unique Visitors</span>
+                            <div class="value" id="unique-visitors">Loading...</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="label">Views (24h)</span>
+                            <div class="value" id="requests-24h">Loading...</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="label">Resume Downloads</span>
+                            <div class="value" id="resume-clicks">Loading...</div>
+                        </div>
+                    </div>
+
+                    <div class="chart-box">
+                        <h4 style="font-weight: 700; margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.9rem;">7-Day Traffic Trends</h4>
+                        <canvas id="statsChart" style="width: 100%; height: 280px;"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Taskbar / Status bar -->
+        <div class="window-taskbar">
+            <div class="taskbar-left">
+                <button class="start-btn" onclick="alert('Nathan Liu — UC Berkeley Data Science & CS Student')">
+                    <i class="fas fa-desktop"></i> nathan.exe
+                </button>
+                <span>System Status: Online</span>
+            </div>
+            <div class="taskbar-right">
+                <div class="taskbar-stat">
+                    <i class="fas fa-eye"></i> active: <strong class="viewer-count">0</strong>
+                </div>
+                <div class="taskbar-stat">
+                    <i class="fas fa-clock"></i> <span id="taskbar-time">00:00 AM</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Photo Modal Dialog (Retro OS alert style) -->
+    <div class="modal-overlay" id="photo-modal">
+        <div class="modal-dialog">
+            <div class="modal-titlebar">
+                <div class="window-title">
+                    <i class="fas fa-image"></i> image_viewer.exe
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn close" id="modal-close-btn">X</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-img-container">
+                    <img id="modal-image" src="" alt="Photo Details">
+                </div>
+                <div class="modal-details">
+                    <h4 id="modal-photo-name">Photo Title</h4>
+                    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <div class="exif-row">
+                            <span class="exif-label">camera</span>
+                            <span class="exif-val" id="exif-camera">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">lens</span>
+                            <span class="exif-val" id="exif-lens">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">exposure</span>
+                            <span class="exif-val" id="exif-exposure">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">aperture</span>
+                            <span class="exif-val" id="exif-aperture">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">iso</span>
+                            <span class="exif-val" id="exif-iso">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">location</span>
+                            <span class="exif-val" id="exif-location">-</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="relevant-classes-container">
-        <h3>Relevant Berkeley Courses</h3>
-        <div class="relevant-classes-list">
-            <span class="class-tag">CS 61A: Structure and Interpretation of Computer Programs</span>
-            <span class="class-tag">CS 61B: Data Structures</span>
-            <span class="class-tag">CS 61C: Great Ideas in Computer Architecture</span>
-            <span class="class-tag">CS 70: Discrete Mathematics and Probability Theory</span>
-            <!-- <span class="class-tag">CS 168: Introduction to the Internet: Architecture and Protocols</span> -->
-            <span class="class-tag">CS 170: Efficient Algorithms and Intractable Problems</span>
-            <!-- <span class="class-tag">CS 186: Database Systems</span> -->
-            <span class="class-tag">CS 182: Designing, Visualizing and Understanding Deep Neural Networks</span>
-            <span class="class-tag">CS 189: Machine Learning</span>
-            <span class="class-tag">CS 198: Introduction to Full-Stack Development</span>
-            <span class="class-tag">EECS 127: Optimization Models in Engineering</span>
-            <span class="class-tag">INFO 159: Natural Language Processing</span>
-            <span class="class-tag">Data 8: Foundations of Data Science</span>
-            <span class="class-tag">Data 100: Principles & Techniques of Data Science</span>
-            <span class="class-tag">Data 101: Data Engineering</span>
-            <span class="class-tag">Data 140: Probability for Data Science</span>
-        </div>
-    </div>
-    
-    <div class="tech-stack-container">
-        <h2>My Tech Stack</h2>
-        <div class="tech-stack-grid">
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python">
+    <!-- Blog Modal Dialog (Retro OS text reader style) -->
+    <div class="modal-overlay" id="blog-modal">
+        <div class="modal-dialog blog-modal-dialog">
+            <div class="modal-titlebar">
+                <div class="window-title">
+                    <i class="fas fa-file-alt"></i> <span id="modal-blog-filename">blog_post.txt</span>
                 </div>
-                <span class="tech-name">Python</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java">
-                </div>
-                <span class="tech-name">Java</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" alt="C++">
-                </div>
-                <span class="tech-name">C++</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript">
-                </div>
-                <span class="tech-name">JavaScript</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" alt="TypeScript">
-                </div>
-                <span class="tech-name">TypeScript</span>
-            </div>
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js">
-                </div>
-                <span class="tech-name">Node Js</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" alt="Next.js">
-                </div>
-                <span class="tech-name">Next Js</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Tailwind_CSS_Logo.svg/1024px-Tailwind_CSS_Logo.svg.png" alt="Tailwind">
-                </div>
-                <span class="tech-name">Tailwind</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" alt="SQL">
-                </div>
-                <span class="tech-name">SQL</span>
-            </div>
-
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" alt="GCP">
-                </div>
-                <span class="tech-name">GCP</span>
-            </div>
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cloudflare/cloudflare-original.svg" alt="Cloudflare">
-                </div>
-                <span class="tech-name">Cloudflare</span>
-            </div>
-            <div class="tech-card">
-                <div class="tech-logo">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Amazon_Web_Services_Logo.svg/1024px-Amazon_Web_Services_Logo.svg.png" alt="AWS">
-                </div>
-                <span class="tech-name">AWS</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="projects-container">
-        <h2>Projects</h2>
-        <div class="projects-grid">
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/project5.png" alt="Project 5">
-                </div>
-                <div class="project-content">
-                    <h3>Flow (In Progress)</h3>
-                    <p>A unified full-stack email and calendar app built with React Native, MongoDB, and AWS.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">JavaScript</span>
-                        <span class="project-tag">Node.js</span>
-                        <span class="project-tag">Express.js</span>
-                        <span class="project-tag">AWS</span>
-                        <span class="project-tag">GCP API</span>
-                        <span class="project-tag">HTML/CSS</span>
-                        <span class="project-tag">MongoDB</span>
-                        <span class="project-tag">Gemini API</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="" target="_blank" class="project-link-btn github-link"><i class="fab fa-github"></i> View on GitHub</a>
-                        <a href="" target="_blank" class="project-link-btn"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                    </div>
+                <div class="window-controls">
+                    <button class="win-btn close" id="blog-modal-close-btn">X</button>
                 </div>
             </div>
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/project4.png" alt="Project 4">
-                </div>
-                <div class="project-content">
-                    <h3>SimplyMail</h3>
-                    <p>A modern, responsive Gmail client built with vanilla JavaScript and the Gmail API, deployable to Firebase Hosting.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">JavaScript</span>
-                        <span class="project-tag">Node.js</span>
-                        <span class="project-tag">Express.js</span>
-                        <span class="project-tag">Firebase</span>
-                        <span class="project-tag">GCP API</span>
-                        <span class="project-tag">HTML/CSS</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/n8liu/SimplyMail" target="_blank" class="project-link-btn github-link"><i class="fab fa-github"></i> View on GitHub</a>
-                        <a href="https://simplymail-a10f8.web.app/" target="_blank" class="project-link-btn"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/project2.png" alt="Project 2">
-                </div>
-                <div class="project-content">
-                    <h3>Spotify Profile Analysis</h3>
-                    <p>A comprehensive project for analyzing your personal Spotify listening data with a modern, interactive Flask dashboard and full ETL/data science pipeline.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">Python</span>
-                        <span class="project-tag">Flask</span>
-                        <span class="project-tag">HTML/CSS</span>
-                        <span class="project-tag"> Spotify API</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/n8liu/spotifyprofileanalysis" target="_blank" class="project-link-btn github-link"><i class="fab fa-github"></i> View on GitHub</a>
-                        <!-- <a href="#" target="_blank" class="project-link-btn"><i class="fas fa-external-link-alt"></i> Live Demo</a> -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/project1.png" alt="Project 1">
-                </div>
-                <div class="project-content">
-                    <h3>Pokédex API</h3>
-                    <p>A simple web application that displays Pokémon information fetched from PokeAPI.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">HTML/CSS</span>
-                        <span class="project-tag">JavaScript</span>
-                        <span class="project-tag">TypeScript</span>
-                        <span class="project-tag">Node.js</span>
-                        <span class="project-tag">Express.js</span>
-                        <span class="project-tag">Firebase</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/n8liu/pokedexAPI" target="_blank" class="project-link-btn github-link"><i class="fab fa-github"></i> View on GitHub</a>
-                        <a href="https://pokedexapi-57916.web.app/" target="_blank" class="project-link-btn"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="project-card">
-                <div class="project-image">
-                    <img src="assets/project3.png" alt="Project 3">
-                </div>
-                <div class="project-content">
-                    <h3>Personal Website</h3>
-                    <p>Designed and developed this dynamic personal portfolio website from scratch, featuring a custom Node.js/Express backend, live project and statistics dashboards, interactive photo galleries, and seamless deployment workflows (Cloudflare, GitHub CI/CD). Integrated analytics, S3-based media management, and a responsive, modern UI. Continuously updated with new features and content.</p>
-                    <div class="project-tags">
-                        <span class="project-tag">JavaScript</span>
-                        <span class="project-tag">HTML/CSS</span>
-                        <span class="project-tag">Node.js</span>
-                        <span class="project-tag">Express.js</span>
-                        <span class="project-tag">Cloudflare R2/AWS SDK</span>
-                        <span class="project-tag">Socket.IO</span>
-                        <span class="project-tag">Github CI/CD</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://github.com/n8liu/myportfolio" target="_blank" class="project-link-btn github-link"><i class="fab fa-github"></i> View on GitHub</a>
-                        <!-- <a href='' id='back-to-top-btn' class="project-link-btn"><i class="fas fa-external-link-alt"></i> Live Demo</a> -->
+            <div class="modal-body blog-modal-body">
+                <div class="blog-post-container">
+                    <h1 id="modal-blog-title" class="blog-title">Blog Title</h1>
+                    <div id="modal-blog-date" class="blog-date">March 24, 2025</div>
+                    <hr style="border: none; border-bottom: var(--border-thin); margin: 1.5rem 0;">
+                    <div id="modal-blog-content" class="blog-content">
+                        <!-- Blog post content will be loaded here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="myhobbies-container">
-        <h2>Photography</h2>
-        <div class="hobbies-content">
-            <div class="hobby-card">
-                <div class="hobby-image">
-                    <img src="assets/photography-preview.png" alt="Photography Preview">
-                </div>
-                <div class="hobby-content">
-                    <h3>My Photography Portfolio</h3>
-                    <p>A collection of my favorite photos from places I have been. Capturing moments, landscapes, and urban scenes. Visit my photography page to see the full gallery!</p>
-                    <!-- <div class="hobby-tags">
-                        <span class="hobby-tag">Landscapes</span>
-                        <span class="hobby-tag">Urban</span>
-                        <span class="hobby-tag">Portrait</span>
-                    </div> -->
-                    <div class="hobby-link">
-                        <a href="/pages/photos.html" class="photo-btn" id="gallery-link">View Gallery <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-left">
-                <div class="live-count-container">
-                    <span><i class="fas fa-eye"></i> <span class="viewer-count">0</span></span>
-                </div>
-            </div>
-            <div class="footer-center">
-                <div class="social-icons">
-                    <a href="https://www.linkedin.com/in/n8liu/" class="social-link linkedin" target="_blank"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/n8.liu/" class="social-link instagram" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.github.com/n8liu" class="social-link github" target="_blank"><i class="fab fa-github"></i></a>
-                    <a href="mailto:nathan.dtliu@gmail.com" class="social-link email-icon" target="_blank"><i class="fas fa-envelope"></i></a>
-                    <button id="back-to-top-btn" class="social-link back-to-top-btn" title="Back to Top">
-                        <i class="fas fa-arrow-up"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="footer-right">
-            </div>
-        </div>
-    </footer>
 
-    <!-- Invisible button in top right for database.html -->
-    <a href="/database.html" class="invisible-db-btn" tabindex="-1" aria-label="Go to database stats"></a>
-
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="script.js"></script>
     <script src="viewers.js"></script>
-    <script>
-        // JavaScript to handle footer visibility when scrolling
-        window.addEventListener('scroll', function() {
-            const footer = document.querySelector('.footer');
-            const aboutContainer = document.querySelector('.about-container');
-            const scrollIndicator = document.querySelector('.scroll-indicator');
-            const backToTopBtn = document.getElementById('back-to-top-btn');
-            
-            // Show/hide footer
-            if (window.scrollY > 800) {
-                footer.classList.add('visible');
-            } else {
-                footer.classList.remove('visible');
-            }
-            
-            // Hide scroll indicator after scrolling 50px
-            if (window.scrollY > 50) {
-                scrollIndicator.style.opacity = '0';
-            } else {
-                scrollIndicator.style.opacity = '1';
-            }
-            
-            // Show back to top button only when near the bottom of the page
-            const windowHeight = window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            const scrollPosition = window.scrollY + windowHeight;
-            
-            if (documentHeight - scrollPosition < 300) {
-                backToTopBtn.classList.add('visible');
-            } else {
-                backToTopBtn.classList.remove('visible');
-            }
-        });
-
-        // Add fade transition for gallery link
-        document.getElementById('gallery-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.body.classList.remove('loaded');
-            setTimeout(() => {
-                window.location.href = this.href;
-            }, 300);
-        });
-
-        document.getElementById('back-to-top-btn').addEventListener('click', function() {
-            // Smooth scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
-        // Track resume clicks
-        document.getElementById('resume-btn').addEventListener('click', function() {
-            fetch('https://myportfolio.nathanliu528.workers.dev/api/resume/increment', { method: 'POST' });
-        });
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Increment on connect
-      fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers/connect');
-
-      // Only increment total page views if this is NOT a reload or back/forward
-      let isNewVisit = true;
-      if (performance.getEntriesByType) {
-        const nav = performance.getEntriesByType("navigation")[0];
-        if (nav && (nav.type === "reload" || nav.type === "back_forward")) isNewVisit = false;
-      } else if (performance.navigation) {
-        if (performance.navigation.type === 1 || performance.navigation.type === 2) isNewVisit = false;
-      }
-      if (isNewVisit) {
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/total/increment');
-        // Increment unique visitors Durable Object
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/unique/increment');
-      }
-
-      async function updateViewerCount() {
-        try {
-          const res = await fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers');
-          const data = await res.json();
-          document.querySelector('.viewer-count').textContent = data.count;
-        } catch (e) {
-          document.querySelector('.viewer-count').textContent = '?';
-        }
-      }
-      updateViewerCount();
-      setInterval(updateViewerCount, 10000);
-
-      // Decrement on disconnect
-      window.addEventListener('beforeunload', function() {
-        navigator.sendBeacon('https://myportfolio.nathanliu528.workers.dev/api/viewers/disconnect');
-      });
-    });
-    </script>
-    <script>
-        // Text animation script
-        const roles = ['Machine Learning Engineer', 'Data Scientist', 'Software Engineer'];
-        const animatedText = document.querySelector('.animated-text');
-        let currentRoleIndex = 0;
-        let currentCharIndex = 0;
-        let isDeleting = false;
-        let typingSpeed = 100; // Speed for typing
-        let deletingSpeed = 50; // Speed for deleting
-        let pauseTime = 2000; // Time to pause at full text
-
-        function typeText() {
-            const currentRole = roles[currentRoleIndex];
-            
-            if (isDeleting) {
-                // Deleting text
-                animatedText.textContent = currentRole.substring(0, currentCharIndex - 1);
-                currentCharIndex--;
-                typingSpeed = deletingSpeed;
-            } else {
-                // Typing text
-                animatedText.textContent = currentRole.substring(0, currentCharIndex + 1);
-                currentCharIndex++;
-                typingSpeed = 100;
-            }
-
-            if (!isDeleting && currentCharIndex === currentRole.length) {
-                // Finished typing, pause before deleting
-                isDeleting = true;
-                typingSpeed = pauseTime;
-            } else if (isDeleting && currentCharIndex === 0) {
-                // Finished deleting, move to next role
-                isDeleting = false;
-                currentRoleIndex = (currentRoleIndex + 1) % roles.length;
-                typingSpeed = 500; // Pause before typing next role
-            }
-
-            setTimeout(typeText, typingSpeed);
-        }
-
-        // Start the animation when the page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Start the text animation immediately
-            typeText();
-            
-            // Fade in the page
-            document.body.classList.add('loaded');
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle site-title clicks for page transitions
-            document.querySelector('.site-title a').addEventListener('click', function(e) {
-                e.preventDefault();
-                document.body.classList.remove('loaded');
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 300);
-            });
-
-            // Handle resume button click to prevent page transition
-            document.getElementById('resume-btn').addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-    </script>
 </body>
 </html>

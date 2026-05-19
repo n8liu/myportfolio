@@ -7,6 +7,14 @@
     <link rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="blog-style.css">
+    <script>
+        const savedTheme = localStorage.getItem('portfolio-theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark'));
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -16,7 +24,7 @@
             <p>This is a placeholder for the full blog post content. Here you can write about your process, share code snippets, images, and more.</p>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque euismod, nisi eu consectetur consectetur, nisl nisi consectetur nisi, eu consectetur nisl nisi euismod nisi.</p>
         </div>
-        <a href="../blog.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Blog</a>
+        <a href="/#blog" class="back-link"><i class="fas fa-arrow-left"></i> Back to Blog</a>
     </div>
 </body>
 </html> 

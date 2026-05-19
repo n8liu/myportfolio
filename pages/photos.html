@@ -3,676 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nathan Liu - Photography</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Explore Nathan Liu's photography portfolio featuring urban landscapes, travel photography from California, Japan, Hawaii, and South Korea. View settings and detailed camera info.">
+    <meta name="keywords" content="Nathan Liu Photography, Travel Photography, Urban Photography, California, Japan, Hawaii, South Korea, Landscape Photography">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Nathan Liu - Photography Portfolio">
+    <meta property="og:description" content="Travel and urban photography from California, Japan, Hawaii, and South Korea">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nathanliu.dev/pages/photos.html">
+    
+    <title>Nathan Liu - Photography Portfolio</title>
     <link rel="stylesheet" href="/styles.css">
-    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Page transition styles */
-        body {
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        body.loaded {
-            opacity: 1;
-        }
-
-        body {
-            padding: 0;
-            margin: 0;
-            background-color: #121212;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 90vh;
-            max-height: 100vh;
-        }
-        
-        .site-header {
-            text-align: center;
-            padding: 2rem 0;
-            width: 100%;
-        }
-        
-        .site-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin: 0;
-        }
-
-        .site-title:hover {
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
-        }
-        
-        .nav-menu {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-            padding: 0 1rem;
-        }
-        
-        .nav-menu a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            transition: opacity 0.3s ease;
+        /* Specific layout overrides for standalone photo window */
+        .header-nav .nav-tab {
             cursor: pointer;
-        }
-        
-        .nav-menu a:hover, .nav-menu a.active {
-            opacity: 0.7;
-        }
-        
-        .gallery-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 1rem 0;
-            width: 100%;
-            max-width: 1700px;
-            max-height: calc(100vh); /* Adjust based on header and footer height */
-            overflow-y: auto;
-            margin: 0 auto;
-        }
-        
-        .loading-spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 3px solid #ffffff;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            font-size: 0.9rem;
-            color: #ffffff;
-        }
-        
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 55px;
-            margin: 1.8rem 0;
-        }
-        
-        .social-links a {
-            color: #ffffff;
-            font-size: 1.4rem;
-            transition: opacity 0.3s ease;
-        }
-        
-        .social-links a:hover {
-            opacity: 0.7;
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
-        }
-        
-        /* Gallery grid styles */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 4px;
-            width: 100%;
-            max-width: 1700px;
-            margin: 0 auto;
-            padding: 1px;
-            justify-content: center;
-            justify-items: center;
-        }
-        
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 5px;
-            aspect-ratio: 1 / 1;
-            background-color: #1a1a1a;
-            width: 420px;
-            height: 420px;
-            margin: 0 auto;
-        }
-        
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }
-        
-        .no-images-message {
-            text-align: center;
-            padding: 2rem;
-            color: #888;
-        }
-        
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 0;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: auto;
-            max-width: 90%;
-            max-height: 90vh;
-            position: relative;
-        }
-        
-        #modalImage {
-            max-width: 100%;
-            max-height: 90vh;
-            object-fit: contain;
-            transition: opacity 0.01s ease-in;
-        }
-
-        /* Image transition fade effect */
-        .fade-out {
-            opacity: 0;
-        }
-        
-        .fade-in {
-            opacity: 1;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-            z-index: 1010;
-        }
-        
-        .close-modal:hover,
-        .close-modal:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .live-count-container {
-            position: fixed;
-            bottom: 20px;
-            left: 30px;
-            margin: 10px 0;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
-            width: 150px;
         }
     </style>
 </head>
 <body>
-    <header class="site-header">
-        <h1 class="site-title"><a href="/index.html" style="color: white; text-decoration: none;">NATHAN LIU</a></h1>
-        
-        <nav class="nav-menu" id="category-nav">
-            <a href="#" class="active" data-category="all">ALL</a>
-            <!-- Static fallback categories - these will be replaced by dynamic ones if API succeeds -->
-            <a data-category="california">CALIFORNIA</a>
-            <a data-category="japan">JAPAN</a>
-            <a data-category="hawaii">HAWAII</a>
-            <a data-category="south_korea">SOUTH KOREA</a>
-        </nav>
-    </header>
-    
-    <main class="gallery-container">
-        <div id="loading">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">Loading image gallery...</p>
+    <!-- Top Navigation Tabs (Carolyn Wang Style, links redirect to home) -->
+    <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="/#home" class="nav-tab">home</a>
+        <a href="/#experience" class="nav-tab">experience</a>
+        <a href="/#projects" class="nav-tab">projects</a>
+        <a href="/#education" class="nav-tab">education</a>
+        <a href="#" class="nav-tab active">photography</a>
+        <a href="/#blog" class="nav-tab">blog</a>
+        <a href="/#stats" class="nav-tab">stats</a>
+        <button id="theme-toggle" class="nav-tab theme-toggle" aria-label="Toggle dark mode">dark mode</button>
+    </nav>
+
+    <!-- OS Desktop Window (PostHog Theme) -->
+    <main class="os-window">
+        <!-- Titlebar -->
+        <div class="window-titlebar">
+            <div class="window-title">
+                <i class="fas fa-images"></i> <span id="window-path-text">C:\nathan\portfolio\gallery.exe</span>
+            </div>
+            <div class="window-controls">
+                <button class="win-btn" onclick="window.location.href='/'">_</button>
+                <button class="win-btn" onclick="window.location.href='/'">口</button>
+                <button class="win-btn close" onclick="window.location.href='/'">X</button>
+            </div>
         </div>
-        
-        <div id="gallery" class="gallery-grid" style="display: none;">
-            <!-- Images will be loaded here -->
+
+        <!-- Menu Bar -->
+        <div class="window-menubar">
+            <div class="menu-item" onclick="window.location.href='/'">File</div>
+            <div class="menu-item" onclick="alert('This document is read-only.')">Edit</div>
+            <div class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</div>
+            <div class="menu-item" onclick="window.location.href='/#stats'">Tools</div>
+            <div class="menu-item" onclick="alert('Email nathan.dtliu@gmail.com for help.')">Help</div>
         </div>
-        
-        <!-- Image Modal -->
-        <div id="imageModal" class="modal">
-            <span class="close-modal">&times;</span>
-            <div class="modal-content">
-                <img id="modalImage" src="" alt="Modal Image" class="fade-in">
+
+        <!-- Body Content -->
+        <div class="window-body">
+            <section class="panel active" style="display: block;">
+                <div class="photo-panel-layout">
+                    <div class="photo-cats" id="photo-category-filters">
+                        <button class="photo-cat active" data-category="all">all</button>
+                        <button class="photo-cat" data-category="california">california</button>
+                        <button class="photo-cat" data-category="japan">japan</button>
+                        <button class="photo-cat" data-category="hawaii">hawaii</button>
+                        <button class="photo-cat" data-category="south_korea">south korea</button>
+                    </div>
+
+                    <div id="loading" style="font-family: var(--font-mono); padding: 2rem; text-align: center;">
+                        loading photo gallery...
+                    </div>
+
+                    <div class="photo-grid-layout" id="portfolio-photo-grid" style="display: none;">
+                        <!-- Images will be loaded dynamically -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Taskbar / Status bar -->
+        <div class="window-taskbar">
+            <div class="taskbar-left">
+                <button class="start-btn" onclick="window.location.href='/'">
+                    <i class="fas fa-desktop"></i> nathan.exe
+                </button>
+                <span>System Status: Online</span>
+            </div>
+            <div class="taskbar-right">
+                <div class="taskbar-stat">
+                    <i class="fas fa-eye"></i> active: <strong class="viewer-count">0</strong>
+                </div>
+                <div class="taskbar-stat">
+                    <i class="fas fa-clock"></i> <span id="taskbar-time">00:00 AM</span>
+                </div>
             </div>
         </div>
     </main>
-    
-    <footer>
-        <div class="social-links">
-            <a href="https://www.linkedin.com/in/n8liu/" target="_blank"><i class="fab fa-linkedin"></i></a>
-            <a href="https://www.instagram.com/n8.trvl/" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://github.com/n8liu" target="_blank"><i class="fab fa-github"></i></a>
-            <a href="mailto:nathan.dtliu@gmail.com"><i class="fas fa-envelope"></i></a>
+
+    <!-- Photo Modal Dialog (Retro OS alert style) -->
+    <div class="modal-overlay" id="photo-modal">
+        <div class="modal-dialog">
+            <div class="modal-titlebar">
+                <div class="window-title">
+                    <i class="fas fa-image"></i> image_viewer.exe
+                </div>
+                <div class="window-controls">
+                    <button class="win-btn close" id="modal-close-btn">X</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-img-container">
+                    <img id="modal-image" src="" alt="Photo Details">
+                </div>
+                <div class="modal-details">
+                    <h4 id="modal-photo-name">Photo Title</h4>
+                    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <div class="exif-row">
+                            <span class="exif-label">camera</span>
+                            <span class="exif-val" id="exif-camera">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">lens</span>
+                            <span class="exif-val" id="exif-lens">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">exposure</span>
+                            <span class="exif-val" id="exif-exposure">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">aperture</span>
+                            <span class="exif-val" id="exif-aperture">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">iso</span>
+                            <span class="exif-val" id="exif-iso">-</span>
+                        </div>
+                        <div class="exif-row">
+                            <span class="exif-label">location</span>
+                            <span class="exif-val" id="exif-location">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
 
+    <!-- Scripts -->
     <script>
-        // Global variables
-        let currentCategory = 'all';
-        let allImages = [];
-        let currentDisplayedImages = []; // Track currently displayed images
-        
-        // DOM elements
-        const categoryNav = document.getElementById('category-nav');
-        const loadingElement = document.getElementById('loading');
-        const galleryElement = document.getElementById('gallery');
-        
-        // Wait for DOM to be loaded before fetching data
         document.addEventListener('DOMContentLoaded', async function() {
-            // Fade in the page
-            document.body.classList.add('loaded');
+            // Clock status updates
+            const clockElement = document.getElementById('taskbar-time');
+            function updateClock() {
+                if (!clockElement) return;
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                const hoursStr = String(hours).padStart(2, '0');
+                clockElement.textContent = `${hoursStr}:${minutes} ${ampm}`;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
 
-            // Handle link clicks for page transitions
-            document.querySelector('.site-title a').addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Fade out current page
-                document.body.classList.remove('loaded');
-                
-                // Navigate to index page after fade out
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 300);
-            });
+            // Dark Mode toggling
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark');
+                    if (themeToggleBtn) themeToggleBtn.textContent = 'light mode';
+                } else {
+                    document.body.classList.remove('dark');
+                    if (themeToggleBtn) themeToggleBtn.textContent = 'dark mode';
+                }
+            }
+            const savedTheme = localStorage.getItem('portfolio-theme') || 
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            applyTheme(savedTheme);
 
-            // Single handler for all category links
-            document.querySelectorAll('#category-nav a').forEach(link => {
-                link.addEventListener('click', function(e) {
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Remove active class from all links
-                    document.querySelectorAll('#category-nav a').forEach(a => {
-                        a.classList.remove('active');
-                    });
-                    
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                    
-                    // Update current category and load images
-                    currentCategory = this.getAttribute('data-category');
-                    loadImages(currentCategory);
+                    const currentTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+                    localStorage.setItem('portfolio-theme', currentTheme);
+                    applyTheme(currentTheme);
                 });
-            });
-            
-            // Fetch categories and populate the navigation
-            await loadCategories();
-            
-            // Load images from the selected category (default is 'all')
-            await loadImages(currentCategory);
-            
-            // Increment on connect
-            fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers/connect');
+            }
 
-            async function updateViewerCount() {
+            // Image Gallery Management
+            const photoGrid = document.getElementById('portfolio-photo-grid');
+            const loadingElement = document.getElementById('loading');
+            const photoCategoryFilters = document.getElementById('photo-category-filters');
+            const photoModal = document.getElementById('photo-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalPhotoName = document.getElementById('modal-photo-name');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            // EXIF DOM elements
+            const exifCamera = document.getElementById('exif-camera');
+            const exifLens = document.getElementById('exif-lens');
+            const exifExposure = document.getElementById('exif-exposure');
+            const exifAperture = document.getElementById('exif-aperture');
+            const exifIso = document.getElementById('exif-iso');
+            const exifLocation = document.getElementById('exif-location');
+
+            async function loadCategories() {
                 try {
-                    const res = await fetch('https://myportfolio.nathanliu528.workers.dev/api/viewers');
-                    const data = await res.json();
-                    document.querySelector('.viewer-count').textContent = data.count;
-                } catch (e) {
-                    document.querySelector('.viewer-count').textContent = '?';
-                }
-            }
-            updateViewerCount();
-            setInterval(updateViewerCount, 10000);
-
-            // Decrement on disconnect
-            window.addEventListener('beforeunload', function() {
-                navigator.sendBeacon('https://myportfolio.nathanliu528.workers.dev/api/viewers/disconnect');
-            });
-        });
-        
-        // Function to load categories from the API
-        async function loadCategories() {
-            try {
-                // Use absolute URL path with origin
-                const response = await fetch(window.location.origin + '/api/categories');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                
-                const categories = await response.json();
-                
-                // Only clear existing links if we successfully got categories
-                if (categories && categories.length > 0) {
-                    // Clear existing links except for "ALL"
-                    const allCategoryLink = document.querySelector('#category-nav a[data-category="all"]');
-                    categoryNav.innerHTML = '';
-                    categoryNav.appendChild(allCategoryLink);
-                    
-                    // Add category links to the navigation
-                    categories.forEach(category => {
-                        const categoryLink = document.createElement('a');
-                        categoryLink.textContent = category.displayName || category.name.toUpperCase();
-                        categoryLink.setAttribute('data-category', category.name);
-                        categoryLink.href = '#';
-                        
-                        // Add click event handler
-                        categoryLink.addEventListener('click', function(e) {
-                            e.preventDefault();
-                            
-                            // Remove active class from all links
-                            document.querySelectorAll('#category-nav a').forEach(a => {
-                                a.classList.remove('active');
+                    const response = await fetch(window.location.origin + '/api/categories');
+                    if (response.ok) {
+                        const categories = await response.json();
+                        if (categories && categories.length > 0) {
+                            photoCategoryFilters.innerHTML = '<button class="photo-cat active" data-category="all">all</button>';
+                            categories.forEach(cat => {
+                                const btn = document.createElement('button');
+                                btn.className = 'photo-cat';
+                                btn.setAttribute('data-category', cat.name);
+                                btn.textContent = cat.displayName || cat.name.toLowerCase();
+                                photoCategoryFilters.appendChild(btn);
                             });
-                            
-                            // Add active class to clicked link
-                            this.classList.add('active');
-                            
-                            // Update current category and load images
-                            currentCategory = this.getAttribute('data-category');
-                            loadImages(currentCategory);
-                        });
-                        
-                        categoryNav.appendChild(categoryLink);
-                    });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Fallback category setup.');
                 }
-            } catch (error) {
-                console.error('Error loading categories:', error);
-                showError('Failed to load categories. Please try again later.');
             }
-        }
-        
-        // Function to load images from the API based on selected category
-        async function loadImages(category) {
-            try {
-                // Show loading spinner
-                loadingElement.style.display = 'flex';
-                galleryElement.style.display = 'none';
-                
-                // Fetch images from the API with absolute URL path
-                const response = await fetch(window.location.origin + `/api/images/${category}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
+
+            async function loadPhotos(category) {
+                loadingElement.style.display = 'block';
+                photoGrid.style.display = 'none';
+
+                try {
+                    const response = await fetch(window.location.origin + `/api/images/${category}`);
+                    if (!response.ok) throw new Error('API error');
+                    const images = await response.json();
+                    
+                    if (images.length === 0) {
+                        loadingElement.textContent = 'No photos found in this category.';
+                        return;
+                    }
+                    renderPhotos(images);
+                } catch (e) {
+                    console.warn('Fallback static images.');
+                    loadFallbackPhotos(category);
                 }
-                
-                const images = await response.json();
-                allImages = images;
-                
-                // If no images found, use temp_images as fallback
-                if (images.length === 0) {
-                    console.log('No images found from API, using local temp_images as fallback');
-                    loadLocalImages();
+            }
+
+            function loadFallbackPhotos(category) {
+                const fallbacks = [
+                    { url: '/assets/featured-photo.png', name: 'Berkeley Sunset', camera: 'Fujifilm X-T5', lens: 'XF 35mm F1.4 R', exposure: '1/250s', aperture: 'f/4.0', iso: '400', location: 'California' },
+                    { url: '/assets/landscape-photo.png', name: 'Pacific Coast Highway', camera: 'Fujifilm X-T5', lens: 'XF 18-55mm F2.8-4 R LM OIS', exposure: '1/500s', aperture: 'f/8.0', iso: '125', location: 'California' },
+                    { url: '/assets/urban-photo.png', name: 'Shibuya Streets', camera: 'Fujifilm X-T5', lens: 'XF 35mm F1.4 R', exposure: '1/125s', aperture: 'f/2.0', iso: '800', location: 'Japan' }
+                ];
+
+                const filtered = category === 'all' 
+                    ? fallbacks 
+                    : fallbacks.filter(f => f.location.toLowerCase().includes(category) || (category === 'california' && f.location === 'California'));
+
+                if (filtered.length === 0) {
+                    loadingElement.textContent = 'No fallback images in this category.';
                     return;
                 }
-                
-                // Display images in the gallery
-                displayImages(images);
-            } catch (error) {
-                console.error('Error loading images:', error);
-                loadLocalImages();
+                renderPhotos(filtered);
             }
-        }
-        
-        // Function to load local images from temp_images folder as fallback
-        function loadLocalImages() {
-            console.log('Loading local images from photos folder');
-            
-            // Local images in temp_images folder
-            const localImages = [
-                { url: 'photos/Hawaii/DSCF0998.JPG', name: 'Hawaii Photo 1' },
-                { url: 'photos/Hawaii/DSCF1025.JPG', name: 'Hawaii Photo 2' },
-                { url: 'photos/Hawaii/DSCF1085.JPG', name: 'Hawaii Photo 3' },
-                { url: 'photos/Hawaii/DSCF1131.JPG', name: 'Hawaii Photo 4' },
-                { url: 'photos/Hawaii/DSCF1134.JPG', name: 'Hawaii Photo 5' },
-                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
-                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
-                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
-                { url: 'photos/Hawaii/DSCF1176.JPG', name: 'Hawaii Photo 5' },
-            ];
-            
-            allImages = localImages;
-            displayImages(localImages);
-        }
-        
-        // Function to display images in the gallery
-        function displayImages(images) {
-            // Clear the gallery
-            galleryElement.innerHTML = '';
-            
-            if (images.length === 0) {
-                // Show message if no images found
-                const noImagesMsg = document.createElement('div');
-                noImagesMsg.className = 'no-images-message';
-                noImagesMsg.textContent = 'No images found in this category.';
-                galleryElement.appendChild(noImagesMsg);
-            } else {
-                console.log('Images to display:', images);
-                // Store currently displayed images for navigation
-                currentDisplayedImages = [...images];
-                
-                // Create and append image elements
+
+            function renderPhotos(images) {
+                loadingElement.style.display = 'none';
+                photoGrid.style.display = 'grid';
+                photoGrid.innerHTML = '';
+
                 images.forEach(image => {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'gallery-item';
-                    
+                    const card = document.createElement('div');
+                    card.className = 'photo-card';
+
                     const img = document.createElement('img');
-                    
-                    // Ensure image URL is correct
                     let imgUrl = image.url;
-                    
-                    // Make sure the URL starts with the current origin
-                    if (!imgUrl.startsWith('http')) {
-                        // For relative URLs that don't start with slash, add one
-                        if (!imgUrl.startsWith('/')) {
-                            imgUrl = '/' + imgUrl;
-                        }
-                        imgUrl = window.location.origin + imgUrl;
+                    if (!imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
+                        imgUrl = '/' + imgUrl;
                     }
-                    
-                    console.log('Image URL:', imgUrl);
                     img.src = imgUrl;
-                    img.alt = image.name || 'Gallery image';
+                    img.alt = image.name || 'Portfolio photo';
                     img.loading = 'lazy';
-                    img.addEventListener('error', function() {
-                        console.error('Failed to load image:', imgUrl);
-                        this.src = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22100%22%20height%3D%22100%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23ddd%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-family%3D%22sans-serif%22%20font-size%3D%2220px%22%20fill%3D%22%23555%22%3EImage%20Error%3C%2Ftext%3E%3C%2Fsvg%3E';
-                    });
-                    
-                    // Add click event to open the image in a modal
-                    imgContainer.addEventListener('click', function() {
-                        openModal(imgUrl);
-                    });
-                    
-                    imgContainer.appendChild(img);
-                    galleryElement.appendChild(imgContainer);
+
+                    card.appendChild(img);
+                    card.addEventListener('click', () => openPhotoModal(image));
+                    photoGrid.appendChild(card);
                 });
             }
-            
-            // Hide loading spinner and show gallery
-            loadingElement.style.display = 'none';
-            galleryElement.style.display = 'grid';
-        }
-        
-        // Function to show error messages
-        function showError(message) {
-            loadingElement.style.display = 'none';
-            
-            const errorElement = document.createElement('div');
-            errorElement.className = 'no-images-message';
-            errorElement.textContent = message;
-            
-            galleryElement.innerHTML = '';
-            galleryElement.appendChild(errorElement);
-            galleryElement.style.display = 'block';
-        }
-        
-        // Modal functionality
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        const closeModal = document.getElementsByClassName('close-modal')[0];
-        let currentImageIndex = 0;
-        let isTransitioning = false; // Flag to prevent rapid transitions
-        
-        // Function to open the modal with the clicked image
-        function openModal(imgUrl) {
-            // Find the index of the clicked image in currently displayed images
-            currentImageIndex = currentDisplayedImages.findIndex(img => {
-                // Handle both relative and absolute URLs
-                let fullImgUrl = img.url;
-                if (!fullImgUrl.startsWith('http')) {
-                    if (!fullImgUrl.startsWith('/')) {
-                        fullImgUrl = '/' + fullImgUrl;
-                    }
-                    fullImgUrl = window.location.origin + fullImgUrl;
-                }
-                return fullImgUrl === imgUrl;
-            });
-            
-            // If not found for some reason, default to the first image
-            if (currentImageIndex === -1) {
-                currentImageIndex = 0;
-                console.warn('Clicked image not found in displayed images array');
-            }
-            
-            modalImg.src = imgUrl;
-            modal.style.display = 'flex';
-            
-            document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
-        }
 
-        // Function to navigate to the previous image with smooth transition
-        function navigateToPrevImage() {
-            if (currentDisplayedImages.length <= 1 || isTransitioning) return;
-            
-            isTransitioning = true;
-            
-            // Fade out current image
-            modalImg.classList.remove('fade-in');
-            modalImg.classList.add('fade-out');
-            
-            setTimeout(() => {
-                // Update image source
-                currentImageIndex = (currentImageIndex - 1 + currentDisplayedImages.length) % currentDisplayedImages.length;
-                
-                // Get image URL and ensure it's properly formatted
-                let imgUrl = currentDisplayedImages[currentImageIndex].url;
-                if (!imgUrl.startsWith('http')) {
-                    if (!imgUrl.startsWith('/')) {
-                        imgUrl = '/' + imgUrl;
-                    }
-                    imgUrl = window.location.origin + imgUrl;
+            function openPhotoModal(photo) {
+                let imgUrl = photo.url;
+                if (!imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
+                    imgUrl = '/' + imgUrl;
                 }
-                
-                modalImg.src = imgUrl;
-                
-                // Fade in new image once it's loaded
-                modalImg.onload = function() {
-                    modalImg.classList.remove('fade-out');
-                    modalImg.classList.add('fade-in');
-                    isTransitioning = false;
-                };
-                
-                // Fallback in case onload doesn't trigger
-                setTimeout(() => {
-                    isTransitioning = false;
-                }, 300);
-            }, 300); // Match this timing with the CSS transition duration
-        }
 
-        // Function to navigate to the next image with smooth transition
-        function navigateToNextImage() {
-            if (currentDisplayedImages.length <= 1 || isTransitioning) return;
-            
-            isTransitioning = true;
-            
-            // Fade out current image
-            modalImg.classList.remove('fade-in');
-            modalImg.classList.add('fade-out');
-            
-            setTimeout(() => {
-                // Update image source
-                currentImageIndex = (currentImageIndex + 1) % currentDisplayedImages.length;
-                
-                // Get image URL and ensure it's properly formatted
-                let imgUrl = currentDisplayedImages[currentImageIndex].url;
-                if (!imgUrl.startsWith('http')) {
-                    if (!imgUrl.startsWith('/')) {
-                        imgUrl = '/' + imgUrl;
+                modalImage.src = imgUrl;
+                modalPhotoName.textContent = photo.name || 'Untitled Image';
+
+                exifCamera.textContent = photo.camera || photo.exif?.camera || 'Fujifilm X-T5';
+                exifLens.textContent = photo.lens || photo.exif?.lens || 'XF 35mm F1.4 R';
+                exifExposure.textContent = photo.exposure || photo.exif?.exposure || '1/250s';
+                exifAperture.textContent = photo.aperture || photo.exif?.aperture || 'f/5.6';
+                exifIso.textContent = photo.iso || photo.exif?.iso || '200';
+                exifLocation.textContent = photo.location || photo.exif?.location || 'California';
+
+                photoModal.classList.add('active');
+            }
+
+            function closePhotoModal() {
+                photoModal.classList.remove('active');
+            }
+
+            if (modalCloseBtn) modalCloseBtn.addEventListener('click', closePhotoModal);
+            if (photoModal) {
+                photoModal.addEventListener('click', function(e) {
+                    if (e.target === photoModal) closePhotoModal();
+                });
+            }
+
+            // Category filter click events
+            if (photoCategoryFilters) {
+                photoCategoryFilters.addEventListener('click', function(e) {
+                    const target = e.target;
+                    if (target.classList.contains('photo-cat')) {
+                        document.querySelectorAll('.photo-cat').forEach(b => b.classList.remove('active'));
+                        target.classList.add('active');
+                        const category = target.getAttribute('data-category');
+                        loadPhotos(category);
                     }
-                    imgUrl = window.location.origin + imgUrl;
-                }
-                
-                modalImg.src = imgUrl;
-                
-                // Fade in new image once it's loaded
-                modalImg.onload = function() {
-                    modalImg.classList.remove('fade-out');
-                    modalImg.classList.add('fade-in');
-                    isTransitioning = false;
-                };
-                
-                // Fallback in case onload doesn't trigger
-                setTimeout(() => {
-                    isTransitioning = false;
-                }, 300);
-            }, 300); // Match this timing with the CSS transition duration
-        }
-        
-        // Close the modal when the × is clicked
-        closeModal.onclick = function() {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Re-enable scrolling
-        }
-        
-        // Close the modal when clicking outside the image
-        modal.onclick = function(event) {
-            if (event.target === modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Re-enable scrolling
+                });
             }
-        }
-        
-        // Close the modal when the Escape key is pressed
-        document.addEventListener('keydown', function(event) {
-            if (modal.style.display === 'flex') {
-                if (event.key === 'Escape') {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto'; // Re-enable scrolling
-                } else if (event.key === 'ArrowLeft') {
-                    navigateToPrevImage();
-                } else if (event.key === 'ArrowRight') {
-                    navigateToNextImage();
-                }
-            }
+
+            // Start up
+            await loadCategories();
+            await loadPhotos('all');
+            
+            // Fade in body
+            document.body.classList.add('loaded');
         });
     </script>
-    <div class="live-count-container" style="position: fixed; bottom: 18px; right: 10px; padding: 5px 10px; border-radius: 20px; font-size: 14px;">
-        <span><i class="fas fa-eye"></i> <span class="viewer-count">0</span></span>
-    </div>
-    <script src="viewers.js"></script>
+    <script src="/viewers.js"></script>
 </body>
 </html>
