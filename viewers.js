@@ -35,19 +35,20 @@ class ViewerCounter {
   }
 
   async initCloudflare() {
+    const workerBase = 'https://myportfolio.nathanliu528.workers.dev';
     try {
       // Register connection
-      const response = await fetch('/api/viewers/connect');
+      const response = await fetch(`${workerBase}/api/viewers/connect`);
       const data = await response.json();
       this.updateUI(data.count);
       
       // Set up polling to keep the count updated
-      this.startPolling();
+      this.startPolling(workerBase);
       
       // Register disconnect event on page unload
       window.addEventListener('beforeunload', async () => {
         try {
-          await fetch('/api/viewers/disconnect', { 
+          await fetch(`${workerBase}/api/viewers/disconnect`, { 
             method: 'POST',
             keepalive: true 
           });
@@ -69,19 +70,19 @@ class ViewerCounter {
         }
       }
       if (isNewVisit) {
-        fetch('/api/total/increment', { method: 'POST' }).catch(() => {});
-        fetch('/api/unique/increment', { method: 'POST' }).catch(() => {});
+        fetch(`${workerBase}/api/total/increment`, { method: 'POST' }).catch(() => {});
+        fetch(`${workerBase}/api/unique/increment`, { method: 'POST' }).catch(() => {});
       }
     } catch (error) {
       console.error('Error connecting to viewer counter:', error);
     }
   }
 
-  startPolling() {
+  startPolling(workerBase) {
     // Poll every 5 seconds to get updated viewer count
     setInterval(async () => {
       try {
-        const response = await fetch('/api/viewers');
+        const response = await fetch(`${workerBase}/api/viewers`);
         const data = await response.json();
         this.updateUI(data.count);
       } catch (error) {

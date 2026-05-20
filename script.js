@@ -1,5 +1,9 @@
 // Client-side JavaScript for Retro OS Portfolio Redesign
 document.addEventListener('DOMContentLoaded', function() {
+    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '0.0.0.0')
+        ? ''
+        : 'https://myportfolio.nathanliu528.workers.dev';
+
     // ----------------------------------------------------
     // 1. Tab Switching Logic (Carolyn Wang Inspired Layout)
     // ----------------------------------------------------
@@ -101,25 +105,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const resumeClicksEl = document.getElementById('resume-clicks');
 
         // Fetch counts
-        fetch('/api/total')
+        fetch(API_BASE + '/api/total')
             .then(res => res.json())
             .then(data => {
                 if (totalViewsEl) totalViewsEl.textContent = data.total ?? '0';
             }).catch(() => { if (totalViewsEl) totalViewsEl.textContent = '?'; });
 
-        fetch('/api/unique/count')
+        fetch(API_BASE + '/api/unique/count')
             .then(res => res.json())
             .then(data => {
                 if (uniqueViewsEl) uniqueViewsEl.textContent = data.count ?? '0';
             }).catch(() => { if (uniqueViewsEl) uniqueViewsEl.textContent = '?'; });
 
-        fetch('/api/total/requests24h')
+        fetch(API_BASE + '/api/total/requests24h')
             .then(res => res.json())
             .then(data => {
                 if (views24hEl) views24hEl.textContent = data.requests24h ?? '0';
             }).catch(() => { if (views24hEl) views24hEl.textContent = '?'; });
 
-        fetch('/api/resume/count')
+        fetch(API_BASE + '/api/resume/count')
             .then(res => res.json())
             .then(data => {
                 if (resumeClicksEl) resumeClicksEl.textContent = data.clicks ?? '0';
@@ -128,8 +132,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Fetch histories and render Chart.js
         try {
             const [totalRes, uniqueRes] = await Promise.all([
-                fetch('/api/total/history7d').then(r => r.json()),
-                fetch('/api/unique/history7d').then(r => r.json())
+                fetch(API_BASE + '/api/total/history7d').then(r => r.json()),
+                fetch(API_BASE + '/api/unique/history7d').then(r => r.json())
             ]);
 
             const labels = totalRes.days.map(ts => {
@@ -502,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resumeBtn = document.getElementById('resume-btn');
     if (resumeBtn) {
         resumeBtn.addEventListener('click', function() {
-            fetch('/api/resume/increment', { method: 'POST' })
+            fetch(API_BASE + '/api/resume/increment', { method: 'POST' })
                 .catch(() => {});
         });
     }
