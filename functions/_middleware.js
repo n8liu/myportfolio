@@ -1,4 +1,5 @@
 // Cloudflare Pages Functions middleware to handle R2 image requests
+import photosMetadata from './photos-metadata.json';
 
 export async function onRequest(context) {
   try {
@@ -181,14 +182,45 @@ async function getImages(category, env, corsHeaders) {
     
     // Create URLs that point to our own Functions endpoint
     const images = objects.map((object) => {
-      return {
+      const filename = object.key.split('/').pop();
+      const meta = photosMetadata.find(m => m.filename.toLowerCase() === filename.toLowerCase());
+      
+      const baseObj = {
         key: object.key,
-        name: object.key.split('/').pop().replace(/\.[^/.]+$/, ""),
+        name: filename.replace(/\.[^/.]+$/, ""),
         url: `/img/${object.key}`,
         category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
         size: object.size,
         uploaded: object.uploaded
       };
+
+      if (meta) {
+        const cameraStr = `${meta.camera || 'FUJIFILM'} ${meta.model || 'X-T5'}`;
+        const lensStr = meta.software ? meta.software.replace('Digital Camera ', '') : 'XF 35mm F1.4 R';
+        const exposureStr = meta.shutterSpeed || '1/250s';
+        const apertureStr = meta.aperture ? meta.aperture.replace('f/f/', 'f/') : 'f/5.6';
+        const isoStr = meta.iso ? String(meta.iso) : '200';
+        const locationStr = baseObj.category ? baseObj.category.replace(/_/g, ' ').toUpperCase() : 'CALIFORNIA';
+
+        return {
+          ...baseObj,
+          camera: cameraStr,
+          lens: lensStr,
+          exposure: exposureStr,
+          aperture: apertureStr,
+          iso: isoStr,
+          location: locationStr,
+          exif: {
+            camera: cameraStr,
+            lens: lensStr,
+            exposure: exposureStr,
+            aperture: apertureStr,
+            iso: isoStr,
+            location: locationStr
+          }
+        };
+      }
+      return baseObj;
     });
     
     console.log(`Returning ${images.length} images for category: ${category}`);

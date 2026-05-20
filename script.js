@@ -101,25 +101,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const resumeClicksEl = document.getElementById('resume-clicks');
 
         // Fetch counts
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/total')
+        fetch('/api/total')
             .then(res => res.json())
             .then(data => {
                 if (totalViewsEl) totalViewsEl.textContent = data.total ?? '0';
             }).catch(() => { if (totalViewsEl) totalViewsEl.textContent = '?'; });
 
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/unique/count')
+        fetch('/api/unique/count')
             .then(res => res.json())
             .then(data => {
                 if (uniqueViewsEl) uniqueViewsEl.textContent = data.count ?? '0';
             }).catch(() => { if (uniqueViewsEl) uniqueViewsEl.textContent = '?'; });
 
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/total/requests24h')
+        fetch('/api/total/requests24h')
             .then(res => res.json())
             .then(data => {
                 if (views24hEl) views24hEl.textContent = data.requests24h ?? '0';
             }).catch(() => { if (views24hEl) views24hEl.textContent = '?'; });
 
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/resume/count')
+        fetch('/api/resume/count')
             .then(res => res.json())
             .then(data => {
                 if (resumeClicksEl) resumeClicksEl.textContent = data.clicks ?? '0';
@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Fetch histories and render Chart.js
         try {
             const [totalRes, uniqueRes] = await Promise.all([
-                fetch('https://myportfolio.nathanliu528.workers.dev/api/total/history7d').then(r => r.json()),
-                fetch('https://myportfolio.nathanliu528.workers.dev/api/unique/history7d').then(r => r.json())
+                fetch('/api/total/history7d').then(r => r.json()),
+                fetch('/api/unique/history7d').then(r => r.json())
             ]);
 
             const labels = totalRes.days.map(ts => {
@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resumeBtn = document.getElementById('resume-btn');
     if (resumeBtn) {
         resumeBtn.addEventListener('click', function() {
-            fetch('https://myportfolio.nathanliu528.workers.dev/api/resume/increment', { method: 'POST' })
+            fetch('/api/resume/increment', { method: 'POST' })
                 .catch(() => {});
         });
     }

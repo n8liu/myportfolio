@@ -69,8 +69,8 @@ class ViewerCounter {
         }
       }
       if (isNewVisit) {
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/total/increment', { method: 'POST' }).catch(() => {});
-        fetch('https://myportfolio.nathanliu528.workers.dev/api/unique/increment', { method: 'POST' }).catch(() => {});
+        fetch('/api/total/increment', { method: 'POST' }).catch(() => {});
+        fetch('/api/unique/increment', { method: 'POST' }).catch(() => {});
       }
     } catch (error) {
       console.error('Error connecting to viewer counter:', error);

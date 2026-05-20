@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gym Routine - Blog</title>
+    <link class="favicon" rel="shortcut icon" href="../assets/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="blog-style.css">
+    <script>
+        const savedTheme = localStorage.getItem('portfolio-theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark'));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="blog-title">My Gym Routine</div>
+        <div class="blog-date">May 20, 2025</div>
+        <div class="blog-content">
+            <h2>Clearing My Mind Through Movement</h2>
+            <p>Coding for hours can take a toll, not just on the posture, but also on mental clarity. When my code compiler throws incomprehensible errors or database queries run slow, the gym is my escape. It provides a structured space to disconnect, focus entirely on physical execution, and release stress.</p>
+            <p>Consistency in physical training has directly improved my academic focus. It instills a sense of routine and discipline that transfers perfectly to working through difficult computer science assignments or long debug cycles.</p>
+
+            <h2>The Weekly Split</h2>
+            <p>I follow a classic Push-Pull-Legs (PPL) split, training 4-5 times a week with active recovery days. This allows for optimal muscle group targeting and plenty of rest:</p>
+            <ul>
+                <li><strong>Push Days:</strong> Chest, shoulders, and triceps (focusing on bench press, overhead press, and lateral raises).</li>
+                <li><strong>Pull Days:</strong> Back, rear delts, and biceps (deadlifts, pull-ups, and seated cable rows).</li>
+                <li><strong>Leg Days:</strong> Quads, hamstrings, and calves (squats, leg curls, and calf raises).</li>
+            </ul>
+
+            <h2>Lessons in Consistency</h2>
+            <p>Just like coding, progress in the gym doesn't happen overnight. It relies on progressive overload—small, incremental increases in weight and volume over weeks and months. Keeping a log of sets and weights helps track progress and keeps me accountable, much like committing code to a GitHub repository.</p>
+        </div>
+        <a href="/#blog" class="back-link"><i class="fas fa-arrow-left"></i> Back to Blog</a>
+    </div>
+</body>
+</html>
