@@ -58,6 +58,13 @@ export default {
 
     // 3. Fallback to Cloudflare Pages static asset serving
     if (env.ASSETS) {
+      // For client-side clean sub-routes without an extension (like /photography, /experience, etc.),
+      // serve the root index.html so client-side routing can take over.
+      const isCleanRoute = !path.includes('.') && path !== '/';
+      if (isCleanRoute) {
+        const indexRequest = new Request(new URL('/index.html', request.url), request);
+        return env.ASSETS.fetch(indexRequest);
+      }
       return env.ASSETS.fetch(request);
     }
 

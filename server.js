@@ -62,16 +62,23 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Route for other HTML pages - handles clean URLs
-app.get('/:page', (req, res) => {
+// Route for other HTML pages - handles clean URLs and SPA routing
+const clientRoutes = ['home', 'experience', 'projects', 'education', 'photography', 'blog', 'stats'];
+
+app.get('/:page', (req, res, next) => {
     const page = req.params.page;
-    // Remove .html extension if present
     const pageName = page.replace('.html', '');
-    // Try to serve the file from pages directory
+    
+    // If it's a client-side SPA route, serve index.html
+    if (clientRoutes.includes(pageName.toLowerCase())) {
+        return res.sendFile(path.join(__dirname, 'index.html'));
+    }
+    
+    // Otherwise, try to serve the file from pages directory
     res.sendFile(path.join(__dirname, 'pages', `${pageName}.html`), (err) => {
         if (err) {
-            // If file not found, send 404
-            res.status(404).send('404: Page not found');
+            // If file not found, let it fall through to 404 handler
+            next();
         }
     });
 });

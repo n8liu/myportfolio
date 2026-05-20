@@ -698,6 +698,8 @@ body.loaded {
     font-family: var(--font-mono);
     font-size: 0.85rem;
     font-weight: 700;
+    user-select: none;
+    cursor: move;
 }
 
 .modal-body {

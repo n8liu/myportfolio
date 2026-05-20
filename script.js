@@ -5,10 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // ----------------------------------------------------
     // Draggable Window Logic
     // ----------------------------------------------------
-    const windowEl = document.querySelector('.os-window');
-    const titlebar = document.querySelector('.window-titlebar');
-    
-    if (windowEl && titlebar) {
+    function makeElementDraggable(windowEl, titlebar) {
+        if (!windowEl || !titlebar) return;
+        
         let isDragging = false;
         let startX = 0;
         let startY = 0;
@@ -62,22 +61,26 @@ document.addEventListener('DOMContentLoaded', function() {
             windowEl.style.transition = '';
             windowEl.classList.remove('dragging');
         }
+
+        // Expose a reset method
+        windowEl.resetDrag = function() {
+            offsetX = 0;
+            offsetY = 0;
+            windowEl.style.transform = '';
+        };
     }
 
-    // ----------------------------------------------------
-    // Desktop Shortcuts Logic
-    // ----------------------------------------------------
-    const shortcuts = document.querySelectorAll('.shortcut-icon');
-    shortcuts.forEach(shortcut => {
-        const handler = function() {
-            const target = shortcut.getAttribute('data-shortcut');
-            if (target) {
-                switchTab(target);
-            }
-        };
-        shortcut.addEventListener('click', handler);
-        shortcut.addEventListener('dblclick', handler);
+    // Apply dragging to main window
+    makeElementDraggable(document.querySelector('.os-window'), document.querySelector('.window-titlebar'));
+
+    // Apply dragging to all modal dialogs (like photo viewer and blog reader)
+    document.querySelectorAll('.modal-dialog').forEach(modalDialog => {
+        const modalTitlebar = modalDialog.querySelector('.modal-titlebar');
+        if (modalTitlebar) {
+            makeElementDraggable(modalDialog, modalTitlebar);
+        }
     });
+
 
     // ----------------------------------------------------
     // 1. Tab Switching Logic (Carolyn Wang Inspired Layout)
@@ -129,23 +132,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function getTabFromPath() {
+        const path = window.location.pathname.substring(1); // Remove leading slash
+        const cleanPath = path.replace('.html', '').toLowerCase();
+        return pathMappings[cleanPath] ? cleanPath : null;
+    }
+
     // Bind tab clicks
     navTabs.forEach(tab => {
         tab.addEventListener('click', function(e) {
             e.preventDefault();
             const tabName = this.getAttribute('data-tab');
             switchTab(tabName);
-            // Update URL hash
-            window.location.hash = tabName;
+            // Update URL using History API
+            const newPath = tabName === 'home' ? '/' : `/${tabName}`;
+            if (window.location.pathname !== newPath) {
+                history.pushState({ tab: tabName }, '', newPath);
+            }
         });
     });
 
-    // Check URL hash on page load
-    const initialHash = window.location.hash.substring(1);
-    if (initialHash && pathMappings[initialHash]) {
-        switchTab(initialHash);
+    // Handle back/forward navigation
+    window.addEventListener('popstate', function(e) {
+        const tabName = (e.state && e.state.tab) || getTabFromPath() || 'home';
+        switchTab(tabName);
+    });
+
+    // Check URL path on page load
+    const initialTab = getTabFromPath();
+    if (initialTab) {
+        switchTab(initialTab);
+        history.replaceState({ tab: initialTab }, '', window.location.pathname);
     } else {
         switchTab('home');
+        history.replaceState({ tab: 'home' }, '', '/');
     }
 
     // ----------------------------------------------------
@@ -264,6 +284,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 12,
+                            left: 8,
+                            right: 8,
+                            top: 4
+                        }
+                    },
                     plugins: {
                         legend: {
                             position: 'top',
@@ -441,6 +469,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function openPhotoModal(photo) {
         if (!photoModal || !modalImage || !modalPhotoName) return;
 
+        // Reset drag position of the dialog
+        const modalDialog = photoModal.querySelector('.modal-dialog');
+        if (modalDialog && typeof modalDialog.resetDrag === 'function') {
+            modalDialog.resetDrag();
+        }
+
         let imgUrl = photo.url;
         if (!imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
             imgUrl = '/' + imgUrl;
@@ -502,6 +536,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function openBlogModal(blogUrl) {
         if (!blogModal || !modalBlogTitle || !modalBlogDate || !modalBlogContent) return;
+
+        // Reset drag position of the dialog
+        const modalDialog = blogModal.querySelector('.modal-dialog');
+        if (modalDialog && typeof modalDialog.resetDrag === 'function') {
+            modalDialog.resetDrag();
+        }
 
         // Show loading state first
         modalBlogTitle.textContent = "Loading post...";
