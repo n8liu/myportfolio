@@ -20,6 +20,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=24"
+  },
   "description": "A modern, responsive personal portfolio website showcasing professional skills, projects, and photography with a clean dark-themed design. Built with Node.js, Express, and Cloudflare's edge computing platform.",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.812.0",
