@@ -15,12 +15,12 @@ const __dirname = path.dirname(__filename);
 // Load photos metadata
 let photosMetadata = [];
 try {
-    const metaPath = path.join(__dirname, 'photos-metadata.json');
+    const metaPath = path.join(__dirname, 'functions', 'photos-metadata.json');
     if (fs.existsSync(metaPath)) {
         photosMetadata = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
         console.log(`Successfully loaded ${photosMetadata.length} EXIF metadata records.`);
     } else {
-        console.warn('photos-metadata.json not found in root.');
+        console.warn('photos-metadata.json not found in functions directory.');
     }
 } catch (error) {
     console.error('Failed to load photos-metadata.json:', error);

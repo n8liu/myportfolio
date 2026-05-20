@@ -14,64 +14,117 @@ export class UniqueVisitors {
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
+
+    const now = Date.now();
+    const todayStr = new Date(now).toISOString().split('T')[0];
+
     if (url.pathname.endsWith('/increment')) {
       let ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || '';
       if (!ip) {
         ip = Math.random().toString(36).slice(2);
       }
-      let now = Date.now();
-      await this.state.storage.put(ip, now);
-      
-      // Prune records older than 7 days to prevent storage leaks and DO memory limit issues
-      const sevenDaysAgo = now - (7 * 24 * 3600 * 1000);
-      let all = await this.state.storage.list();
-      let count = 0;
-      for (let [key, lastSeen] of all.entries()) {
-        if (lastSeen < sevenDaysAgo) {
+
+      // Check if IP is already seen today
+      const seenKey = `seen:${todayStr}:${ip}`;
+      const hasBeenSeen = await this.state.storage.get(seenKey);
+
+      if (!hasBeenSeen) {
+        // Record as seen today, with value as timestamp
+        await this.state.storage.put(seenKey, now);
+
+        // Increment today's unique count
+        const dailyKey = `count:${todayStr}`;
+        const dailyCount = (await this.state.storage.get(dailyKey)) || 0;
+        await this.state.storage.put(dailyKey, dailyCount + 1);
+      }
+
+      // Trigger pruning of data older than 7 days once a day
+      const lastPruned = await this.state.storage.get('last_pruned_date');
+      if (lastPruned !== todayStr) {
+        const eightDaysAgo = new Date(now - 8 * 24 * 3600 * 1000).toISOString().split('T')[0];
+        const oldKeys = await this.state.storage.list({ prefix: `seen:${eightDaysAgo}:` });
+        for (const key of oldKeys.keys()) {
           await this.state.storage.delete(key);
+        }
+        await this.state.storage.delete(`count:${eightDaysAgo}`);
+        await this.state.storage.put('last_pruned_date', todayStr);
+      }
+
+      // Get 7-day exact unique visitors count
+      const count = await this.getUniqueCount7D(now);
+      return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
+
+    } else if (url.pathname.endsWith('/visitors24h')) {
+      // Sum visitors over the past 24 hours
+      const visitors24h = await this.getUniqueCount24H(now);
+      return new Response(JSON.stringify({ visitors24h }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
+
+    } else if (url.pathname.endsWith('/count')) {
+      // Get 7-day unique count (this matches previous behavior)
+      const count = await this.getUniqueCount7D(now);
+      return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
+
+    } else if (url.pathname.endsWith('/history7d')) {
+      // Prepare 7 days of daily visitor counts
+      const counts = [];
+      const days = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now - i * 24 * 3600 * 1000);
+        const dateStr = d.toISOString().split('T')[0];
+        d.setUTCHours(0, 0, 0, 0);
+        days.push(d.getTime());
+
+        const dailyCount = (await this.state.storage.get(`count:${dateStr}`)) || 0;
+        counts.push(dailyCount);
+      }
+      return new Response(JSON.stringify({ days, counts }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
+    }
+
+    return new Response('Not found', { status: 404, headers: corsHeaders });
+  }
+
+  // Calculate unique IP count over past 7 days
+  async getUniqueCount7D(now) {
+    const uniqueIPs = new Set();
+    for (let i = 0; i < 7; i++) {
+      const dateStr = new Date(now - i * 24 * 3600 * 1000).toISOString().split('T')[0];
+      let cursor = "";
+      while (true) {
+        const options = { prefix: `seen:${dateStr}:`, limit: 100 };
+        if (cursor) options.cursor = cursor;
+        const res = await this.state.storage.list(options);
+        for (const key of res.keys()) {
+          const parts = key.split(':');
+          if (parts.length >= 3) {
+            uniqueIPs.add(parts[2]);
+          }
+        }
+        if (res.cursor) {
+          cursor = res.cursor;
         } else {
-          count++;
+          break;
         }
       }
-      return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
-    } else if (url.pathname.endsWith('/visitors24h')) {
-      let now = Date.now();
-      let all = await this.state.storage.list();
-      let count = 0;
-      for (let [ip, lastSeen] of all.entries()) {
-        if (now - lastSeen < 24*3600*1000) count++;
-      }
-      return new Response(JSON.stringify({ visitors24h: count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
-    } else if (url.pathname.endsWith('/count')) {
-      let all = await this.state.storage.list();
-      let count = all.size;
-      return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
-    } else if (url.pathname.endsWith('/history7d')) {
-      let now = Date.now();
-      let all = await this.state.storage.list();
-      // Prepare 7 days of buckets for unique IPs per day
-      let buckets = Array(7).fill(0);
-      let perDayIPs = Array(7).fill(null).map(() => new Set());
-      for (let [ip, lastSeen] of all.entries()) {
-        for (let i = 0; i < 7; i++) {
-          let dayStart = new Date(now - (6-i)*24*3600*1000);
-          dayStart.setUTCHours(0,0,0,0);
-          let dayEnd = dayStart.getTime() + 24*3600*1000;
-          if (lastSeen >= dayStart.getTime() && lastSeen < dayEnd) {
-            perDayIPs[i].add(ip);
+    }
+    return uniqueIPs.size;
+  }
+
+  // Calculate unique IP count over past 24 hours
+  async getUniqueCount24H(now) {
+    const uniqueIPs = new Set();
+    const twentyFourHoursAgo = now - 24 * 3600 * 1000;
+    for (let i = 0; i < 2; i++) {
+      const dateStr = new Date(now - i * 24 * 3600 * 1000).toISOString().split('T')[0];
+      const res = await this.state.storage.list({ prefix: `seen:${dateStr}:` });
+      for (const [key, lastSeen] of res.entries()) {
+        if (lastSeen >= twentyFourHoursAgo) {
+          const parts = key.split(':');
+          if (parts.length >= 3) {
+            uniqueIPs.add(parts[2]);
           }
         }
       }
-      for (let i = 0; i < 7; i++) buckets[i] = perDayIPs[i].size;
-      // Prepare day labels (midnight UTC for each day)
-      let days = [];
-      for (let i = 6; i >= 0; i--) {
-        let d = new Date(now - i*24*3600*1000);
-        d.setUTCHours(0,0,0,0);
-        days.push(d.getTime());
-      }
-      return new Response(JSON.stringify({ days, counts: buckets }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
     }
-    return new Response('Not found', { status: 404, headers: corsHeaders });
+    return uniqueIPs.size;
   }
 }

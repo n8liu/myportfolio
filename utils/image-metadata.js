@@ -149,7 +149,7 @@ const isMain = process.argv[1] && (path.resolve(process.argv[1]) === fileURLToPa
 if (isMain) {
     const args = process.argv.slice(2);
     const photosDir = args[0] || path.join(__dirname, '..', 'photos');
-    const outputPath = args[1] || path.join(__dirname, '..', 'photos-metadata.json');
+    const outputPath = args[1] || path.join(__dirname, '..', 'functions', 'photos-metadata.json');
     
     console.log(`Extracting metadata from ${photosDir}...`);
     

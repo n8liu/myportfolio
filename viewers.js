@@ -35,7 +35,7 @@ class ViewerCounter {
   }
 
   async initCloudflare() {
-    const workerBase = 'https://myportfolio.nathanliu528.workers.dev';
+    const workerBase = '';
     try {
       // Register connection
       const response = await fetch(`${workerBase}/api/viewers/connect`);

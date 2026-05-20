@@ -1,8 +1,83 @@
 // Client-side JavaScript for Retro OS Portfolio Redesign
 document.addEventListener('DOMContentLoaded', function() {
-    const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '0.0.0.0')
-        ? ''
-        : 'https://myportfolio.nathanliu528.workers.dev';
+    const API_BASE = '';
+
+    // ----------------------------------------------------
+    // Draggable Window Logic
+    // ----------------------------------------------------
+    const windowEl = document.querySelector('.os-window');
+    const titlebar = document.querySelector('.window-titlebar');
+    
+    if (windowEl && titlebar) {
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        titlebar.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', dragMove);
+        document.addEventListener('mouseup', dragEnd);
+
+        // Touch support
+        titlebar.addEventListener('touchstart', dragStart, { passive: true });
+        document.addEventListener('touchmove', dragMove, { passive: false });
+        document.addEventListener('touchend', dragEnd);
+
+        function dragStart(e) {
+            if (window.innerWidth <= 768) return; // Disable dragging on mobile
+            
+            // Do not drag if clicking controls or buttons
+            if (e.target.closest('.win-btn') || e.target.closest('.menu-item')) return;
+
+            isDragging = true;
+            
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+            
+            startX = clientX - offsetX;
+            startY = clientY - offsetY;
+            
+            windowEl.style.transition = 'none';
+            windowEl.classList.add('dragging');
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            
+            if (e.cancelable) e.preventDefault();
+
+            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+
+            offsetX = clientX - startX;
+            offsetY = clientY - startY;
+
+            windowEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+        }
+
+        function dragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            windowEl.style.transition = '';
+            windowEl.classList.remove('dragging');
+        }
+    }
+
+    // ----------------------------------------------------
+    // Desktop Shortcuts Logic
+    // ----------------------------------------------------
+    const shortcuts = document.querySelectorAll('.shortcut-icon');
+    shortcuts.forEach(shortcut => {
+        const handler = function() {
+            const target = shortcut.getAttribute('data-shortcut');
+            if (target) {
+                switchTab(target);
+            }
+        };
+        shortcut.addEventListener('click', handler);
+        shortcut.addEventListener('dblclick', handler);
+    });
 
     // ----------------------------------------------------
     // 1. Tab Switching Logic (Carolyn Wang Inspired Layout)
@@ -149,10 +224,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 statsChartInstance.destroy();
             }
 
-            const isDark = document.body.classList.contains('dark');
-            const borderCol = isDark ? '#f4f1ea' : '#1e1e1e';
-            const textCol = isDark ? '#f4f1ea' : '#1e1e1e';
-            const gridCol = isDark ? 'rgba(244, 241, 234, 0.05)' : 'rgba(30, 30, 30, 0.05)';
+            const borderCol = '#1e1e1e';
+            const textCol = '#1e1e1e';
+            const gridCol = 'rgba(30, 30, 30, 0.05)';
 
             statsChartInstance = new Chart(ctx.getContext('2d'), {
                 type: 'line',
@@ -508,55 +582,6 @@ document.addEventListener('DOMContentLoaded', function() {
         resumeBtn.addEventListener('click', function() {
             fetch(API_BASE + '/api/resume/increment', { method: 'POST' })
                 .catch(() => {});
-        });
-    }
-
-    // ----------------------------------------------------
-    // 6. Dark Mode Toggle & Initialization
-    // ----------------------------------------------------
-    const themeToggleBtn = document.getElementById('theme-toggle');
-
-    function applyTheme(theme) {
-        if (theme === 'dark') {
-            document.body.classList.add('dark');
-            if (themeToggleBtn) themeToggleBtn.textContent = 'light mode';
-        } else {
-            document.body.classList.remove('dark');
-            if (themeToggleBtn) themeToggleBtn.textContent = 'dark mode';
-        }
-
-        // Broadcast to dynamic child elements if needed
-        const activeTab = document.querySelector('.nav-tab.active');
-        if (activeTab && activeTab.getAttribute('data-tab') === 'stats' && statsChartInstance) {
-            const isDark = document.body.classList.contains('dark');
-            const borderCol = isDark ? '#f4f1ea' : '#1e1e1e';
-            const textCol = isDark ? '#f4f1ea' : '#1e1e1e';
-            const gridCol = isDark ? 'rgba(244, 241, 234, 0.05)' : 'rgba(30, 30, 30, 0.05)';
-
-            statsChartInstance.data.datasets.forEach(dataset => {
-                dataset.borderColor = borderCol;
-                dataset.pointBorderColor = borderCol;
-            });
-            statsChartInstance.options.scales.x.ticks.color = textCol;
-            statsChartInstance.options.scales.x.grid.color = gridCol;
-            statsChartInstance.options.scales.y.ticks.color = textCol;
-            statsChartInstance.options.scales.y.grid.color = gridCol;
-            statsChartInstance.options.plugins.legend.labels.color = textCol;
-            statsChartInstance.update();
-        }
-    }
-
-    // Load theme from localStorage or system preferences
-    const savedTheme = localStorage.getItem('portfolio-theme') || 
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    applyTheme(savedTheme);
-
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const currentTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
-            localStorage.setItem('portfolio-theme', currentTheme);
-            applyTheme(currentTheme);
         });
     }
 

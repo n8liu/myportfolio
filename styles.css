@@ -19,18 +19,6 @@
     --grid-color: rgba(30, 30, 30, 0.03);
 }
 
-body.dark {
-    --bg-canvas: #121210;       /* Dark warm charcoal */
-    --bg-window: #1e1e1b;       /* Dark window background */
-    --bg-chrome: #2d2d2a;       /* Dark retro gray */
-    --bg-active: #b57a07;       /* Deeper amber */
-    --accent: #9b81e8;          /* Muted lighter purple */
-    --text: #f4f1ea;            /* Cream white */
-    --text-muted: #a39f97;      /* Muted gray-beige */
-    --border-color: #f4f1ea;
-    --grid-color: rgba(244, 241, 234, 0.03);
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -125,6 +113,11 @@ body.loaded {
     font-size: 0.85rem;
     font-weight: 700;
     user-select: none;
+    cursor: move;
+}
+
+.os-window.dragging {
+    box-shadow: 8px 8px 0px 0px var(--border-color) !important;
 }
 
 .window-title {
@@ -663,16 +656,16 @@ body.loaded {
     right: 0;
     bottom: 0;
     background-color: rgba(30, 30, 30, 0.4);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
     transition: opacity 0.2s ease;
 }
 
 .modal-overlay.active {
+    display: flex;
     opacity: 1;
     pointer-events: auto;
 }
@@ -760,18 +753,70 @@ body.loaded {
     font-weight: 700;
 }
 
-/* Theme Toggle Tab Style */
-.theme-toggle {
-    margin-left: auto;
-    background: none;
-    border: 2px solid transparent;
-    cursor: pointer;
-    color: var(--text);
+
+/* Desktop Shortcut Icons */
+.desktop-shortcuts {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 10;
 }
 
-.theme-toggle:hover {
-    background-color: rgba(128, 128, 128, 0.08) !important;
-    text-decoration: underline;
+.shortcut-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 80px;
+    padding: 0.5rem;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+    border-radius: 4px;
+    transition: all 0.1s ease;
+}
+
+.shortcut-icon i {
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
+    filter: drop-shadow(1px 1px 0px var(--border-color));
+}
+
+.shortcut-icon:hover {
+    background-color: rgba(128, 128, 128, 0.08);
+}
+
+.shortcut-icon:focus {
+    background-color: var(--bg-active);
+    outline: var(--border-thin);
+}
+
+@media (max-width: 1024px) {
+    .desktop-shortcuts {
+        position: relative;
+        top: 0;
+        left: 0;
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .desktop-shortcuts {
+        display: none !important;
+    }
 }
 
 /* Zooming out for dashboard mode transition */
@@ -910,3 +955,4 @@ body.zooming-out {
         font-size: 1.5rem;
     }
 }
+
