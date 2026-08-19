@@ -16,7 +16,11 @@
     --shadow-hover: 1px 1px 0px 0px var(--border-color);
     --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'Space Mono', monospace;
-    --grid-color: rgba(30, 30, 30, 0.03);
+    --grid-color: rgba(30, 30, 30, 0.035);
+    --mouse-x: 50vw;
+    --mouse-y: 50vh;
+    --mouse-px: 0;
+    --mouse-py: 0;
 }
 
 * {
@@ -27,10 +31,6 @@
 
 body {
     background-color: var(--bg-canvas);
-    background-image: 
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-    background-size: 20px 20px;
     color: var(--text);
     font-family: var(--font-sans);
     min-height: 100vh;
@@ -40,6 +40,33 @@ body {
     justify-content: flex-start;
     padding: 2rem 1rem;
     overflow-y: scroll;
+    position: relative;
+}
+
+/* Minimalist Interactive Retro OS Wallpaper (Cursor Ambient Spotlight & Parallax Grid) */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+    background-color: var(--bg-canvas);
+    background-image: 
+        radial-gradient(650px circle at var(--mouse-x, 50vw) var(--mouse-y, 50vh), rgba(255, 231, 160, 0.45) 0%, rgba(81, 57, 137, 0.05) 35%, transparent 75%),
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 
+        100% 100%,
+        20px 20px,
+        20px 20px;
+    background-position: 
+        0 0,
+        calc(var(--mouse-px, 0) * 8px) calc(var(--mouse-py, 0) * 8px),
+        calc(var(--mouse-px, 0) * 8px) calc(var(--mouse-py, 0) * 8px);
+    will-change: background-position;
 }
 
 /* Page transitions */
@@ -201,6 +228,77 @@ body.loaded {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Status Badge (Retro OS Style) */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--bg-window);
+    border: var(--border);
+    box-shadow: 2px 2px 0px 0px var(--border-color);
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.1s ease;
+    cursor: default;
+}
+
+.status-badge:hover {
+    background-color: var(--bg-active);
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px 0px var(--border-color);
+}
+
+.status-badge-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: status-pulse 2s infinite;
+}
+
+@keyframes status-pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.status-badge-label {
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.taskbar-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.taskbar-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    animation: status-pulse 2s infinite;
 }
 
 /* Home Panel (Carolyn Wang Layout) */

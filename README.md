@@ -142,9 +142,3 @@ Telemetry is loaded from serverless backend APIs:
 *   `Total Views` / `Unique Visitors` / `Views (24h)`
 *   Dynamic 7-day traffic chart (automatically styled dynamically on theme changes)
 *   Resume download logs
-
----
-
-## License
-
-This project is licensed under the ISC License.

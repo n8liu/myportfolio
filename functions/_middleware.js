@@ -33,7 +33,7 @@ export async function onRequest(context) {
     
     // Handle R2 image requests directly
     if (path.startsWith('/img/')) {
-      return await serveR2Object(path.substring(5), env, corsHeaders); // Remove '/img/' from path
+      return await serveR2Object(path.substring(5), env, corsHeaders, request, context); // Remove '/img/' from path
     }
 
     // Pass through all other requests
@@ -51,13 +51,21 @@ export async function onRequest(context) {
 }
 
 // Serve an R2 object directly
-async function serveR2Object(objectKey, env, corsHeaders) {
+async function serveR2Object(objectKey, env, corsHeaders, request, context) {
   try {
     if (!env.MY_BUCKET) {
       throw new Error('R2 bucket binding not available');
     }
 
-    console.log(`Serving from R2: ${objectKey}`);
+    // Check Cloudflare Edge Cache first
+    const cache = caches.default;
+    let cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      console.log(`Cache hit for: ${objectKey}`);
+      return cachedResponse;
+    }
+
+    console.log(`Cache miss. Serving from R2: ${objectKey}`);
     
     // Get the object from R2
     const object = await env.MY_BUCKET.get(objectKey);
@@ -90,14 +98,21 @@ async function serveR2Object(objectKey, env, corsHeaders) {
       headers.set('Content-Type', 'application/octet-stream');
     }
     
-    // Set cache control for good performance
-    headers.set('Cache-Control', 'public, max-age=31536000');
+    // Set cache control for good performance (1 year browser and Edge CDN cache)
+    headers.set('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
     headers.set('Content-Length', object.size);
     
     // Use streaming for better performance
-    return new Response(object.body, {
+    const response = new Response(object.body, {
       headers
     });
+
+    // Cache the response asynchronously at the Edge CDN
+    if (context && context.waitUntil) {
+      context.waitUntil(cache.put(request, response.clone()));
+    }
+    
+    return response;
   } catch (error) {
     console.error(`Error serving R2 object: ${objectKey}`, error);
     return new Response(JSON.stringify({ 

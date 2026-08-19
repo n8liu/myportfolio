@@ -53,7 +53,7 @@ export default {
     }
     
     if (path.startsWith('/img/')) {
-      return await serveR2Object(path.substring(5), env, corsHeaders); // Remove '/img/' from path
+      return await serveR2Object(path.substring(5), env, corsHeaders, request, ctx); // Remove '/img/' from path
     }
 
     // 3. Fallback to Cloudflare Pages static asset serving
@@ -74,11 +74,21 @@ export default {
 
 // --- Helper Functions for R2 / Photography ---
 
-async function serveR2Object(objectKey, env, corsHeaders) {
+async function serveR2Object(objectKey, env, corsHeaders, request, ctx) {
   try {
     if (!env.MY_BUCKET) {
       throw new Error('R2 bucket binding not available');
     }
+
+    // Check Cloudflare Edge Cache first
+    const cache = caches.default;
+    let cachedResponse = await cache.match(request);
+    if (cachedResponse) {
+      console.log(`Cache hit for: ${objectKey}`);
+      return cachedResponse;
+    }
+
+    console.log(`Cache miss. Serving from R2: ${objectKey}`);
     
     const object = await env.MY_BUCKET.get(objectKey);
     
@@ -107,12 +117,20 @@ async function serveR2Object(objectKey, env, corsHeaders) {
       headers.set('Content-Type', 'application/octet-stream');
     }
     
-    headers.set('Cache-Control', 'public, max-age=31536000');
+    // Set cache control for good performance (1 year browser and Edge CDN cache)
+    headers.set('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
     headers.set('Content-Length', object.size);
     
-    return new Response(object.body, {
+    const response = new Response(object.body, {
       headers
     });
+
+    // Cache the response asynchronously at the Edge CDN
+    if (ctx && ctx.waitUntil) {
+      ctx.waitUntil(cache.put(request, response.clone()));
+    }
+    
+    return response;
   } catch (error) {
     return new Response(JSON.stringify({ 
       error: 'Failed to serve object', 

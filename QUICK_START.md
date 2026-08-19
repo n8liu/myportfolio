@@ -168,5 +168,3 @@ This will show you:
 npm run build
 npm run deploy
 ```
-
-Your improvements are live! 🎉

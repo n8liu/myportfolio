@@ -190,3 +190,33 @@ for (let [ip, lastSeen] of all.entries()) {
 }
 ```
 *Note: A production-ready design would utilize key prefixes (e.g., `ip:{ip_address}`) and maintain a separate daily unique visitor counter to avoid listing IP addresses completely during standard requests.*
+
+---
+
+## 6. Crucial Implementation Updates (Implemented May 2026)
+
+### Restored Analytics & API_BASE Injection
+- **Problem**: Client-side analytics calls were missing, freezing production visitor count.
+- **Solution**: Re-implemented increment calls for total views and unique visitors in [script.js](file:///Users/natedogl/CODE/myportfolio/script.js) and [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js).
+- **Environment Handling**: Instead of hardcoding URLs, the client files define placeholders:
+  - `const API_BASE = '';` in [script.js](file:///Users/natedogl/CODE/myportfolio/script.js)
+  - `const workerBase = '';` in [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js)
+- **Deployment Automation**: Added [prepare-pages-config.js](file:///Users/natedogl/CODE/myportfolio/utils/prepare-pages-config.js) to the build pipeline. During `npm run build`, it:
+  1. Checks if `process.env.API_BASE` is set.
+  2. If present, replaces the placeholders in `dist/script.js` and `dist/viewers.js` with the production worker URL (`https://myportfolio.nathanliu528.workers.dev`).
+  3. Generates a production-compatible Pages `dist/wrangler.toml` containing DO bindings, migrations, and R2 configurations.
+
+---
+
+## 7. Knowledge Transfer for Future AI Models & Agents
+
+When making updates or debugging this codebase, pay close attention to the following system invariants and architectural details:
+
+### ⚠️ High-Risk Gotchas
+
+1. **Do NOT Edit `dist/` Files Directly**:
+   The `dist/` directory is ephemeral and is completely rebuilt during deployments. Any edits made there will be lost. Always edit source files in the root folder, and let the build pipeline compile and copy them.
+2. **Preserve Empty String Placeholders**:
+   In root files like [script.js](file:///Users/natedogl/CODE/myportfolio/script.js) and [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js), keep the placeholders as empty strings (`API_BASE = ''` and `workerBase = ''`). The build process will automatically inject the environment values. This ensures that local development continues to query the local fallback servers (e.g. Socket.io on port 3000) automatically when run locally, while utilizing Cloudflare in production.
+3. **Cloudflare Pages Configuration Drift**:
+   Cloudflare Pages requires bindings (Durable Objects, R2, compatibility dates, and migrations) to be present at deploy-time. We generate `dist/wrangler.toml` dynamically from the root `wrangler.toml` using `prepare-pages-config.js`. If you add new bindings or change Durable Object settings, update the root [wrangler.toml](file:///Users/natedogl/CODE/myportfolio/wrangler.toml), NOT the build files.
