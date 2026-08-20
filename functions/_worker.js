@@ -213,8 +213,8 @@ async function getImages(category, env, corsHeaders) {
       };
 
       if (meta) {
-        const cameraStr = `${meta.camera || 'FUJIFILM'} ${meta.model || 'X-T5'}`;
-        const lensStr = meta.software ? meta.software.replace('Digital Camera ', '') : 'XF 35mm F1.4 R';
+        const cameraStr = `${meta.camera || 'FUJIFILM'} ${meta.model || 'X100VI'}`;
+        const lensStr = meta.software ? meta.software.replace('Digital Camera ', '') : 'Fujinon 23mm F2.0 (Fixed)';
         const exposureStr = meta.shutterSpeed || '1/250s';
         const apertureStr = meta.aperture ? meta.aperture.replace('f/f/', 'f/') : 'f/5.6';
         const isoStr = meta.iso ? String(meta.iso) : '200';

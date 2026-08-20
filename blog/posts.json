@@ -1,0 +1,82 @@
+[
+  {
+    "id": "matcha",
+    "title": "Ranking Every Matcha I Tried!",
+    "date": "Aug. 20, 2026",
+    "datetime": "2026-08-20",
+    "readTime": "2 min read",
+    "summary": "Matcha this, matcha that. I love matcha, so here is every matcha I have tried.",
+    "tags": ["Food", "Matcha", "Drink"],
+    "file": "matcha.md"
+  },
+  {
+    "id": "market-pipeline",
+    "title": "Building an Event-Driven Market Pipeline with Vector Search",
+    "date": "Jun. 1, 2026",
+    "datetime": "2026-06-01",
+    "readTime": "5 min read",
+    "summary": "An event-driven data pipeline using zero-shot extraction, vector embeddings, and clustering to process financial news into deduplicated market intelligence.",
+    "tags": ["Data Engineering", "Vector Search", "NLP"],
+    "file": "market-pipeline.md"
+  },
+  {
+    "id": "berkeley-classes",
+    "title": "Ranking and Rating Every Class I Took at UC Berkeley",
+    "date": "May 20, 2026",
+    "datetime": "2026-05-20",
+    "readTime": "2 min read",
+    "summary": "An honest review, rating matrix, and breakdown of every Computer Science, Data Science, Statistics, and Physics course I completed at Cal (Class of 2026).",
+    "tags": ["UC Berkeley", "Course Reviews", "Academics"],
+    "file": "berkeley-classes.md"
+  },
+  {
+    "id": "clickbait-classifier",
+    "title": "From TF-IDF to BERT: Lessons from Clickbait Classifier",
+    "date": "Mar. 28, 2026",
+    "datetime": "2026-03-28",
+    "readTime": "4 min read",
+    "summary": "Fine-tuning a BERT classifier on 18K news titles to achieve 0.89 F1, outperforming TF-IDF by +0.14 points. Lessons in NLP, error analysis, and evaluation.",
+    "tags": ["Machine Learning", "NLP", "BERT"],
+    "file": "clickbait-classifier.md"
+  },
+  {
+    "id": "fujifilm-x100vi",
+    "title": "Why My Fujifilm X100VI",
+    "date": "Nov. 12, 2025",
+    "datetime": "2025-11-12",
+    "readTime": "4 min read",
+    "summary": "Comparing the tactile shooting experience, film simulations (Classic Chrome, Reala Ace), and the discipline of a fixed 23mm F2 lens versus computational smartphones.",
+    "tags": ["Photography", "Fujifilm", "Design"],
+    "file": "fujifilm-x100vi.md"
+  },
+  {
+    "id": "gym",
+    "title": "My Gym Routine",
+    "date": "May 28, 2025 (Updated Aug. 18, 2026)",
+    "datetime": "2025-05-28",
+    "readTime": "3 min read",
+    "summary": "My weekly gym routine, tracking consistency, personal milestones, and how working out helps clear my head from coding.",
+    "tags": ["Fitness", "Routine", "Life"],
+    "file": "gym.md"
+  },
+  {
+    "id": "datascience",
+    "title": "Why Data Engineering",
+    "date": "Apr. 2, 2025",
+    "datetime": "2025-04-02",
+    "readTime": "3 min read",
+    "summary": "A reflection on why data science excites me, statistical insights, and the power of data visualization.",
+    "tags": ["Data Science", "Reflection", "Engineering"],
+    "file": "datascience.md"
+  },
+  {
+    "id": "portfolio",
+    "title": "How I Built My Portfolio Website",
+    "date": "Mar. 24, 2025",
+    "datetime": "2025-03-24",
+    "readTime": "5 min read",
+    "summary": "A breakdown of my serverless tech stack, custom Durable Objects trackers, R2 integration, and design decisions.",
+    "tags": ["Full Stack", "Cloudflare", "Web Development"],
+    "file": "portfolio.md"
+  }
+]

@@ -62,6 +62,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Route for single blog post deep links (e.g. /blog/:slug)
+app.get('/blog/:slug', (req, res, next) => {
+    if (req.params.slug.includes('.')) {
+        return next();
+    }
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Route for other HTML pages - handles clean URLs and SPA routing
 const clientRoutes = ['home', 'experience', 'projects', 'education', 'photography', 'blog', 'stats'];
 
@@ -112,8 +120,8 @@ app.get('/api/images/:category?', async (req, res) => {
             const meta = photosMetadata.find(m => m.filename.toLowerCase() === filename.toLowerCase());
             
             if (meta) {
-                const cameraStr = `${meta.camera || 'FUJIFILM'} ${meta.model || 'X-T5'}`;
-                const lensStr = meta.software ? meta.software.replace('Digital Camera ', '') : 'XF 35mm F1.4 R';
+                const cameraStr = `${meta.camera || 'FUJIFILM'} ${meta.model || 'X100VI'}`;
+                const lensStr = meta.software ? meta.software.replace('Digital Camera ', '') : 'Fujinon 23mm F2.0 (Fixed)';
                 const exposureStr = meta.shutterSpeed || '1/250s';
                 const apertureStr = meta.aperture ? meta.aperture.replace('f/f/', 'f/') : 'f/5.6';
                 const isoStr = meta.iso ? String(meta.iso) : '200';

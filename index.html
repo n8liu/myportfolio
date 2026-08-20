@@ -1,35 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
+
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Nathan Liu - UC Berkeley Data Science & Computer Science student passionate about machine learning, full-stack development, and data-driven solutions. View my projects, coursework, and photography.">
-    <meta name="keywords" content="Nathan Liu, Data Science, Computer Science, UC Berkeley, Machine Learning, Full Stack Developer, Portfolio, Software Engineer">
+    <meta name="description"
+        content="Nathan Liu - UC Berkeley Data Science & Computer Science student passionate about machine learning, full-stack development, and data-driven solutions. View my projects, coursework, and photography.">
+    <meta name="keywords"
+        content="Nathan Liu, Data Science, Computer Science, UC Berkeley, Machine Learning, Full Stack Developer, Portfolio, Software Engineer">
     <meta name="author" content="Nathan Liu">
-    
+
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Nathan Liu - Data Science & Computer Science Portfolio">
-    <meta property="og:description" content="UC Berkeley student passionate about machine learning, data analytics, and full-stack development. Explore my projects and technical expertise.">
+    <meta property="og:description"
+        content="UC Berkeley student passionate about machine learning, data analytics, and full-stack development. Explore my projects and technical expertise.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nathanliu.dev">
     <meta property="og:image" content="https://nathanliu.dev/assets/profile.jpeg">
-    
+
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Nathan Liu - Portfolio">
-    <meta name="twitter:description" content="UC Berkeley Data Science & CS student | Machine Learning | Full-Stack Development">
+    <meta name="twitter:description"
+        content="UC Berkeley Data Science & CS student | Machine Learning | Full-Stack Development">
     <meta name="twitter:image" content="https://nathanliu.dev/assets/profile.jpeg">
-    
+
     <title>Nathan Liu - Data Science & Computer Science Portfolio</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+    <base href="/">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
@@ -57,6 +63,7 @@
     }
     </script>
 </head>
+
 <body>
 
     <!-- Top Navigation Tabs (Carolyn Wang Style) -->
@@ -86,10 +93,13 @@
 
         <!-- Menu Bar -->
         <div class="window-menubar">
-            <div class="menu-item" onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with love and retro vibes.')">File</div>
-            <div class="menu-item" onclick="alert('This document is read-only.')">Edit</div>
+            <div class="menu-item"
+                onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with love and retro vibes.')">File</div>
+            <div class="menu-item"
+                onclick="alert('This document is read-only. You can edit notes in the Sticky Note widget!')">Edit</div>
             <div class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</div>
-            <div class="menu-item" onclick="document.querySelector('[data-tab=\'stats\']').click()">Tools</div>
+            <div class="menu-item" onclick="if (window.toggleStickyNote) window.toggleStickyNote(true);">Notes</div>
+            <div class="menu-item" onclick="document.querySelector('[data-tab=\'stats\']').click()">Stats</div>
             <div class="menu-item" onclick="alert('Email nathan.dtliu@gmail.com for help.')">Help</div>
         </div>
 
@@ -109,20 +119,33 @@
                                 rel="noopener noreferrer">uc berkeley</a> (go bears!) studying <a
                                 href="https://eecs.berkeley.edu/cs/" target="_blank" rel="noopener noreferrer">computer
                                 science</a> & <a href="https://cdss.berkeley.edu/dsus" target="_blank"
-                                rel="noopener noreferrer">data science</a>. my academic interests lie in machine learning and data engineering pipelines.</p>
-                        <p>currently, i'm focused on learning scalable cloud-native architectures, designing data-driven systems, and looking for <a href="mailto:nathan.dtliu@gmail.com?subject=New%20Grad%20Opportunity%20-%20Nathan%20Liu">new grad and full-time opportunities</a>. beyond writing code, i'm an avid photographer capturing urban structures and natural landscapes.</p>
-                        <p>in my free time, i like to go <a href="#photography" onclick="document.querySelector('[data-tab=\'photography\']').click()">sidequesting with my camera</a>, hit the gym to clear my head, or travel the world.</p>
-                        
+                                rel="noopener noreferrer">data science</a>. my academic interests lie in machine
+                            learning and data engineering pipelines.</p>
+                        <p>currently, i'm focused on learning scalable cloud-native architectures, designing data-driven
+                            systems, and looking for <a
+                                href="mailto:nathan.dtliu@gmail.com?subject=New%20Grad%20Opportunity%20-%20Nathan%20Liu">new
+                                grad and full-time opportunities</a>. beyond writing code, i'm an avid photographer
+                            capturing urban structures and natural landscapes.</p>
+                        <p>in my free time, i like to go <a href="#photography"
+                                onclick="document.querySelector('[data-tab=\'photography\']').click()">sidequesting with
+                                my camera</a>, hit the gym to clear my head, or travel the world.</p>
+
                         <div class="project-actions" style="margin-top: 1.5rem;">
-                            <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn-retro primary" id="resume-btn">resume.pdf <i class="fas fa-download"></i></a>
-                            <a href="https://cal.com/n8liu" target="_blank" class="btn-retro">book a meeting <i class="fas fa-arrow-up-right-from-square"></i></a>
+                            <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn-retro primary"
+                                id="resume-btn">resume.pdf <i class="fas fa-download"></i></a>
+                            <a href="https://cal.com/n8liu" target="_blank" class="btn-retro">book a meeting <i
+                                    class="fas fa-arrow-up-right-from-square"></i></a>
                         </div>
 
                         <div class="social-links">
-                            <a href="https://www.linkedin.com/in/n8liu/" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                            <a href="https://www.github.com/n8liu" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                            <a href="https://www.instagram.com/n8.trvl/" class="social-btn" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="mailto:nathan.dtliu@gmail.com" class="social-btn" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                            <a href="https://www.linkedin.com/in/n8liu/" class="social-btn" target="_blank"
+                                rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                            <a href="https://www.github.com/n8liu" class="social-btn" target="_blank"
+                                rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="https://www.instagram.com/n8.trvl/" class="social-btn" target="_blank"
+                                rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="mailto:nathan.dtliu@gmail.com" class="social-btn" aria-label="Email"><i
+                                    class="fas fa-envelope"></i></a>
                         </div>
 
                         <div class="last-updated">
@@ -140,6 +163,17 @@
             <!-- EXPERIENCE PANEL -->
             <section id="panel-experience" class="panel">
                 <div class="experience-list">
+
+                    <div class="retro-card experience-loading-card">
+                        <div class="card-header">
+                            <h3 class="card-title loading-card-title">
+                                Loading<span class="loading-dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span><span class="loading-cursor">_</span>
+                            </h3>
+                            <span class="retro-badge loading-badge">to be continued...</span>
+                        </div>
+                        <div class="card-subtitle">Upcoming adventure • Summer / Fall 2026</div>
+                    </div>
+
                     <div class="retro-card">
                         <div class="card-header">
                             <h3 class="card-title">Data Engineer Intern</h3>
@@ -147,9 +181,14 @@
                         </div>
                         <div class="card-subtitle">Carbon Sustain • Berkeley, CA</div>
                         <ul class="card-bullets">
-                            <li>Assembled a real-time LLM decisioning pipeline on AWS (Kinesis, Lambda, Step Functions) to process 100k events/day which enforced schema-validated JSON outputs and wrote full traces to S3 for auditability and replay.</li>
-                            <li>Improved platform reliability by adding idempotency keys in DynamoDB and CloudWatch alarms to reduce failed executions and eliminated release-related deployment failures by 33%.</li>
-                            <li>Cut dashboard data retrieval time by 80% by rewriting high-cost joins, adding composite indexes, and implementing cursor pagination in Django/PostgreSQL APIs.</li>
+                            <li>Assembled a real-time LLM decisioning pipeline on AWS (Kinesis, Lambda, Step Functions)
+                                to process 100k events/day which enforced schema-validated JSON outputs and wrote full
+                                traces to S3 for auditability and replay.</li>
+                            <li>Improved platform reliability by adding idempotency keys in DynamoDB and CloudWatch
+                                alarms to reduce failed executions and eliminated release-related deployment failures by
+                                33%.</li>
+                            <li>Cut dashboard data retrieval time by 80% by rewriting high-cost joins, adding composite
+                                indexes, and implementing cursor pagination in Django/PostgreSQL APIs.</li>
                         </ul>
                     </div>
 
@@ -160,9 +199,13 @@
                         </div>
                         <div class="card-subtitle">UnifIBD • Remote (San Jose, CA)</div>
                         <ul class="card-bullets">
-                            <li>Reconstructed a mobile CI/CD pipeline with GitHub Actions, automating deployments to TestFlight + Google Play, which cut manual release times from hours to minutes.</li>
-                            <li>Overhauled cross-team development workflows between the analytics and engineering teams, reducing feature handoff latency by half and accelerating time-to-production for data-driven updates.</li>
-                            <li>Built a Django backend and admin CMS that enabled marketing to update in-app content without requiring an app store submission.</li>
+                            <li>Reconstructed a mobile CI/CD pipeline with GitHub Actions, automating deployments to
+                                TestFlight + Google Play, which cut manual release times from hours to minutes.</li>
+                            <li>Overhauled cross-team development workflows between the analytics and engineering teams,
+                                reducing feature handoff latency by half and accelerating time-to-production for
+                                data-driven updates.</li>
+                            <li>Built a Django backend and admin CMS that enabled marketing to update in-app content
+                                without requiring an app store submission.</li>
                         </ul>
                     </div>
 
@@ -173,9 +216,13 @@
                         </div>
                         <div class="card-subtitle">L.A. Lucky Import & Export Inc. • Los Angeles, CA</div>
                         <ul class="card-bullets">
-                            <li>Built a near-real-time SAP inventory sync for 3,647+ SKUs using incremental pulls and upserts into Postgres which reduced manual entry by 80% and enabled automated invoicing for 100% of customers.</li>
-                            <li>Rebuilt a legacy platform (Django REST, JWT, React) and improved performance 80% by reducing payload size and adding server-side caching.</li>
-                            <li>Built a Docker-based CI/CD workflow to deploy ETL/ELT jobs automatically, streamlining legacy database migration and improving pipeline reliability.</li>
+                            <li>Built a near-real-time SAP inventory sync for 3,647+ SKUs using incremental pulls and
+                                upserts into Postgres which reduced manual entry by 80% and enabled automated invoicing
+                                for 100% of customers.</li>
+                            <li>Rebuilt a legacy platform (Django REST, JWT, React) and improved performance 80% by
+                                reducing payload size and adding server-side caching.</li>
+                            <li>Built a Docker-based CI/CD workflow to deploy ETL/ELT jobs automatically, streamlining
+                                legacy database migration and improving pipeline reliability.</li>
                         </ul>
                     </div>
                 </div>
@@ -190,31 +237,37 @@
                             <h3 class="card-title">Live Semantic Market</h3>
                             <span class="retro-badge">Active (2026)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses zero-shot extraction, vector search, and clustering to process financial news into deduplicated market intelligence.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses
+                            zero-shot extraction, vector search, and clustering to process financial news into
+                            deduplicated market intelligence.</p>
                         <div class="tech-badges">
-                            <span class="tech-pill">React Native</span>
-                            <span class="tech-pill">Node.js</span>
                             <span class="tech-pill">JavaScript</span>
-                            <span class="tech-pill">REST APIs</span>
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">Fast APIs</span>
+                            <span class="tech-pill">React</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
                         </div>
                     </div>
-                    
+
                     <div class="retro-card">
                         <div class="card-header">
                             <h3 class="card-title">Clickbait Classifier</h3>
                             <span class="retro-badge">Completed (2026)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on 18K social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set, outperforming a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on 18K
+                            social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set, outperforming
+                            a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
                         <div class="tech-badges">
                             <span class="tech-pill">Python</span>
                             <span class="tech-pill">PyTorch</span>
                             <span class="tech-pill">Pandas</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
                         </div>
                     </div>
 
@@ -223,7 +276,8 @@
                             <h3 class="card-title">Flow</h3>
                             <span class="retro-badge">Completed (2026)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Unified full-stack email and calendar mobile app utilizing AI sorting, multi-account syncing, and metadata indexing.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Unified full-stack email and calendar
+                            mobile app utilizing AI sorting, multi-account syncing, and metadata indexing.</p>
                         <div class="tech-badges">
                             <span class="tech-pill">React Native</span>
                             <span class="tech-pill">Node.js</span>
@@ -232,7 +286,8 @@
                             <span class="tech-pill">Gemini</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
                         </div>
                     </div>
 
@@ -241,7 +296,9 @@
                             <h3 class="card-title">ItineraryAI</h3>
                             <span class="retro-badge">Completed (2026)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built a chat-based travel concierge that generates structured itineraries from a single prompt and shipped a web dashboard for trip planning (budgets, maps, calendar sync).</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built a chat-based travel concierge that
+                            generates structured itineraries from a single prompt and shipped a web dashboard for trip
+                            planning (budgets, maps, calendar sync).</p>
                         <div class="tech-badges">
                             <span class="tech-pill">Python</span>
                             <span class="tech-pill">LangChain</span>
@@ -249,7 +306,8 @@
                             <span class="tech-pill">JavaScript</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
                         </div>
                     </div>
 
@@ -258,14 +316,17 @@
                             <h3 class="card-title">The IBD Digest</h3>
                             <span class="retro-badge">Completed (2025)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion app for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent onboarding and local state persistence.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion app
+                            for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent
+                            onboarding and local state persistence.</p>
                         <div class="tech-badges">
                             <span class="tech-pill">Flutter</span>
                             <span class="tech-pill">Dart</span>
                             <span class="tech-pill">Provider</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
                         </div>
                     </div>
 
@@ -274,7 +335,8 @@
                             <h3 class="card-title">Spotify Analytics</h3>
                             <span class="retro-badge">Completed (2025)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard showing profile insights, favorite genres, and user recommendations.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard
+                            showing profile insights, favorite genres, and user recommendations.</p>
                         <div class="tech-badges">
                             <span class="tech-pill">Python</span>
                             <span class="tech-pill">Flask</span>
@@ -282,7 +344,8 @@
                             <span class="tech-pill">Pandas</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
+                            <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro"
+                                target="_blank"><i class="fab fa-github"></i> code</a>
                         </div>
                     </div>
 
@@ -291,15 +354,18 @@
                             <h3 class="card-title">SimplyMail</h3>
                             <span class="retro-badge">Completed (2024)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high performance, clean visual interfaces, and secure Gmail API integrations.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high
+                            performance, clean visual interfaces, and secure Gmail API integrations.</p>
                         <div class="tech-badges">
                             <span class="tech-pill">JavaScript</span>
                             <span class="tech-pill">Firebase</span>
                             <span class="tech-pill">Gmail API</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu/SimplyMail" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
-                            <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i> demo</a>
+                            <a href="https://github.com/n8liu/SimplyMail" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
+                            <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i
+                                    class="fas fa-external-link-alt"></i> demo</a>
                         </div>
                     </div>
 
@@ -308,15 +374,18 @@
                             <h3 class="card-title">Pokédex API</h3>
                             <span class="retro-badge">Completed (2024)</span>
                         </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fast cached Express middleware client providing interactive Pokemon lookups and type analytics.</p>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fast cached Express middleware client
+                            providing interactive Pokemon lookups and type analytics.</p>
                         <div class="tech-badges">
                             <span class="tech-pill">TypeScript</span>
                             <span class="tech-pill">Express</span>
                             <span class="tech-pill">PokeAPI</span>
                         </div>
                         <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu/pokedexAPI" class="btn-retro" target="_blank"><i class="fab fa-github"></i> code</a>
-                            <a href="https://pokedexapi-57916.web.app/" class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i> demo</a>
+                            <a href="https://github.com/n8liu/pokedexAPI" class="btn-retro" target="_blank"><i
+                                    class="fab fa-github"></i> code</a>
+                            <a href="https://pokedexapi-57916.web.app/" class="btn-retro primary" target="_blank"><i
+                                    class="fas fa-external-link-alt"></i> demo</a>
                         </div>
                     </div>
                 </div>
@@ -330,9 +399,11 @@
                             <h3 class="card-title">University of California, Berkeley</h3>
                             <span class="retro-badge">Class of 2026</span>
                         </div>
-                        <div class="card-subtitle">Bachelor of Arts in Computer Science & Data Science (Applied Math)</div>
+                        <div class="card-subtitle">Bachelor of Arts in Computer Science & Data Science (Applied Math)
+                        </div>
                         <p style="margin-bottom: 0.5rem;"><strong>GPA:</strong> 3.75</p>
-                        <p><strong>Focus:</strong> Data Engineering & Machine Learning.</p>
+                        <p style="margin-bottom: 0.8rem;"><strong>Focus:</strong> Data Engineering & Machine Learning.
+                        </p>
                     </div>
 
                     <div class="course-groups">
@@ -340,9 +411,12 @@
                             <h3>Computer Science</h3>
                             <div class="course-pills">
                                 <span class="course-pill" title="Computer Security">CS 161</span>
-                                <span class="course-pill" title="Operating Systems and Systems Programming">CS 162</span>
-                                <span class="course-pill" title="Introduction to the Internet: Architecture and Protocols">CS 168</span>
-                                <span class="course-pill" title="Efficient Algorithms and Intractable Problems">CS 170</span>
+                                <span class="course-pill" title="Operating Systems and Systems Programming">CS
+                                    162</span>
+                                <span class="course-pill"
+                                    title="Introduction to the Internet: Architecture and Protocols">CS 168</span>
+                                <span class="course-pill" title="Efficient Algorithms and Intractable Problems">CS
+                                    170</span>
                                 <span class="course-pill" title="Introduction to Database Systems">CS 186</span>
                                 <span class="course-pill" title="Introduction to Artificial Intelligence">CS 188</span>
                                 <span class="course-pill" title="Introduction to Machine Learning">CS 189</span>
@@ -363,6 +437,14 @@
                         </div>
 
                         <div class="course-group">
+                            <h3>Statistics</h3>
+                            <div class="course-pills">
+                                <span class="course-pill" title="Stochastic Processes">STAT 150</span>
+                                <span class="course-pill" title="Introduction to Time Series">STAT 153</span>
+                            </div>
+                        </div>
+
+                        <div class="course-group">
                             <h3>Engineering & Analytics</h3>
                             <div class="course-pills">
                                 <span class="course-pill" title="Optimization Models in Engineering">EECS 127</span>
@@ -374,9 +456,12 @@
                         <div class="course-group">
                             <h3>Physics</h3>
                             <div class="course-pills">
-                                <span class="course-pill" title="Physics for Scientists and Engineers I">PHYSICS 7A</span>
-                                <span class="course-pill" title="Physics for Scientists and Engineers II">PHYSICS 7B</span>
-                                <span class="course-pill" title="Physics for Scientists and Engineers III">PHYSICS 7C</span>
+                                <span class="course-pill" title="Physics for Scientists and Engineers I">PHYSICS
+                                    7A</span>
+                                <span class="course-pill" title="Physics for Scientists and Engineers II">PHYSICS
+                                    7B</span>
+                                <span class="course-pill" title="Physics for Scientists and Engineers III">PHYSICS
+                                    7C</span>
                             </div>
                         </div>
                     </div>
@@ -411,35 +496,10 @@
                 </div>
             </section>
 
-            <!-- BLOG PANEL -->
+                        <!-- BLOG PANEL -->
             <section id="panel-blog" class="panel">
-                <div class="experience-list">
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Why I Love Data Science</h3>
-                            <span class="retro-badge">April 2, 2025</span>
-                        </div>
-                        <p style="margin-bottom: 1rem;">A reflection on why data science excites me, statistical insights, and the power of data visualization.</p>
-                        <a href="blog/blog2.html" class="btn-retro read-blog-btn"><i class="fas fa-book-open"></i> Read Post</a>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">My Gym Routine</h3>
-                            <span class="retro-badge">May 20, 2025</span>
-                        </div>
-                        <p style="margin-bottom: 1rem;">My weekly gym routine, tracking consistency, personal milestones, and how working out helps clear my head from coding.</p>
-                        <a href="blog/blog3.html" class="btn-retro read-blog-btn"><i class="fas fa-book-open"></i> Read Post</a>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">How I Built My Portfolio Website</h3>
-                            <span class="retro-badge">March 24, 2025</span>
-                        </div>
-                        <p style="margin-bottom: 1rem;">A breakdown of my serverless tech stack, custom Durable Objects trackers, R2 integration, and design decisions.</p>
-                        <a href="blog/blog1.html" class="btn-retro read-blog-btn"><i class="fas fa-book-open"></i> Read Post</a>
-                    </div>
+                <div class="experience-list" id="blog-cards-container">
+                    <!-- Dynamically rendered from blog/posts.json -->
                 </div>
             </section>
 
@@ -466,7 +526,9 @@
                     </div>
 
                     <div class="chart-box">
-                        <h4 style="font-weight: 700; margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.9rem;">7-Day Traffic Trends</h4>
+                        <h4
+                            style="font-weight: 700; margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.9rem;">
+                            7-Day Traffic Trends</h4>
                         <canvas id="statsChart" style="width: 100%; height: 280px;"></canvas>
                     </div>
                 </div>
@@ -478,6 +540,14 @@
             <div class="taskbar-left">
                 <button class="start-btn" onclick="alert('Nathan Liu — UC Berkeley Data Science & CS Student')">
                     <i class="fas fa-desktop"></i> nathan.exe
+                </button>
+                <button class="taskbar-app-btn active" id="taskbar-terminal-btn" title="Toggle Terminal (term.exe)"
+                    aria-label="Toggle Terminal">
+                    <i class="fas fa-terminal"></i> term.exe
+                </button>
+                <button class="taskbar-app-btn active" id="taskbar-sticky-btn" title="Toggle Sticky Note"
+                    aria-label="Toggle Sticky Note">
+                    <i class="fas fa-sticky-note"></i> notes.txt
                 </button>
                 <span class="taskbar-status">
                     <span class="taskbar-dot"></span> System Status: Open to Work
@@ -493,6 +563,76 @@
             </div>
         </div>
     </main>
+
+    <!-- Retro Terminal Widget (Bottom Left - Minimized/Folded by default) -->
+    <aside class="terminal-widget folded" id="terminal-widget" aria-label="Interactive Terminal Console">
+        <div class="terminal-header">
+            <span class="terminal-title"><i class="fas fa-terminal"></i> term.exe — bash</span>
+            <div class="terminal-controls">
+                <button class="terminal-btn-mini" id="terminal-clear" title="Clear Terminal" aria-label="Clear Terminal">
+                    <i class="fas fa-eraser"></i>
+                </button>
+                <button class="terminal-btn-mini" id="terminal-minimize" title="Fold/Unfold Terminal" aria-label="Fold Terminal">_</button>
+                <button class="terminal-btn-mini close" id="terminal-close" title="Close Terminal" aria-label="Close Terminal">×</button>
+            </div>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+            <div class="terminal-output" id="terminal-output">
+                <div class="terminal-line banner"><span class="terminal-accent">NathanOS v3.2.0</span> [x86_64-retro-web]</div>
+                <div class="terminal-line info">Type <span class="cmd-highlight">'help'</span> to see available commands or click quick pills below.</div>
+            </div>
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">nathan@cal:~$</span>
+                <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Terminal Command Input">
+            </div>
+        </div>
+        <div class="terminal-footer">
+            <div class="terminal-quick-cmds">
+                <button class="term-pill" data-cmd="help">help</button>
+                <button class="term-pill" data-cmd="about">about</button>
+                <button class="term-pill" data-cmd="skills">skills</button>
+                <button class="term-pill" data-cmd="projects">projects</button>
+                <button class="term-pill" data-cmd="matcha">matcha</button>
+                <button class="term-pill" data-cmd="clear">clear</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Retro Sticky Note Widget -->
+    <aside class="sticky-note" id="sticky-note" aria-label="Desktop Sticky Note">
+        <div class="sticky-tape" aria-hidden="true"></div>
+        <div class="sticky-note-header">
+            <span class="sticky-note-title"><i class="fas fa-sticky-note"></i> notes.txt</span>
+            <div class="sticky-note-controls">
+                <button class="sticky-btn-mini" id="sticky-note-edit" title="Edit Note" aria-label="Edit Note">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="sticky-btn-mini" id="sticky-note-reset" title="Reset Default Notes"
+                    aria-label="Reset Default Notes">
+                    <i class="fas fa-rotate-left"></i>
+                </button>
+                <button class="sticky-btn-mini" id="sticky-note-minimize" title="Fold/Unfold Note"
+                    aria-label="Fold Note">_</button>
+                <button class="sticky-btn-mini close" id="sticky-note-close" title="Close Note"
+                    aria-label="Close Note">×</button>
+            </div>
+        </div>
+        <div class="sticky-note-body" id="sticky-note-content" contenteditable="false" spellcheck="false">
+            <p class="sticky-heading"><strong>⚡ NATHAN'S NOTES</strong></p>
+            <ul class="sticky-list">
+                <li><strong>Status:</strong> 🎓 Graduated UC Berkeley! Seeking 2026 Full-Time Data Engineering / SWE
+                    roles.</li>
+                <li><strong>Watching:</strong> <em>Twinkling Watermelon</em> (KDrama)</li>
+                <li><strong>Building:</strong> Currently collaborating on a open-source project!</li>
+                <li><strong>Gear:</strong>Fujifilm X100VI & Sony ZVE10 II</li>
+            </ul>
+            <p class="sticky-tip"><em>Pro-tip: Drag me around or click ✏️ to type your own note!</em></p>
+        </div>
+        <div class="sticky-note-footer">
+            <span class="sticky-note-hint"><i class="fas fa-info-circle"></i> click ✏️ to edit</span>
+            <span class="sticky-note-status" id="sticky-save-status">synced</span>
+        </div>
+    </aside>
 
     <!-- Photo Modal Dialog (Retro OS alert style) -->
     <div class="modal-overlay" id="photo-modal">
@@ -543,14 +683,14 @@
     </div>
 
     <!-- Blog Modal Dialog (Retro OS text reader style) -->
-    <div class="modal-overlay" id="blog-modal">
+    <div class="modal-overlay" id="blog-modal" role="dialog" aria-modal="true" aria-labelledby="modal-blog-title">
         <div class="modal-dialog blog-modal-dialog">
             <div class="modal-titlebar">
                 <div class="window-title">
                     <i class="fas fa-file-alt"></i> <span id="modal-blog-filename">blog_post.txt</span>
                 </div>
                 <div class="window-controls">
-                    <button class="win-btn close" id="blog-modal-close-btn">X</button>
+                    <button class="win-btn close" id="blog-modal-close-btn" aria-label="Close Blog Post">X</button>
                 </div>
             </div>
             <div class="modal-body blog-modal-body">
@@ -567,8 +707,10 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    <script src="script.js"></script>
-    <script src="viewers.js"></script>
+    <script src="/script.js"></script>
+    <script src="/viewers.js"></script>
 </body>
+
 </html>
