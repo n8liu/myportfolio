@@ -27,8 +27,6 @@ Here is the breakdown across all courses grouped and ordered as in my academics 
 | | **DATA C104** | Human Contexts & Ethics of Data | **4/10** | 5/10 | 8/10 |
 | | **DATA 140** | Probability for Data Science | **7/10** | 10/10 | 8/10 |
 | | **DATA 144** | Data Mining and Analytics | **5/10** | 5/10 | 5/10 |
-| **Statistics** | **STAT 150** | Stochastic Processes | **7/10** | 9/10 | 7/10 |
-| | **STAT 153** | Time Series Analysis | **7/10** | 9/10 | 7/10 |
 | **Engineering & Analytics** | **EECS 127** | Optimization Models in Engineering | **7/10** | 10/10 | 8/10 |
 | | **INFO 159** | Natural Language Processing | **10/10** | 7/10 | 7/10 |
 | | **IEOR 162** | Linear Programming & Network Flows | **5/10** | 6/10 | 6/10 |
