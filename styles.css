@@ -517,22 +517,23 @@ body.loaded {
 }
 
 .retro-badge.loading-badge {
-    position: relative;
-    padding-left: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.25rem 0.6rem;
+    line-height: 1;
 }
 
 .retro-badge.loading-badge::before {
     content: '';
-    position: absolute;
-    left: 0.45rem;
-    top: 50%;
-    transform: translateY(-50%);
+    display: inline-block;
     width: 6px;
     height: 6px;
     background-color: #f59e0b;
     border-radius: 50%;
     box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
     animation: status-pulse 2s infinite;
+    flex-shrink: 0;
 }
 
 @keyframes retroDotBounce {
