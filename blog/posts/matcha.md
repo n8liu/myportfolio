@@ -34,17 +34,10 @@ Probably tastes the best but cups are a scam.
 ### Da Vien - Milpitas, CA (4/5)
 Was my go to, good value, big cup.
 
-### UG Tea - Milpitas, CA (3.5/5)
-Decent.
+## Berkeley
 
 ### 8 Gram Matcha - Berkeley, CA (4/5)
 Best in Berkeley for matcha.
-
-### Lacaphe - San Jose, CA (3.5/5)
-Good but not great.
-
-### Izumi Matcha - San Jose, CA (2.5/5)
-Was the best, fell off, not the baseline.
 
 ### Binge Coffee House - Berkeley (Telegraph), CA (3/5)
 Earl grey matcha + biscoff only good drink, better than 8 gram if you like flavored matcha.
@@ -55,14 +48,7 @@ Was good for a few months, not the baseline it used to be. But heard it got bett
 ### Yume Mori - Berkeley, CA (3/5)
 Good but cups are a scam.
 
-### Tadaima Mission - San Francisco, CA (3/5)
-Okay.
-
-### La La Land - Glendale, CA (1/5)
-Save your soul.
-
-### Academic Coffee - San Jose, CA (2.5/5)
-Best nextdoor to SJSU, but still not great, was good tho.
+## Livermore + Dublin + Pleasanton
 
 ### Junbi Matcha - Livermore, CA (3.5/5)
 Good flavors, one of the better franchise matcha places.
@@ -70,7 +56,12 @@ Good flavors, one of the better franchise matcha places.
 ### Boba Bliss - Dublin, CA (3/5)
 Milky matcha, but I do like there other drinks.
 
-### Aroma - San Jose, CA
+### Macchi - Pleasanton, CA (3/5)
+
+## San Francisco
+
+### Tadaima Mission - San Francisco, CA (3/5)
+Okay.
 
 ### Matcha Cafe Maiko - San Francisco, CA
 
@@ -78,10 +69,41 @@ Milky matcha, but I do like there other drinks.
 
 ### Kiss of Matcha - San Francisco, CA
 
+### Q Specialty Coffee - San Francisco, CA
+
+## San Jose + Milpitas
+
+### Academic Coffee - San Jose, CA (2.5/5)
+Best nextdoor to SJSU, but still not great, was good tho.
+
+### Lacaphe - San Jose, CA (3.5/5)
+Good but not great.
+
+### Izumi Matcha - San Jose, CA (2.5/5)
+Was the best, fell off, not the baseline.
+
+### Aroma - San Jose, CA
+
 ### Maruwu Seicha - San Jose, CA
 
 ### Matcha Matcha - San Jose, CA
 
 ### Ceré Tea - San Jose, CA
+
+### UG Tea - Milpitas, CA (3.5/5)
+Decent.
+
+## Los Angelos + Orange County
+
+### La La Land - Glendale, CA (1/5)
+Save your soul.
+
+## Las Vegas
+
+### Hatoya Las Vegas - Las Vegas, NV (2/5)
+Most expensive matcha I tried ($15), not worth it.
+
+### Urban Matcha - Las Vegas, NV (4/5)
+Good match, good price in Vegas.
 
 ### More to come....
