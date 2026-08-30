@@ -19,55 +19,69 @@ Matcha. The taste of grass, I love it. Here is every place I have tried and my t
 1. La La Land (Glendale) -> actually nasty
 
 
-### Airoma Cafe - Fountain Valley (5/5)
+### Airoma Cafe - Fountain Valley, CA (5/5)
 Actually too good of a cup. Worth the 10 minute line wait, the drive to LA, and the price.
 
-### Brew Story - Huntington Beach (4.5/5)
-Actually really good, decent cup, good flavors, strong matcha
+### Brew Story - Huntington Beach, CA (4.5/5)
+Actually really good, decent cup, good flavors, strong matcha.
 
-### Matsu Matcha - Cupertino (4.5/5)
-Best biscoff matcha (i love biscoff)
+### Matsu Matcha - Cupertino, CA (4.5/5)
+Best biscoff matcha (i love biscoff).
 
-### Community Goods - Los Angeles (4/5)
-Probably tastes the best but cups are a scam
+### Community Goods - Los Angeles, CA (4/5)
+Probably tastes the best but cups are a scam.
 
-### Da Vien - Milpitas (4/5)
-Was my go to, good value, big cup
+### Da Vien - Milpitas, CA (4/5)
+Was my go to, good value, big cup.
 
-### UG Tea - Milpitas (3.5/5)
-Decent
+### UG Tea - Milpitas, CA (3.5/5)
+Decent.
 
-### 8 Gram Matcha - Berkeley (4/5)
-Best in Berkeley for matcha
+### 8 Gram Matcha - Berkeley, CA (4/5)
+Best in Berkeley for matcha.
 
-### Lacaphe - San Jose (3.5/5)
-Good but not great
+### Lacaphe - San Jose, CA (3.5/5)
+Good but not great.
 
-### Izumi Matcha - San Jose (2.5/5)
-Was the best, fell off, not the baseline
+### Izumi Matcha - San Jose, CA (2.5/5)
+Was the best, fell off, not the baseline.
 
-### Binge Coffee House - Berkeley (Telegraph) (3/5)
-Earl grey matcha + biscoff only good drink, better than 8 gram if you like flavored matcha
+### Binge Coffee House - Berkeley (Telegraph), CA (3/5)
+Earl grey matcha + biscoff only good drink, better than 8 gram if you like flavored matcha.
 
-### De Matcha - Berkeley (2.5/5)
+### De Matcha - Berkeley, CA (2.5/5)
 Was good for a few months, not the baseline it used to be. But heard it got better, have yet to try again.
 
-### Yume Mori - Berkeley (3/5)
+### Yume Mori - Berkeley, CA (3/5)
 Good but cups are a scam.
 
-### Tadaima Mission - San Francisco (3/5)
-Okay
+### Tadaima Mission - San Francisco, CA (3/5)
+Okay.
 
-### La La Land - Glendale
-Safe your soul
+### La La Land - Glendale, CA (1/5)
+Save your soul.
 
-### Academic Coffee - San Jose (2.5/5)
-Best nextdoor to SJSU, but still not great, was good tho
+### Academic Coffee - San Jose, CA (2.5/5)
+Best nextdoor to SJSU, but still not great, was good tho.
 
-### Junbi Matcha - Livermore (3.5/5)
-Good flavors, one of the better franchise matcha places
+### Junbi Matcha - Livermore, CA (3.5/5)
+Good flavors, one of the better franchise matcha places.
 
-### Boba Bliss - Dublin (3/5)
-Milky matcha, but I do like there other drinks
+### Boba Bliss - Dublin, CA (3/5)
+Milky matcha, but I do like there other drinks.
+
+### Aroma - San Jose, CA
+
+### Matcha Cafe Maiko - San Francisco, CA
+
+## Nagomi - San Francisco, CA
+
+### Kiss of Matcha - San Francisco, CA
+
+### Maruwu Seicha - San Jose, CA
+
+### Matcha Matcha - San Jose, CA
+
+### Ceré Tea - San Jose, CA
 
 ### More to come....
