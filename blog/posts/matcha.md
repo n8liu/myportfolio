@@ -22,13 +22,13 @@ Matcha. The taste of grass, I love it. Here is every place I have tried and my t
 ### Airoma Cafe - Fountain Valley, CA (5/5)
 Actually too good of a cup. Worth the 10 minute line wait, the drive to LA, and the price.
 
-### Brew Story - Huntington Beach, CA (4.5/5)
+### Brew Story - Huntington Beach, CA (49/5)
 Actually really good, decent cup, good flavors, strong matcha.
 
-### Matsu Matcha - Cupertino, CA (4.5/5)
+### Matsu Matcha - Cupertino, CA (4.6/5)
 Best biscoff matcha (i love biscoff).
 
-### Community Goods - Los Angeles, CA (4/5)
+### Community Goods - Los Angeles, CA (4.6/5)
 Probably tastes the best but cups are a scam.
 
 ### Da Vien - Milpitas, CA (4/5)
@@ -82,7 +82,8 @@ Good but not great.
 ### Izumi Matcha - San Jose, CA (2.5/5)
 Was the best, fell off, not the baseline.
 
-### Aroma - San Jose, CA
+### Aroma - San Jose, CA (4.8/5)
+Might be the best in San Jose.
 
 ### Maruwu Seicha - San Jose, CA
 
@@ -91,7 +92,7 @@ Was the best, fell off, not the baseline.
 ### Ceré Tea - San Jose, CA
 
 ### UG Tea - Milpitas, CA (3.5/5)
-Decent.
+Decent. But really good cookie butter matcha smoothie.
 
 ## Los Angelos + Orange County
 

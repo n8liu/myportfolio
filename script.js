@@ -2,27 +2,48 @@
 document.addEventListener('DOMContentLoaded', function () {
     const API_BASE = '';
 
+    // Lightweight dynamic script loader for on-demand libraries (Chart.js, marked)
+    const scriptCache = new Map();
+    function loadScript(src) {
+        if (scriptCache.has(src)) {
+            return scriptCache.get(src);
+        }
+        const promise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+        scriptCache.set(src, promise);
+        return promise;
+    }
+
     // ----------------------------------------------------
     // Minimalist Interactive Wallpaper (Cursor Glow & Parallax Grid)
     // ----------------------------------------------------
     let mouseTicking = false;
-    window.addEventListener('pointermove', function (e) {
-        if (!mouseTicking) {
-            window.requestAnimationFrame(function () {
-                const x = e.clientX;
-                const y = e.clientY;
-                const px = ((x / window.innerWidth) - 0.5) * 2; // -1 to 1
-                const py = ((y / window.innerHeight) - 0.5) * 2; // -1 to 1
+    const isTouchDevice = window.matchMedia('(hover: none)').matches;
+    if (!isTouchDevice) {
+        window.addEventListener('pointermove', function (e) {
+            if (!mouseTicking) {
+                window.requestAnimationFrame(function () {
+                    const x = e.clientX;
+                    const y = e.clientY;
+                    const px = ((x / window.innerWidth) - 0.5) * 2; // -1 to 1
+                    const py = ((y / window.innerHeight) - 0.5) * 2; // -1 to 1
 
-                document.documentElement.style.setProperty('--mouse-x', `${x}px`);
-                document.documentElement.style.setProperty('--mouse-y', `${y}px`);
-                document.documentElement.style.setProperty('--mouse-px', px.toFixed(3));
-                document.documentElement.style.setProperty('--mouse-py', py.toFixed(3));
-                mouseTicking = false;
-            });
-            mouseTicking = true;
-        }
-    }, { passive: true });
+                    document.documentElement.style.setProperty('--mouse-x', `${x}px`);
+                    document.documentElement.style.setProperty('--mouse-y', `${y}px`);
+                    document.documentElement.style.setProperty('--mouse-px', px.toFixed(3));
+                    document.documentElement.style.setProperty('--mouse-py', py.toFixed(3));
+                    mouseTicking = false;
+                });
+                mouseTicking = true;
+            }
+        }, { passive: true });
+    }
 
     // ----------------------------------------------------
     // Draggable Window Logic
@@ -108,13 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const stickyHeaderEl = stickyNoteEl ? stickyNoteEl.querySelector('.sticky-note-header') : null;
     if (stickyNoteEl && stickyHeaderEl) {
         makeElementDraggable(stickyNoteEl, stickyHeaderEl);
-    }
-
-    // Apply dragging to Terminal widget
-    const terminalWidgetEl = document.getElementById('terminal-widget');
-    const terminalHeaderEl = terminalWidgetEl ? terminalWidgetEl.querySelector('.terminal-header') : null;
-    if (terminalWidgetEl && terminalHeaderEl) {
-        makeElementDraggable(terminalWidgetEl, terminalHeaderEl);
     }
 
 
@@ -400,6 +414,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const ctx = document.getElementById('statsChart');
             if (!ctx) return;
 
+            // Load Chart.js dynamically on-demand if not already loaded
+            if (typeof window.Chart === 'undefined') {
+                try {
+                    await loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js');
+                } catch (loadErr) {
+                    console.error('Could not load Chart.js from CDN', loadErr);
+                    return;
+                }
+            }
+
             // Destroy existing instance to avoid duplicates
             if (statsChartInstance) {
                 statsChartInstance.destroy();
@@ -409,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const textCol = '#1e1e1e';
             const gridCol = 'rgba(30, 30, 30, 0.05)';
 
-            statsChartInstance = new Chart(ctx.getContext('2d'), {
+            statsChartInstance = new window.Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels,
@@ -552,7 +576,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Fetch categories dynamically
         try {
-            const response = await fetch(window.location.origin + '/api/categories');
+            const response = await fetch((API_BASE || '') + '/api/categories');
             if (response.ok) {
                 const categories = await response.json();
                 if (categories && categories.length > 0) {
@@ -595,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function () {
         photoGrid.innerHTML = '<div style="font-family: var(--font-mono); padding: 2rem; grid-column: 1/-1; text-align: center;">loading photos...</div>';
 
         try {
-            const response = await fetch(window.location.origin + `/api/images/${category}`);
+            const response = await fetch((API_BASE || '') + `/api/images/${category}`);
             if (!response.ok) throw new Error('API error');
             const images = await response.json();
 
@@ -723,6 +747,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const blogCardsContainer = document.getElementById('blog-cards-container');
 
     const DEFAULT_BLOG_POSTS = [
+        {
+            "id": "matcha",
+            "title": "Ranking Every Matcha I Tried!",
+            "date": "Aug. 20, 2026",
+            "datetime": "2026-08-20",
+            "readTime": "2 min read",
+            "summary": "Matcha this, matcha that. I love matcha, so here is every matcha I have tried.",
+            "tags": ["Food", "Matcha", "Drink"],
+            "file": "matcha.md"
+        },
         {
             "id": "market-pipeline",
             "title": "Building an Event-Driven Market Pipeline with Vector Search",
@@ -894,8 +928,17 @@ document.addEventListener('DOMContentLoaded', function () {
             markdownText = markdownText.replace(/^#\s+[^\n]+\n+/, '');
 
             let renderedHtml = '';
-            if (typeof marked !== 'undefined' && typeof marked.parse === 'function') {
-                renderedHtml = marked.parse(markdownText, { gfm: true, breaks: true });
+            // Load marked on-demand if not already present
+            if (typeof window.marked === 'undefined' || typeof window.marked.parse !== 'function') {
+                try {
+                    await loadScript('https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js');
+                } catch (loadErr) {
+                    console.warn('Could not load marked from CDN, falling back to basic renderer', loadErr);
+                }
+            }
+
+            if (typeof window.marked !== 'undefined' && typeof window.marked.parse === 'function') {
+                renderedHtml = window.marked.parse(markdownText, { gfm: true, breaks: true });
             } else {
                 // Fallback basic paragraph renderer
                 renderedHtml = markdownText
@@ -1049,9 +1092,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (stickyNote) {
         loadStickyNote();
 
-        // Restore saved visibility state
+        // Restore saved visibility state (default to minimized on screens <= 1024px to declutter viewport)
         const savedVisible = localStorage.getItem('portfolio-sticky-visible');
-        if (savedVisible === 'false') {
+        if (savedVisible === 'false' || (savedVisible === null && window.innerWidth <= 1024)) {
             toggleStickyNote(false);
         } else {
             toggleStickyNote(true);
@@ -1122,490 +1165,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Expose toggle globally
         window.toggleStickyNote = toggleStickyNote;
-    }
-
-    // ----------------------------------------------------
-    // 7. Retro OS Terminal Widget Logic (Bottom Left)
-    // ----------------------------------------------------
-    const terminalWidget = document.getElementById('terminal-widget');
-    const terminalBody = document.getElementById('terminal-body');
-    const terminalOutput = document.getElementById('terminal-output');
-    const terminalInput = document.getElementById('terminal-input');
-    const terminalClearBtn = document.getElementById('terminal-clear');
-    const terminalMinBtn = document.getElementById('terminal-minimize');
-    const terminalCloseBtn = document.getElementById('terminal-close');
-    const taskbarTerminalBtn = document.getElementById('taskbar-terminal-btn');
-    const taskbarStartBtn = document.getElementById('taskbar-start-btn');
-
-    let commandHistory = [];
-    let historyIndex = -1;
-
-    function toggleTerminal(forceState) {
-        if (!terminalWidget) return;
-        const isHidden = terminalWidget.classList.contains('minimized');
-        const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
-
-        if (shouldShow) {
-            terminalWidget.classList.remove('minimized');
-            if (taskbarTerminalBtn) taskbarTerminalBtn.classList.add('active');
-            localStorage.setItem('portfolio-terminal-visible', 'true');
-            setTimeout(() => {
-                if (terminalInput) terminalInput.focus();
-            }, 100);
-        } else {
-            terminalWidget.classList.add('minimized');
-            if (taskbarTerminalBtn) taskbarTerminalBtn.classList.remove('active');
-            localStorage.setItem('portfolio-terminal-visible', 'false');
-        }
-    }
-
-    function printTerminalLine(text, type = 'output') {
-        if (!terminalOutput) return;
-        const line = document.createElement('div');
-        line.className = `terminal-line ${type}`;
-        line.innerHTML = text;
-        terminalOutput.appendChild(line);
-        if (terminalBody) {
-            terminalBody.scrollTop = terminalBody.scrollHeight;
-        }
-    }
-
-    function clearTerminal() {
-        if (!terminalOutput) return;
-        terminalOutput.innerHTML = `
-<div class="terminal-line banner"><span class="terminal-accent">NathanOS v3.2.0</span> [x86_64-retro-web]</div>
-<div class="terminal-line info">Type <span class="cmd-highlight">'help'</span> to see available commands or click quick pills below.</div>
-        `.trim();
-    }
-
-    function escapeTerminalHtml(text) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
-
-    function executeCommand(rawCmd) {
-        const cmd = rawCmd.trim();
-        if (!cmd) return;
-
-        // Add to history
-        commandHistory.push(cmd);
-        historyIndex = commandHistory.length;
-
-        // Print user input line
-        printTerminalLine(`<span class="terminal-prompt">nathan@cal:~$</span> ${escapeTerminalHtml(cmd)}`, 'user-cmd');
-
-        const parts = cmd.split(' ').filter(Boolean);
-        const action = parts[0].toLowerCase();
-        const args = parts.slice(1);
-
-        switch (action) {
-            case 'help':
-            case '?':
-            case 'man':
-                printTerminalLine(`
-<span class="terminal-accent">Available NathanOS Commands:</span>
-  <span class="cmd-highlight">about</span>       - Bio, background & education
-  <span class="cmd-highlight">skills</span>      - Technical stack & competencies
-  <span class="cmd-highlight">projects</span>    - Featured software & engineering projects
-  <span class="cmd-highlight">experience</span>  - Internships & career background
-  <span class="cmd-highlight">education</span>   - UC Berkeley coursework & degree
-  <span class="cmd-highlight">blog [slug]</span> - List articles or open an article modal
-  <span class="cmd-highlight">matcha</span>      - Nathan's top matcha rankings
-  <span class="cmd-highlight">photos</span>      - Camera gear & photography
-  <span class="cmd-highlight">stats</span>       - Real-time visitor counts & analytics
-  <span class="cmd-highlight">goto &lt;tab&gt;</span>   - Switch tab (home, projects, blog, etc.)
-  <span class="cmd-highlight">theme &lt;mode&gt;</span> - Switch theme (dark, light, toggle)
-  <span class="cmd-highlight">contact</span>     - Socials, GitHub & contact info
-  <span class="cmd-highlight">clear</span>       - Clear terminal screen
-  <span class="cmd-highlight">date</span>        - Berkeley local time & date
-  <span class="cmd-highlight">echo &lt;msg&gt;</span>   - Print message
-  <span class="cmd-highlight">sudo</span>        - Superuser privileges
-  <span class="cmd-highlight">exit</span>        - Minimize terminal window
-                `.trim(), 'output');
-                break;
-
-            case 'about':
-            case 'whoami':
-            case 'bio':
-                printTerminalLine(`
-<span class="terminal-accent">Nathan Liu</span> — UC Berkeley '26 (Data Science & Computer Science)
-• Focus: Machine Learning, Data Engineering Pipelines & Full-Stack Systems.
-• Passionate about minimalist UI design, street photography (Fujifilm X100VI), and fitness.
-• Seeking 2026 Full-Time Software Engineering & Data Science opportunities.
-                `.trim(), 'output');
-                break;
-
-            case 'skills':
-            case 'stack':
-                printTerminalLine(`
-<span class="terminal-accent">Technical Skills & Technologies:</span>
-  • <span class="cmd-highlight">Languages:</span>      Python, Java, SQL (PostgreSQL), C/C++, JavaScript, TypeScript, Dart
-  • <span class="cmd-highlight">Cloud & Systems:</span> Git, Docker, AWS (Kinesis, DynamoDB, S3, CloudWatch), Cloudflare Edge
-  • <span class="cmd-highlight">Data & ML:</span>      PyTorch, NumPy, pandas, Matplotlib, PySpark, LangChain, Hugging Face, Scikit-Learn
-  • <span class="cmd-highlight">Web:</span>            React, Node.js, Django, FastAPI, Web3, Express, Flask, React Native, Flutter
-  • <span class="cmd-highlight">Dev Tools:</span>      Linux/Bash, Postman, Figma, Wrangler CLI
-Type <span class="cmd-highlight">'goto skills'</span> to view the full visual skills dashboard!
-                `.trim(), 'output');
-                break;
-
-            case 'projects':
-                printTerminalLine(`
-<span class="terminal-accent">Featured Projects:</span>
-  [1] <span class="cmd-highlight">Event-Driven Market Pipeline</span>: Zero-shot transformer embeddings & streaming cluster dedup.
-  [2] <span class="cmd-highlight">SimplyMail</span>: Fast web Gmail client built with JavaScript & Firebase.
-  [3] <span class="cmd-highlight">Spotify Analytics</span>: Listening telemetry dashboard & genre analyzer.
-  [4] <span class="cmd-highlight">Pokédex API</span>: Autocomplete Pokémon search with evolutions & stats.
-Type <span class="cmd-highlight">'goto projects'</span> to navigate to the projects window!
-                `.trim(), 'output');
-                break;
-
-            case 'experience':
-            case 'work':
-            case 'jobs':
-                printTerminalLine(`
-<span class="terminal-accent">Experience:</span>
-  • Software Engineering & Data Engineering Projects
-  • Data Science & SWE Internships
-  • Distributed Systems & Cloudflare Serverless Architecture
-Type <span class="cmd-highlight">'goto experience'</span> for the complete timeline and resume!
-                `.trim(), 'output');
-                break;
-
-            case 'education':
-            case 'academics':
-            case 'school':
-            case 'cal':
-            case 'berkeley':
-                printTerminalLine(`
-<span class="terminal-accent">Education — UC Berkeley (Class of 2026):</span>
-  • Degree: B.A. Data Science & Computer Science (GPA: 3.75)
-  • CS Core: CS 61A, CS 61B, CS 61C, CS 161, CS 162, CS 170, CS 186, CS 189
-  • Data Core: DATA 8, DATA 100, DATA C101, DATA 140, EECS 127
-Type <span class="cmd-highlight">'goto education'</span> to see the full course matrix & ratings!
-                `.trim(), 'output');
-                break;
-
-            case 'matcha':
-                printTerminalLine(`
-<span class="terminal-accent">🍵 Nathan's Matcha Power Rankings (2026):</span>
-  1. <span class="cmd-highlight">Airoma Cafe</span> (Fountain Valley, CA): Matcha Einspanner (5/5) ★
-  2. <span class="cmd-highlight">Brew Story</span> (Huntington Beach, CA): Banana Cream Matcha (4.5/5)
-  3. <span class="cmd-highlight">Matsu Matcha</span> (Cupertino, CA): Biscoff Matcha (4.5/5)
-  4. <span class="cmd-highlight">Community Goods</span> (Los Angeles, CA): Rocky's Matcha (4/5)
-  5. <span class="cmd-highlight">Da Vien</span> (Milpitas, CA): Banana Matcha (4/5)
-Type <span class="cmd-highlight">'blog matcha'</span> to open the full blog post!
-                `.trim(), 'output');
-                break;
-
-            case 'blog':
-            case 'posts':
-                if (args.length > 0) {
-                    const slug = args[args.length - 1].toLowerCase();
-                    if (slug === 'open' && args.length > 1) {
-                        const targetSlug = args[1].toLowerCase();
-                        openBlogModal(targetSlug);
-                        printTerminalLine(`<span class="terminal-line success">Opening article: ${targetSlug}...</span>`);
-                    } else if (slug !== 'open') {
-                        openBlogModal(slug);
-                        printTerminalLine(`<span class="terminal-line success">Opening article: ${slug}...</span>`);
-                    }
-                } else {
-                    let listStr = `<span class="terminal-accent">Available Blog Articles:</span>\n`;
-                    cachedBlogPosts.forEach((p, i) => {
-                        listStr += `  [${i + 1}] <span class="cmd-highlight">${p.id}</span> (${p.date})\n      ${p.title}\n`;
-                    });
-                    listStr += `Type <span class="cmd-highlight">'blog &lt;slug&gt;'</span> (e.g. 'blog matcha') to open an article modal!`;
-                    printTerminalLine(listStr.trim(), 'output');
-                }
-                break;
-
-            case 'photos':
-            case 'photography':
-            case 'camera':
-                printTerminalLine(`
-<span class="terminal-accent">Photography:</span>
-  • Primary Body: <span class="cmd-highlight">Fujifilm X100VI</span> (23mm F2 Fixed)
-  • Video Setup:  <span class="cmd-highlight">Sony ZVE10 II</span>
-  • Locations:    California, Japan, Hawaii, South Korea
-Type <span class="cmd-highlight">'goto photography'</span> to open the gallery!
-                `.trim(), 'output');
-                break;
-
-            case 'stats':
-            case 'telemetry':
-                const viewers = document.getElementById('active-viewers-count') ? document.getElementById('active-viewers-count').textContent : '1';
-                printTerminalLine(`
-<span class="terminal-accent">System Telemetry:</span>
-  • Status:       ONLINE [200 OK]
-  • Active Users: <span class="cmd-highlight">${viewers} visitor(s) online</span>
-  • Architecture: Cloudflare Pages + Durable Objects (SQLite Backend)
-  • Client Time:  ${new Date().toLocaleTimeString()}
-Type <span class="cmd-highlight">'goto stats'</span> to view the full 7-day traffic chart!
-                `.trim(), 'output');
-                break;
-
-            case 'goto':
-            case 'cd':
-            case 'open':
-                if (args.length === 0) {
-                    printTerminalLine(`Usage: <span class="cmd-highlight">goto &lt;tab&gt;</span> (e.g. goto projects, goto blog, goto stats)`, 'error');
-                } else {
-                    const tab = args[0].toLowerCase();
-                    const validTabs = ['home', 'experience', 'projects', 'skills', 'education', 'photography', 'blog', 'stats'];
-                    if (validTabs.includes(tab)) {
-                        switchTab(tab);
-                        const newPath = tab === 'home' ? '/' : `/${tab}`;
-                        if (window.location.pathname !== newPath) {
-                            history.pushState({ tab }, '', newPath);
-                        }
-                        printTerminalLine(`<span class="terminal-line success">Navigated to ${tab}.</span>`);
-                    } else {
-                        printTerminalLine(`Unknown panel: "${tab}". Valid tabs: ${validTabs.join(', ')}`, 'error');
-                    }
-                }
-                break;
-
-            case 'theme':
-                if (args.length === 0 || args[0] === 'toggle') {
-                    const isDark = document.documentElement.classList.toggle('dark');
-                    localStorage.setItem('portfolio-theme', isDark ? 'dark' : 'light');
-                    printTerminalLine(`<span class="terminal-line success">Theme switched to ${isDark ? 'dark' : 'light'} mode.</span>`);
-                } else if (args[0] === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('portfolio-theme', 'dark');
-                    printTerminalLine(`<span class="terminal-line success">Dark theme enabled.</span>`);
-                } else if (args[0] === 'light') {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('portfolio-theme', 'light');
-                    printTerminalLine(`<span class="terminal-line success">Light theme enabled.</span>`);
-                }
-                break;
-
-            case 'contact':
-            case 'socials':
-            case 'email':
-                printTerminalLine(`
-<span class="terminal-accent">Connect with Nathan:</span>
-  • Email:    <a href="mailto:contact@nathanliu.dev" style="color:#ffe7a0;">contact@nathanliu.dev</a>
-  • LinkedIn: <a href="https://linkedin.com/in/n8liu" target="_blank" style="color:#ffe7a0;">linkedin.com/in/n8liu</a>
-  • GitHub:   <a href="https://github.com/n8liu" target="_blank" style="color:#ffe7a0;">github.com/n8liu</a>
-  • Hevy:     <a href="https://hevy.com/user/natedogl" target="_blank" style="color:#ffe7a0;">hevy.com/user/natedogl</a>
-                `.trim(), 'output');
-                break;
-
-            case 'date':
-            case 'time':
-                printTerminalLine(new Date().toString(), 'output');
-                break;
-
-            case 'echo':
-                printTerminalLine(escapeTerminalHtml(args.join(' ')), 'output');
-                break;
-
-            case 'clear':
-            case 'cls':
-                clearTerminal();
-                break;
-
-            case 'sudo':
-                printTerminalLine(`guest is not in the sudoers file. This incident will be reported to Oski 🐻.`, 'error');
-                break;
-
-            case 'exit':
-            case 'quit':
-                toggleTerminal(false);
-                break;
-
-            case 'ls':
-            case 'dir':
-                printTerminalLine(`
-home.md         experience.txt   projects.bat
-academics.doc   gallery.exe      blog.ini
-dashboard.sys   notes.txt        term.exe
-                `.trim(), 'output');
-                break;
-
-            case 'cat':
-                if (args.length === 0) {
-                    printTerminalLine(`Usage: cat &lt;filename&gt;`, 'error');
-                } else {
-                    const filename = args[0].toLowerCase();
-                    if (filename.includes('note')) {
-                        printTerminalLine(document.getElementById('sticky-note-content') ? document.getElementById('sticky-note-content').innerText : 'No notes found.', 'output');
-                    } else if (filename.includes('blog')) {
-                        executeCommand('blog');
-                    } else {
-                        printTerminalLine(`cat: ${escapeTerminalHtml(filename)}: Permission denied or binary file.`, 'error');
-                    }
-                }
-                break;
-
-            default:
-                printTerminalLine(`nathan-os: command not found: "${escapeTerminalHtml(cmd)}". Type <span class="cmd-highlight">'help'</span> for a list of commands.`, 'error');
-                break;
-        }
-    }
-
-    function toggleFoldTerminal(forceState) {
-        if (!terminalWidget) return;
-        const isFolded = terminalWidget.classList.contains('folded');
-        const shouldFold = typeof forceState === 'boolean' ? forceState : !isFolded;
-
-        if (shouldFold) {
-            terminalWidget.classList.add('folded');
-            localStorage.setItem('portfolio-terminal-folded', 'true');
-        } else {
-            terminalWidget.classList.remove('folded');
-            localStorage.setItem('portfolio-terminal-folded', 'false');
-            setTimeout(() => {
-                if (terminalInput) terminalInput.focus();
-            }, 100);
-        }
-    }
-
-    if (terminalWidget) {
-        // Restore saved visibility (default to visible)
-        const savedTermVisible = localStorage.getItem('portfolio-terminal-visible');
-        if (savedTermVisible === 'false') {
-            toggleTerminal(false);
-        } else {
-            toggleTerminal(true);
-        }
-
-        // Restore saved folded/minimized state (defaults to folded on load)
-        const savedTermFolded = localStorage.getItem('portfolio-terminal-folded');
-        if (savedTermFolded === 'false') {
-            terminalWidget.classList.remove('folded');
-        } else {
-            terminalWidget.classList.add('folded');
-        }
-
-        // Click titlebar when folded to unfold
-        const termHeader = terminalWidget.querySelector('.terminal-header');
-        if (termHeader) {
-            termHeader.addEventListener('click', function (e) {
-                if (terminalWidget.classList.contains('folded') && !e.target.closest('.terminal-controls')) {
-                    toggleFoldTerminal(false);
-                }
-            });
-        }
-
-        // Input key listener
-        if (terminalInput) {
-            terminalInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const val = this.value;
-                    this.value = '';
-                    executeCommand(val);
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (commandHistory.length > 0) {
-                        if (historyIndex > 0) {
-                            historyIndex--;
-                        } else if (historyIndex === -1) {
-                            historyIndex = commandHistory.length - 1;
-                        }
-                        this.value = commandHistory[historyIndex] || '';
-                    }
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (commandHistory.length > 0) {
-                        if (historyIndex < commandHistory.length - 1) {
-                            historyIndex++;
-                            this.value = commandHistory[historyIndex] || '';
-                        } else {
-                            historyIndex = commandHistory.length;
-                            this.value = '';
-                        }
-                    }
-                } else if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const current = this.value.trim().toLowerCase();
-                    const candidates = ['about', 'skills', 'projects', 'experience', 'education', 'blog', 'matcha', 'photos', 'stats', 'goto', 'theme', 'contact', 'clear', 'help', 'date', 'echo', 'sudo', 'exit', 'ls', 'cat'];
-                    const match = candidates.find(c => c.startsWith(current));
-                    if (match) {
-                        this.value = match;
-                    }
-                }
-            });
-        }
-
-        // Click body to focus input
-        if (terminalBody && terminalInput) {
-            terminalBody.addEventListener('click', function () {
-                terminalInput.focus();
-            });
-        }
-
-        // Quick command pills
-        document.querySelectorAll('.term-pill').forEach(pill => {
-            pill.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const cmd = this.getAttribute('data-cmd');
-                if (cmd) {
-                    executeCommand(cmd);
-                    if (terminalInput) terminalInput.focus();
-                }
-            });
-        });
-
-        // Minimize / Fold
-        if (terminalMinBtn) {
-            terminalMinBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                toggleFoldTerminal();
-            });
-        }
-
-        // Close
-        if (terminalCloseBtn) {
-            terminalCloseBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                toggleTerminal(false);
-            });
-        }
-
-        // Clear
-        if (terminalClearBtn) {
-            terminalClearBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                clearTerminal();
-            });
-        }
-
-        // Taskbar terminal buttons
-        if (taskbarTerminalBtn) {
-            taskbarTerminalBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (terminalWidget.classList.contains('minimized')) {
-                    toggleTerminal(true);
-                    toggleFoldTerminal(false);
-                } else if (terminalWidget.classList.contains('folded')) {
-                    toggleFoldTerminal(false);
-                } else {
-                    toggleFoldTerminal(true);
-                }
-            });
-        }
-
-        if (taskbarStartBtn) {
-            taskbarStartBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (terminalWidget.classList.contains('minimized')) {
-                    toggleTerminal(true);
-                    toggleFoldTerminal(false);
-                } else if (terminalWidget.classList.contains('folded')) {
-                    toggleFoldTerminal(false);
-                } else {
-                    toggleFoldTerminal(true);
-                }
-            });
-        }
-
-        // Expose globally
-        window.toggleTerminal = toggleTerminal;
-        window.toggleFoldTerminal = toggleFoldTerminal;
     }
 
     // Fade in page body

@@ -4,9 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
 
     <!-- SEO Meta Tags -->
     <meta name="description"
@@ -32,6 +29,9 @@
 
     <title>Nathan Liu - Data Science & Computer Science Portfolio</title>
     <base href="/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap">
     <link rel="stylesheet" href="/styles.css">
     <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -73,6 +73,7 @@
         <a href="#panel-experience" class="nav-tab" data-tab="experience">experience</a>
         <a href="#panel-projects" class="nav-tab" data-tab="projects">projects</a>
         <a href="#panel-skills" class="nav-tab" data-tab="skills">skills</a>
+        <span class="nav-separator" aria-hidden="true">|</span>
         <a href="/photography" class="nav-tab" data-tab="photography">photography</a>
         <a href="/blog" class="nav-tab" data-tab="blog">blog</a>
         <a href="/stats" class="nav-tab" data-tab="stats">stats</a>
@@ -125,8 +126,7 @@
                                     science</a>. my academic interests lie in machine
                                 learning and data engineering pipelines.</p>
                             <p>currently, i'm focused on scalable cloud-native architectures, designing event-driven
-                                data
-                                systems, and actively looking for <a
+                                data systems, and actively looking for <a
                                     href="mailto:nathan.dtliu@gmail.com?subject=New%20Grad%20Opportunity%20-%20Nathan%20Liu">new
                                     grad and full-time opportunities</a>. beyond writing code, i'm an avid photographer
                                 capturing urban structures and natural landscapes.</p>
@@ -138,8 +138,6 @@
                             <div class="project-actions" style="margin-top: 1.5rem;">
                                 <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn-retro primary"
                                     id="resume-btn">resume.pdf <i class="fas fa-download"></i></a>
-                                <!-- <a href="https://cal.com/n8liu" target="_blank" class="btn-retro">book a meeting <i
-                                    class="fas fa-arrow-up-right-from-square"></i></a> -->
                             </div>
 
                             <div class="social-links">
@@ -160,7 +158,10 @@
                         </div>
                         <div class="profile-pic-container">
                             <div class="profile-pic-frame">
-                                <img src="assets/profile.jpeg" alt="Nathan Liu Profile Picture">
+                                <picture>
+                                    <source srcset="assets/profile.webp" type="image/webp">
+                                    <img src="assets/profile.jpeg" alt="Nathan Liu Profile Picture" width="160" height="160" fetchpriority="high">
+                                </picture>
                             </div>
                         </div>
                     </div>
@@ -274,14 +275,14 @@
                             </div>
                             <div class="card-subtitle">Carbon Sustain • Berkeley, CA</div>
                             <ul class="card-bullets">
-                                <li>Engineered a real-time event-processing pipeline handling 100K+ events/day, adding
+                                <!-- <li>Engineered a real-time event-processing pipeline handling 100K+ events/day, adding
                                     schema validation and S3 execution traces to support deterministic replay and faster
                                     incident debugging.</li>
                                 <li>Enhanced system reliability by implementing DynamoDB idempotency keys to handle
                                     retry spikes and configuring CloudWatch alarms, cutting real-time execution failures
                                     by 62%.</li>
                                 <li>Analyzed catering and digital-media footprint data to identify decarbonization
-                                    opportunities representing up to 76% of modeled event emissions</li>
+                                    opportunities representing up to 76% of modeled event emissions</li> -->
                             </ul>
                         </div>
 
@@ -292,13 +293,13 @@
                             </div>
                             <div class="card-subtitle">UnifIBD • Remote (San Jose, CA)</div>
                             <ul class="card-bullets">
-                                <li>Reduced time-to-production for data features by half by standardizing
+                                <!-- <li>Reduced time-to-production for data features by half by standardizing
                                     analytics-to-engineering integration workflows and implementation handoffs</li>
                                 <li>Removed manual mobile releases to TestFlight and Google Play with Fastlane and
                                     GitHub Actions, reducing deployment time from hours to minutes</li>
                                 <li>Led a three-engineer migration of a Swift iOS application to Flutter, defining the
                                     architecture and technical milestones while consolidating platform-specific code
-                                    into a shared codebase.</li>
+                                    into a shared codebase.</li> -->
                             </ul>
                         </div>
 
@@ -309,14 +310,14 @@
                             </div>
                             <div class="card-subtitle">L.A. Lucky Import & Export Inc. • Los Angeles, CA</div>
                             <ul class="card-bullets">
-                                <li>Developed statistical forecasting pipelines and inventory anomaly detection across
+                                <!-- <li>Developed statistical forecasting pipelines and inventory anomaly detection across
                                     4,000+ SKUs, identifying seasonal surges to improve supply chain and reduce
                                     inventory shrinkage by 60%.</li>
                                 <li>Reduced API response latency by 78% by minimizing response payloads and introducing
                                     server-side caching for frequently accessed inventory data.</li>
                                 <li>Reconstructed a real-time SAP inventory sync using incremental pulls and upserts
                                     into PostgreSQL which reduced manual processing substantially and enabled automated
-                                    invoicing for all customers</li>
+                                    invoicing for all customers</li> -->
                             </ul>
                         </div>
 
@@ -327,7 +328,7 @@
                             </div>
                             <div class="card-subtitle">Happy Lemon • Danville, CA</div>
                             <ul class="card-bullets">
-                                <li>Directed a team of 15+ staff members by managing end-to-end scheduling, hiring, and
+                                <!-- <li>Directed a team of 15+ staff members by managing end-to-end scheduling, hiring, and
                                     onboarding, fostering a collaborative and high-performing environment in a
                                     fast-paced
                                     setting.</li>
@@ -337,7 +338,7 @@
                                 <li>Spearheaded daily operations over a three-year tenure, serving as the primary
                                     escalation
                                     point for resolving complex customer concerns and enforcing consistent quality
-                                    standards.</li>
+                                    standards.</li> -->
                             </ul>
                         </div>
                     </div>
@@ -666,15 +667,24 @@
                         </div>
 
                         <div class="photo-grid-layout" id="portfolio-photo-grid">
-                            <!-- Loaded dynamically or displays placeholder cards initially -->
+                            <!-- Fallback cards with optimized responsive WebP pictures -->
                             <div class="photo-card" onclick="openFallbackPhoto('featured')">
-                                <img src="assets/featured-photo.png" alt="Featured Photo">
+                                <picture>
+                                    <source srcset="assets/featured-photo.webp" type="image/webp">
+                                    <img src="assets/featured-photo.png" alt="Featured Photo" loading="lazy" width="600" height="380">
+                                </picture>
                             </div>
                             <div class="photo-card" onclick="openFallbackPhoto('landscape')">
-                                <img src="assets/landscape-photo.png" alt="Landscape Photo">
+                                <picture>
+                                    <source srcset="assets/landscape-photo.webp" type="image/webp">
+                                    <img src="assets/landscape-photo.png" alt="Landscape Photo" loading="lazy" width="600" height="397">
+                                </picture>
                             </div>
                             <div class="photo-card" onclick="openFallbackPhoto('urban')">
-                                <img src="assets/urban-photo.png" alt="Urban Photo">
+                                <picture>
+                                    <source srcset="assets/urban-photo.webp" type="image/webp">
+                                    <img src="assets/urban-photo.png" alt="Urban Photo" loading="lazy" width="600" height="393">
+                                </picture>
                             </div>
                         </div>
                     </div>
@@ -752,39 +762,6 @@
         </div>
     </main>
 
-    <!-- Retro Terminal Widget (Bottom Left - Minimized/Folded by default) -->
-    <!-- <aside class="terminal-widget folded" id="terminal-widget" aria-label="Interactive Terminal Console">
-        <div class="terminal-header">
-            <span class="terminal-title"><i class="fas fa-terminal"></i> term.exe — bash</span>
-            <div class="terminal-controls">
-                <button class="terminal-btn-mini" id="terminal-clear" title="Clear Terminal" aria-label="Clear Terminal">
-                    <i class="fas fa-eraser"></i>
-                </button>
-                <button class="terminal-btn-mini" id="terminal-minimize" title="Fold/Unfold Terminal" aria-label="Fold Terminal">_</button>
-                <button class="terminal-btn-mini close" id="terminal-close" title="Close Terminal" aria-label="Close Terminal">×</button>
-            </div>
-        </div>
-        <div class="terminal-body" id="terminal-body">
-            <div class="terminal-output" id="terminal-output">
-                <div class="terminal-line banner"><span class="terminal-accent">NathanOS v3.2.0</span> [x86_64-retro-web]</div>
-                <div class="terminal-line info">Type <span class="cmd-highlight">'help'</span> to see available commands or click quick pills below.</div>
-            </div>
-            <div class="terminal-input-line">
-                <span class="terminal-prompt">nathan@cal:~$</span>
-                <input type="text" class="terminal-input" id="terminal-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Terminal Command Input">
-            </div>
-        </div>
-        <div class="terminal-footer">
-            <div class="terminal-quick-cmds">
-                <button class="term-pill" data-cmd="help">help</button>
-                <button class="term-pill" data-cmd="about">about</button>
-                <button class="term-pill" data-cmd="skills">skills</button>
-                <button class="term-pill" data-cmd="projects">projects</button>
-                <button class="term-pill" data-cmd="matcha">matcha</button>
-                <button class="term-pill" data-cmd="clear">clear</button>
-            </div>
-        </div>
-    </aside> -->
 
     <!-- Retro Sticky Note Widget -->
     <aside class="sticky-note" id="sticky-note" aria-label="Desktop Sticky Note">
@@ -894,11 +871,9 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-    <script src="/script.js"></script>
-    <script src="/viewers.js"></script>
+    <!-- Scripts (marked and chart.js are loaded on-demand dynamically) -->
+    <script src="/script.js" defer></script>
+    <script src="/viewers.js" defer></script>
 </body>
 
 </html>

@@ -79,8 +79,10 @@ class ViewerCounter {
   }
 
   startPolling(workerBase) {
-    // Poll every 5 seconds to get updated viewer count
-    setInterval(async () => {
+    let pollingInterval = null;
+
+    const poll = async () => {
+      if (document.hidden) return;
       try {
         const response = await fetch(`${workerBase}/api/viewers`);
         const data = await response.json();
@@ -88,7 +90,32 @@ class ViewerCounter {
       } catch (error) {
         console.error('Error polling viewer count:', error);
       }
-    }, 5000);
+    };
+
+    const start = () => {
+      if (!pollingInterval) {
+        pollingInterval = setInterval(poll, 5000);
+      }
+    };
+
+    const stop = () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+      }
+    };
+
+    // Pause polling when tab is hidden, resume immediately when visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        poll();
+        start();
+      }
+    });
+
+    start();
   }
 
   initSocketIO() {
