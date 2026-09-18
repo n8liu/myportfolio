@@ -27,7 +27,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Nathan Liu - Portfolio">
     <meta name="twitter:description"
-        content="UC Berkeley Data Science & CS student | Machine Learning | Full-Stack Development">
+        content="UC Berkeley Data Science & Computer Science student | Machine Learning | Full-Stack Development">
     <meta name="twitter:image" content="https://nathanliu.dev/assets/profile.jpeg">
 
     <title>Nathan Liu - Data Science & Computer Science Portfolio</title>
@@ -68,10 +68,11 @@
 
     <!-- Top Navigation Tabs (Carolyn Wang Style) -->
     <nav class="header-nav" aria-label="Primary Navigation">
-        <a href="/" class="nav-tab active" data-tab="home">home</a>
-        <a href="/experience" class="nav-tab" data-tab="experience">experience</a>
-        <a href="/projects" class="nav-tab" data-tab="projects">projects</a>
-        <a href="/education" class="nav-tab" data-tab="education">education</a>
+        <a href="#panel-home" class="nav-tab active" data-tab="home">home</a>
+        <a href="#panel-education" class="nav-tab" data-tab="education">education</a>
+        <a href="#panel-experience" class="nav-tab" data-tab="experience">experience</a>
+        <a href="#panel-projects" class="nav-tab" data-tab="projects">projects</a>
+        <a href="#panel-skills" class="nav-tab" data-tab="skills">skills</a>
         <a href="/photography" class="nav-tab" data-tab="photography">photography</a>
         <a href="/blog" class="nav-tab" data-tab="blog">blog</a>
         <a href="/stats" class="nav-tab" data-tab="stats">stats</a>
@@ -93,8 +94,7 @@
 
         <!-- Menu Bar -->
         <div class="window-menubar">
-            <div class="menu-item"
-                onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with love and retro vibes.')">File</div>
+            <div class="menu-item" onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with care.')">File</div>
             <div class="menu-item"
                 onclick="alert('This document is read-only. You can edit notes in the Sticky Note widget!')">Edit</div>
             <div class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</div>
@@ -105,420 +105,623 @@
 
         <!-- Body Content -->
         <div class="window-body">
-            <!-- HOME PANEL -->
-            <section id="panel-home" class="panel active">
-                <div class="home-grid">
-                    <div class="bio-text">
-                        <div class="status-badge" title="Status: Open to Work">
-                            <span class="status-badge-dot"></span>
-                            <span class="status-badge-label">STATUS:</span>
-                            <span class="status-badge-text">Seeking 2026 New Grad & Full-Time Roles</span>
-                        </div>
-                        <h1>hi! i'm nathan 👋</h1>
-                        <p>i just graduated at <a href="https://www.berkeley.edu" target="_blank"
-                                rel="noopener noreferrer">uc berkeley</a> (go bears!) studying <a
-                                href="https://eecs.berkeley.edu/cs/" target="_blank" rel="noopener noreferrer">computer
-                                science</a> & <a href="https://cdss.berkeley.edu/dsus" target="_blank"
-                                rel="noopener noreferrer">data science</a>. my academic interests lie in machine learning and data engineering pipelines.</p>
-                                <p>currently, i'm focused on scalable cloud-native architectures, designing event-driven data systems, and actively looking for <a href="mailto:nathan.dtliu@gmail.com?subject=New%20Grad%20Opportunity%20-%20Nathan%20Liu">new grad and full-time opportunities</a>. beyond writing code, i'm an avid photographer capturing urban structures and natural landscapes.</p>
-                                <p>in my free time, i like to go <a href="#photography" onclick="document.querySelector('[data-tab=\'photography\']').click()">sidequesting with my camera</a>, hit the gym to clear my head, or travel the world.</p>
+            <!-- MAIN SCROLL PORTFOLIO VIEW -->
+            <div id="view-portfolio" class="page-view active">
+                <!-- HOME PANEL -->
+                <section id="panel-home" class="panel active">
+                    <div class="home-grid">
+                        <div class="bio-text">
+                            <div class="status-badge" title="Status: Open to Work">
+                                <span class="status-badge-dot"></span>
+                                <span class="status-badge-label">STATUS:</span>
+                                <span class="status-badge-text">Seeking 2026 New Grad & Full-Time Roles</span>
+                            </div>
+                            <h1>hi! i'm nathan 👋</h1>
+                            <p>i just graduated at <a href="https://www.berkeley.edu" target="_blank"
+                                    rel="noopener noreferrer">uc berkeley</a> (go bears!) studying <a
+                                    href="https://cdss.berkeley.edu/dsus" target="_blank" rel="noopener noreferrer">data
+                                    science</a> & <a href="https://eecs.berkeley.edu/cs/" target="_blank"
+                                    rel="noopener noreferrer">computer
+                                    science</a>. my academic interests lie in machine
+                                learning and data engineering pipelines.</p>
+                            <p>currently, i'm focused on scalable cloud-native architectures, designing event-driven
+                                data
+                                systems, and actively looking for <a
+                                    href="mailto:nathan.dtliu@gmail.com?subject=New%20Grad%20Opportunity%20-%20Nathan%20Liu">new
+                                    grad and full-time opportunities</a>. beyond writing code, i'm an avid photographer
+                                capturing urban structures and natural landscapes.</p>
+                            <p>in my free time, i like to go <a href="#photography"
+                                    onclick="document.querySelector('[data-tab=\'photography\']').click()">sidequesting
+                                    with
+                                    my camera</a>, hit the gym to clear my head, or travel the world.</p>
 
-                        <div class="project-actions" style="margin-top: 1.5rem;">
-                            <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn-retro primary"
-                                id="resume-btn">resume.pdf <i class="fas fa-download"></i></a>
-                            <a href="https://cal.com/n8liu" target="_blank" class="btn-retro">book a meeting <i
-                                    class="fas fa-arrow-up-right-from-square"></i></a>
-                        </div>
+                            <div class="project-actions" style="margin-top: 1.5rem;">
+                                <a href="/assets/Nathan_Liu_Resume.pdf" target="_blank" class="btn-retro primary"
+                                    id="resume-btn">resume.pdf <i class="fas fa-download"></i></a>
+                                <!-- <a href="https://cal.com/n8liu" target="_blank" class="btn-retro">book a meeting <i
+                                    class="fas fa-arrow-up-right-from-square"></i></a> -->
+                            </div>
 
-                        <div class="social-links">
-                            <a href="https://www.linkedin.com/in/n8liu/" class="social-btn" target="_blank"
-                                rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                            <a href="https://www.github.com/n8liu" class="social-btn" target="_blank"
-                                rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                            <a href="https://www.instagram.com/n8.trvl/" class="social-btn" target="_blank"
-                                rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                            <a href="mailto:nathan.dtliu@gmail.com" class="social-btn" aria-label="Email"><i
-                                    class="fas fa-envelope"></i></a>
-                        </div>
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/n8liu/" class="social-btn" target="_blank"
+                                    rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                                <a href="https://www.github.com/n8liu" class="social-btn" target="_blank"
+                                    rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                                <a href="https://www.instagram.com/n8.trvl/" class="social-btn" target="_blank"
+                                    rel="noopener noreferrer" aria-label="Instagram"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="mailto:nathan.dtliu@gmail.com" class="social-btn" aria-label="Email"><i
+                                        class="fas fa-envelope"></i></a>
+                            </div>
 
-                        <div class="last-updated">
-                            last updated on aug 19, 2026. built with love.
-                        </div>
-                    </div>
-                    <div class="profile-pic-container">
-                        <div class="profile-pic-frame">
-                            <img src="assets/profile.jpeg" alt="Nathan Liu Profile Picture">
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- EXPERIENCE PANEL -->
-            <section id="panel-experience" class="panel">
-                <div class="experience-list">
-
-                    <div class="retro-card experience-loading-card">
-                        <div class="card-header">
-                            <h3 class="card-title loading-card-title">
-                                Loading<span class="loading-dots"><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span><span class="loading-cursor">_</span>
-                            </h3>
-                            <span class="retro-badge loading-badge">to be continued...</span>
-                        </div>
-                        <div class="card-subtitle">Actively interviewing for Data Engineering & SWE roles.</div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Data Engineer Intern</h3>
-                            <span class="retro-badge">May 2025 - Aug. 2025</span>
-                        </div>
-                        <div class="card-subtitle">Carbon Sustain • Berkeley, CA</div>
-                        <ul class="card-bullets">
-                            <li>Engineered a real-time LLM anomaly detection pipeline that processed 100k events, enforced schema‑validated JSON, and logged full traces to S3 for replayability, enabling faster incident investigation.</li>
-                            <li>Enhanced system reliability by implementing DynamoDB idempotency keys to handle retry spikes and configuring CloudWatch alarms, cutting real-time execution failures by 50%</li>
-                            <li>Cut dashboard data retrieval time by 80% by rewriting high-cost joins, adding composite indexes, and implementing cursor pagination.</li>
-                        </ul>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Software Engineer</h3>
-                            <span class="retro-badge">Jan 2025 - Aug. 2025</span>
-                        </div>
-                        <div class="card-subtitle">UnifIBD • Remote (San Jose, CA)</div>
-                        <ul class="card-bullets">
-                            <li>Architected a mobile CI/CD pipeline using Fastlane and GitHub Actions, automating deployments to TestFlight/Google Play to cut release times from hours to minutes</li>
-                            <li>Accelerated time-to-production for data features by 50% by standardizing integration workflows and documentation between analytics and engineering teams.</li>
-                            <li>Led a three-person engineering team in migrating a Swift iOS app to Flutter and establishing architectural direction, technical milestones, and reduced maintenance effort.</li>
-                        </ul>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Data Science Intern</h3>
-                            <span class="retro-badge">Jun. 2024 - Aug. 2024</span>
-                        </div>
-                        <div class="card-subtitle">L.A. Lucky Import & Export Inc. • Los Angeles, CA</div>
-                        <ul class="card-bullets">
-                            <li>Reconstructed a real-time SAP inventory sync for 4,000+ SKUs using incremental pulls and upserts into PostgreSQL which reduced manual entry by 100% and enabled automated invoicing for all customers.</li>
-                            <li>Overhauled a legacy platform (Django REST, JWT, React) and improved performance by 75% by reducing payload size and adding server-side caching.</li>
-                            <li>Built a Docker-based CI/CD workflow to deploy ETL/ELT jobs automatically, streamlining legacy database migration and improving pipeline reliability.</li>
-                        </ul>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Shift Manager</h3>
-                            <span class="retro-badge">Sep. 2021 - Jun. 2024</span>
-                        </div>
-                        <div class="card-subtitle">Happy Lemon • Danville, CA</div>
-                        <ul class="card-bullets">
-                            <li>Directed a team of 15+ staff members by managing end-to-end scheduling, hiring, and onboarding, fostering a collaborative and high-performing environment in a fast-paced setting.</li>
-                            <li>Evaluated and optimized front and back-of-house workflows to eliminate operational bottlenecks, directly improving service speed and team efficiency during peak volume hours.</li>
-                            <li>Spearheaded daily operations over a three-year tenure, serving as the primary escalation point for resolving complex customer concerns and enforcing consistent quality standards.</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <!-- PROJECTS PANEL -->
-            <section id="panel-projects" class="panel">
-                <div class="projects-grid">
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Live Semantic Market</h3>
-                            <span class="retro-badge">Active (2026)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses
-                            zero-shot extraction, vector search, and clustering to process financial news into
-                            deduplicated market intelligence.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">JavaScript</span>
-                            <span class="tech-pill">Python</span>
-                            <span class="tech-pill">Fast APIs</span>
-                            <span class="tech-pill">React</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Clickbait Classifier</h3>
-                            <span class="retro-badge">Completed (2026)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on 18K
-                            social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set, outperforming
-                            a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">Python</span>
-                            <span class="tech-pill">PyTorch</span>
-                            <span class="tech-pill">Pandas</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Flow</h3>
-                            <span class="retro-badge">Completed (2026)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Unified full-stack email and calendar
-                            mobile app utilizing AI sorting, multi-account syncing, and metadata indexing.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">React Native</span>
-                            <span class="tech-pill">Node.js</span>
-                            <span class="tech-pill">MongoDB</span>
-                            <span class="tech-pill">AWS</span>
-                            <span class="tech-pill">Gemini</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">ItineraryAI</h3>
-                            <span class="retro-badge">Completed (2026)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built a chat-based travel concierge that
-                            generates structured itineraries from a single prompt and shipped a web dashboard for trip
-                            planning (budgets, maps, calendar sync).</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">Python</span>
-                            <span class="tech-pill">LangChain</span>
-                            <span class="tech-pill">FastAPI</span>
-                            <span class="tech-pill">JavaScript</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">The IBD Digest</h3>
-                            <span class="retro-badge">Completed (2025)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion app
-                            for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent
-                            onboarding and local state persistence.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">Flutter</span>
-                            <span class="tech-pill">Dart</span>
-                            <span class="tech-pill">Provider</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                            <a href="https://apps.apple.com/tr/app/the-ibd-digest/id6473455443" class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i> demo</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Spotify Analytics</h3>
-                            <span class="retro-badge">Completed (2025)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard
-                            showing profile insights, favorite genres, and user recommendations.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">Python</span>
-                            <span class="tech-pill">Flask</span>
-                            <span class="tech-pill">Spotify API</span>
-                            <span class="tech-pill">Pandas</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro"
-                                target="_blank"><i class="fab fa-github"></i> code</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">SimplyMail</h3>
-                            <span class="retro-badge">Completed (2024)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high
-                            performance, clean visual interfaces, and secure Gmail API integrations.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">JavaScript</span>
-                            <span class="tech-pill">Firebase</span>
-                            <span class="tech-pill">Gmail API</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu/SimplyMail" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                            <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i
-                                    class="fas fa-external-link-alt"></i> demo</a>
-                        </div>
-                    </div>
-
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Pokédex API</h3>
-                            <span class="retro-badge">Completed (2024)</span>
-                        </div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fast cached Express middleware client
-                            providing interactive Pokemon lookups and type analytics.</p>
-                        <div class="tech-badges">
-                            <span class="tech-pill">TypeScript</span>
-                            <span class="tech-pill">Express</span>
-                            <span class="tech-pill">PokeAPI</span>
-                        </div>
-                        <div style="margin-top: 0.8rem;" class="project-actions">
-                            <a href="https://github.com/n8liu/pokedexAPI" class="btn-retro" target="_blank"><i
-                                    class="fab fa-github"></i> code</a>
-                            <a href="https://pokedexapi-57916.web.app/" class="btn-retro primary" target="_blank"><i
-                                    class="fas fa-external-link-alt"></i> demo</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- EDUCATION PANEL -->
-            <section id="panel-education" class="panel">
-                <div class="education-grid">
-                    <div class="retro-card">
-                        <div class="card-header">
-                            <h3 class="card-title">University of California, Berkeley</h3>
-                            <span class="retro-badge">Class of 2026</span>
-                        </div>
-                        <div class="card-subtitle">Bachelor of Arts in Computer Science & Data Science (Applied Math)
-                        </div>
-                        <p style="margin-bottom: 0.5rem;"><strong>GPA:</strong> 3.75</p>
-                        <p style="margin-bottom: 0.8rem;"><strong>Focus:</strong> Data Engineering & Machine Learning.
-                        </p>
-                    </div>
-
-                    <div class="course-groups">
-                        <div class="course-group">
-                            <h3>Computer Science</h3>
-                            <div class="course-pills">
-                                <span class="course-pill" title="Computer Security">CS 161</span>
-                                <span class="course-pill" title="Operating Systems and Systems Programming">CS
-                                    162</span>
-                                <span class="course-pill"
-                                    title="Introduction to the Internet: Architecture and Protocols">CS 168</span>
-                                <span class="course-pill" title="Efficient Algorithms and Intractable Problems">CS
-                                    170</span>
-                                <span class="course-pill" title="Introduction to Database Systems">CS 186</span>
-                                <span class="course-pill" title="Introduction to Artificial Intelligence">CS 188</span>
-                                <span class="course-pill" title="Introduction to Machine Learning">CS 189</span>
-                                <span class="course-pill" title="Introduction to Full-Stack Development">CS 198</span>
+                            <div class="last-updated">
+                                last updated on september 16, 2026. built with care.
                             </div>
                         </div>
-
-                        <div class="course-group">
-                            <h3>Data Science</h3>
-                            <div class="course-pills">
-                                <span class="course-pill" title="Foundations of Data Science">DATA 8</span>
-                                <span class="course-pill" title="Principles of Data Science">DATA 100</span>
-                                <span class="course-pill" title="Data Engineering">DATA C101</span>
-                                <span class="course-pill" title="Human Contexts and Ethics of Data">DATA C104</span>
-                                <span class="course-pill" title="Probability for Data Science">DATA 140</span>
-                                <span class="course-pill" title="Data Mining and Analytics">DATA 144</span>
-                            </div>
-                        </div>
-
-                        <div class="course-group">
-                            <h3>Engineering & Analytics</h3>
-                            <div class="course-pills">
-                                <span class="course-pill" title="Optimization Models in Engineering">EECS 127</span>
-                                <span class="course-pill" title="Natural Language Processing">INFO 159</span>
-                                <span class="course-pill" title="Linear Programming and Network Flows">IEOR 162</span>
-                            </div>
-                        </div>
-
-                        <div class="course-group">
-                            <h3>Physics</h3>
-                            <div class="course-pills">
-                                <span class="course-pill" title="Physics for Scientists and Engineers I">PHYSICS
-                                    7A</span>
-                                <span class="course-pill" title="Physics for Scientists and Engineers II">PHYSICS
-                                    7B</span>
-                                <span class="course-pill" title="Physics for Scientists and Engineers III">PHYSICS
-                                    7C</span>
+                        <div class="profile-pic-container">
+                            <div class="profile-pic-frame">
+                                <img src="assets/profile.jpeg" alt="Nathan Liu Profile Picture">
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- PHOTOGRAPHY PANEL -->
-            <section id="panel-photography" class="panel">
-                <div class="photo-panel-layout">
-                    <div class="photo-cats" id="photo-category-filters">
-                        <button class="photo-cat active" data-category="all">all</button>
-                        <button class="photo-cat" data-category="california">california</button>
-                        <button class="photo-cat" data-category="japan">japan</button>
-                        <button class="photo-cat" data-category="hawaii">hawaii</button>
-                        <button class="photo-cat" data-category="south_korea">south korea</button>
+                <!-- EDUCATION PANEL -->
+                <section id="panel-education" class="panel">
+                    <div class="section-divider-bar">
+                        <div class="section-divider-title">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>education</span>
+                        </div>
+                        <span class="section-divider-file">academics.doc</span>
                     </div>
+                    <div class="education-grid">
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">University of California, Berkeley</h3>
+                                <span class="retro-badge">Class of 2026</span>
+                            </div>
+                            <div class="card-subtitle">Bachelor of Arts in Data Science (Applied Math) & Computer
+                                Science
+                            </div>
+                            <p style="margin-bottom: 0.5rem;"><strong>GPA:</strong> 3.75</p>
+                            <p style="margin-bottom: 0.8rem;"><strong>Focus:</strong> Data Engineering & Machine
+                                Learning.
+                            </p>
+                        </div>
 
-                    <div class="photo-grid-layout" id="portfolio-photo-grid">
-                        <!-- Loaded dynamically or displays placeholder cards initially -->
-                        <div class="photo-card" onclick="openFallbackPhoto('featured')">
-                            <img src="assets/featured-photo.png" alt="Featured Photo">
-                        </div>
-                        <div class="photo-card" onclick="openFallbackPhoto('landscape')">
-                            <img src="assets/landscape-photo.png" alt="Landscape Photo">
-                        </div>
-                        <div class="photo-card" onclick="openFallbackPhoto('urban')">
-                            <img src="assets/urban-photo.png" alt="Urban Photo">
+                        <div class="course-groups">
+                            <div class="course-group">
+                                <h3>Computer Science</h3>
+                                <div class="course-pills">
+                                    <span class="course-pill" title="Computer Security">CS 161</span>
+                                    <span class="course-pill" title="Operating Systems and Systems Programming">CS
+                                        162</span>
+                                    <span class="course-pill" title="Efficient Algorithms and Intractable Problems">CS
+                                        170</span>
+                                    <span class="course-pill" title="Introduction to Database Systems">CS 186</span>
+                                    <span class="course-pill" title="Introduction to Artificial Intelligence">CS
+                                        188</span>
+                                    <span class="course-pill" title="Introduction to Machine Learning">CS 189</span>
+                                    <span class="course-pill" title="Introduction to Full-Stack Development">CS
+                                        198</span>
+                                </div>
+                            </div>
+
+                            <div class="course-group">
+                                <h3>Data Science</h3>
+                                <div class="course-pills">
+                                    <span class="course-pill" title="Foundations of Data Science">DATA 8</span>
+                                    <span class="course-pill" title="Principles of Data Science">DATA 100</span>
+                                    <span class="course-pill" title="Data Engineering">DATA C101</span>
+                                    <span class="course-pill" title="Human Contexts and Ethics of Data">DATA C104</span>
+                                    <span class="course-pill" title="Probability for Data Science">DATA 140</span>
+                                </div>
+                            </div>
+
+                            <div class="course-group">
+                                <h3>Engineering & Analytics</h3>
+                                <div class="course-pills">
+                                    <span class="course-pill" title="Optimization Models in Engineering">EECS 127</span>
+                                    <span class="course-pill" title="Natural Language Processing">INFO 159</span>
+                                    <span class="course-pill" title="Linear Programming and Network Flows">IEOR
+                                        162</span>
+                                </div>
+                            </div>
+
+                            <div class="course-group">
+                                <h3>Physics</h3>
+                                <div class="course-pills">
+                                    <span class="course-pill" title="Physics for Scientists and Engineers I">PHYSICS
+                                        7A</span>
+                                    <span class="course-pill" title="Physics for Scientists and Engineers II">PHYSICS
+                                        7B</span>
+                                    <span class="course-pill" title="Physics for Scientists and Engineers III">PHYSICS
+                                        7C</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </section>
 
-
-                </div>
-            </section>
-
-                        <!-- BLOG PANEL -->
-            <section id="panel-blog" class="panel">
-                <div class="experience-list" id="blog-cards-container">
-                    <!-- Dynamically rendered from blog/posts.json -->
-                </div>
-            </section>
-
-            <!-- STATS PANEL -->
-            <section id="panel-stats" class="panel">
-                <div class="stats-layout">
-                    <div class="stats-cards-grid">
-                        <div class="stat-card">
-                            <span class="label">Total Views</span>
-                            <div class="value" id="cf-total-views">Loading...</div>
+                <!-- EXPERIENCE PANEL -->
+                <section id="panel-experience" class="panel">
+                    <div class="section-divider-bar">
+                        <div class="section-divider-title">
+                            <i class="fas fa-briefcase"></i>
+                            <span>experience</span>
                         </div>
-                        <div class="stat-card">
-                            <span class="label">Unique Visitors</span>
-                            <div class="value" id="unique-visitors">Loading...</div>
+                        <span class="section-divider-file">experience.txt</span>
+                    </div>
+                    <div class="experience-list">
+
+                        <div class="retro-card experience-loading-card">
+                            <div class="card-header">
+                                <h3 class="card-title loading-card-title">
+                                    Loading<span class="loading-dots"><span class="dot">.</span><span
+                                            class="dot">.</span><span class="dot">.</span></span><span
+                                        class="loading-cursor">_</span>
+                                </h3>
+                                <span class="retro-badge loading-badge">to be continued...</span>
+                            </div>
+                            <div class="card-subtitle">Actively interviewing for Data Engineering & SWE roles.</div>
                         </div>
-                        <div class="stat-card">
-                            <span class="label">Views (24h)</span>
-                            <div class="value" id="requests-24h">Loading...</div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Data Engineer Intern</h3>
+                                <span class="retro-badge">May 2025 - Aug. 2025</span>
+                            </div>
+                            <div class="card-subtitle">Carbon Sustain • Berkeley, CA</div>
+                            <ul class="card-bullets">
+                                <li>Engineered a real-time event-processing pipeline handling 100K+ events/day, adding
+                                    schema validation and S3 execution traces to support deterministic replay and faster
+                                    incident debugging.</li>
+                                <li>Enhanced system reliability by implementing DynamoDB idempotency keys to handle
+                                    retry spikes and configuring CloudWatch alarms, cutting real-time execution failures
+                                    by 62%.</li>
+                                <li>Analyzed catering and digital-media footprint data to identify decarbonization
+                                    opportunities representing up to 76% of modeled event emissions</li>
+                            </ul>
                         </div>
-                        <div class="stat-card">
-                            <span class="label">Resume Downloads</span>
-                            <div class="value" id="resume-clicks">Loading...</div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Software Engineer</h3>
+                                <span class="retro-badge">Jan. 2025 - May 2025</span>
+                            </div>
+                            <div class="card-subtitle">UnifIBD • Remote (San Jose, CA)</div>
+                            <ul class="card-bullets">
+                                <li>Reduced time-to-production for data features by half by standardizing
+                                    analytics-to-engineering integration workflows and implementation handoffs</li>
+                                <li>Removed manual mobile releases to TestFlight and Google Play with Fastlane and
+                                    GitHub Actions, reducing deployment time from hours to minutes</li>
+                                <li>Led a three-engineer migration of a Swift iOS application to Flutter, defining the
+                                    architecture and technical milestones while consolidating platform-specific code
+                                    into a shared codebase.</li>
+                            </ul>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Data Science Intern</h3>
+                                <span class="retro-badge">Jun. 2024 - Aug. 2024</span>
+                            </div>
+                            <div class="card-subtitle">L.A. Lucky Import & Export Inc. • Los Angeles, CA</div>
+                            <ul class="card-bullets">
+                                <li>Developed statistical forecasting pipelines and inventory anomaly detection across
+                                    4,000+ SKUs, identifying seasonal surges to improve supply chain and reduce
+                                    inventory shrinkage by 60%.</li>
+                                <li>Reduced API response latency by 78% by minimizing response payloads and introducing
+                                    server-side caching for frequently accessed inventory data.</li>
+                                <li>Reconstructed a real-time SAP inventory sync using incremental pulls and upserts
+                                    into PostgreSQL which reduced manual processing substantially and enabled automated
+                                    invoicing for all customers</li>
+                            </ul>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Shift Manager</h3>
+                                <span class="retro-badge">Sep. 2021 - Jun. 2024</span>
+                            </div>
+                            <div class="card-subtitle">Happy Lemon • Danville, CA</div>
+                            <ul class="card-bullets">
+                                <li>Directed a team of 15+ staff members by managing end-to-end scheduling, hiring, and
+                                    onboarding, fostering a collaborative and high-performing environment in a
+                                    fast-paced
+                                    setting.</li>
+                                <li>Evaluated and optimized front and back-of-house workflows to eliminate operational
+                                    bottlenecks, directly improving service speed and team efficiency during peak volume
+                                    hours.</li>
+                                <li>Spearheaded daily operations over a three-year tenure, serving as the primary
+                                    escalation
+                                    point for resolving complex customer concerns and enforcing consistent quality
+                                    standards.</li>
+                            </ul>
                         </div>
                     </div>
+                </section>
 
-                    <div class="chart-box">
-                        <h4
-                            style="font-weight: 700; margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.9rem;">
-                            7-Day Traffic Trends</h4>
-                        <canvas id="statsChart" style="width: 100%; height: 280px;"></canvas>
+                <!-- PROJECTS PANEL -->
+                <section id="panel-projects" class="panel">
+                    <div class="section-divider-bar">
+                        <div class="section-divider-title">
+                            <i class="fas fa-code-branch"></i>
+                            <span>projects</span>
+                        </div>
+                        <span class="section-divider-file">projects.bat</span>
                     </div>
-                </div>
-            </section>
+                    <div class="projects-grid">
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">CardboardDex</h3>
+                                <span class="retro-badge">Active (2026)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">A full-stack trading card market
+                                platform
+                                that pairs canonical catalog data and market prices from multiple API sources to deliver
+                                real-time price trends, arbitrage analytics, and investment signals.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">JavaScript</span>
+                                <span class="tech-pill">Python</span>
+                                <span class="tech-pill">PostgreSQL</span>
+                                <span class="tech-pill">Celery</span>
+                                <span class="tech-pill">Fast APIs</span>
+
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                            </div>
+                        </div>
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Live Semantic Market</h3>
+                                <span class="retro-badge">Completed (2026)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses
+                                zero-shot extraction, vector search, and clustering to process financial news into
+                                deduplicated market intelligence.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">JavaScript</span>
+                                <span class="tech-pill">Python</span>
+                                <span class="tech-pill">Fast APIs</span>
+                                <span class="tech-pill">React</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                            </div>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Clickbait Classifier</h3>
+                                <span class="retro-badge">Completed (2026)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on
+                                18K
+                                social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set,
+                                outperforming
+                                a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">Python</span>
+                                <span class="tech-pill">PyTorch</span>
+                                <span class="tech-pill">Pandas</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                            </div>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">ItineraryAI</h3>
+                                <span class="retro-badge">Completed (2026)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built a chat-based travel concierge
+                                that
+                                generates structured itineraries from a single prompt and shipped a web dashboard for
+                                trip
+                                planning (budgets, maps, calendar sync).</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">Python</span>
+                                <span class="tech-pill">LangChain</span>
+                                <span class="tech-pill">FastAPI</span>
+                                <span class="tech-pill">JavaScript</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                            </div>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">The IBD Digest</h3>
+                                <span class="retro-badge">Completed (2025)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion
+                                app
+                                for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent
+                                onboarding and local state persistence.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">Flutter</span>
+                                <span class="tech-pill">Dart</span>
+                                <span class="tech-pill">Provider</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                                <a href="https://apps.apple.com/tr/app/the-ibd-digest/id6473455443"
+                                    class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i>
+                                    demo</a>
+                            </div>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Spotify Analytics</h3>
+                                <span class="retro-badge">Completed (2025)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard
+                                showing profile insights, favorite genres, and user recommendations.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">Python</span>
+                                <span class="tech-pill">Flask</span>
+                                <span class="tech-pill">Spotify API</span>
+                                <span class="tech-pill">Pandas</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro"
+                                    target="_blank"><i class="fab fa-github"></i> code</a>
+                            </div>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">SimplyMail</h3>
+                                <span class="retro-badge">Completed (2024)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high
+                                performance, clean visual interfaces, and secure Gmail API integrations.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">JavaScript</span>
+                                <span class="tech-pill">Firebase</span>
+                                <span class="tech-pill">Gmail API</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu/SimplyMail" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                                <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i
+                                        class="fas fa-external-link-alt"></i> demo</a>
+                            </div>
+                        </div>
+
+                        <div class="retro-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Pokédex API</h3>
+                                <span class="retro-badge">Completed (2024)</span>
+                            </div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fast cached Express middleware client
+                                providing interactive Pokemon lookups and type analytics.</p>
+                            <div class="tech-badges">
+                                <span class="tech-pill">TypeScript</span>
+                                <span class="tech-pill">Express</span>
+                                <span class="tech-pill">PokeAPI</span>
+                            </div>
+                            <div style="margin-top: 0.8rem;" class="project-actions">
+                                <a href="https://github.com/n8liu/pokedexAPI" class="btn-retro" target="_blank"><i
+                                        class="fab fa-github"></i> code</a>
+                                <a href="https://pokedexapi-57916.web.app/" class="btn-retro primary" target="_blank"><i
+                                        class="fas fa-external-link-alt"></i> demo</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SKILLS PANEL (Compact Matrix) -->
+                <section id="panel-skills" class="panel">
+                    <div class="section-divider-bar">
+                        <div class="section-divider-title">
+                            <i class="fas fa-microchip"></i>
+                            <span>skills</span>
+                        </div>
+                        <span class="section-divider-file">skills.cfg</span>
+                    </div>
+                    <div class="compact-skills-container">
+                        <div class="compact-skills-row">
+                            <div class="compact-skills-label"><i class="fas fa-code"></i> Languages</div>
+                            <div class="compact-skills-pills">
+                                <span class="skill-pill" title="Primary: Backend, scripting, data engineering, ML"><i
+                                        class="fab fa-python"></i> Python</span>
+                                <span class="skill-pill"
+                                    title="Relational database querying, PostgreSQL, SQLite, complex joins"><i
+                                        class="fas fa-database"></i> SQL</span>
+                                <span class="skill-pill" title="Modern ES6+, DOM manipulation, event-driven web"><i
+                                        class="fab fa-js"></i> JavaScript</span>
+                                <span class="skill-pill" title="Static typing, interface design, API contracts"><i
+                                        class="fas fa-code"></i> TypeScript</span>
+                                <span class="skill-pill"
+                                    title="Systems programming, memory management (CS 61C, CS 162)"><i
+                                        class="fas fa-microchip"></i> C / C++</span>
+                                <span class="skill-pill"
+                                    title="Object-oriented programming, data structures (CS 61B)"><i
+                                        class="fab fa-java"></i> Java</span>
+                                <span class="skill-pill" title="Semantic markup, accessibility, CSS tokens & Grid"><i
+                                        class="fab fa-html5"></i> HTML/CSS</span>
+                                <span class="skill-pill"
+                                    title="Cross-platform mobile UI development (UnifIBD, IBD Digest)"><i
+                                        class="fas fa-mobile-alt"></i> Dart</span>
+                            </div>
+                        </div>
+                        <div class="compact-skills-row">
+                            <div class="compact-skills-label"><i class="fas fa-brain"></i> Data & AI</div>
+                            <div class="compact-skills-pills">
+                                <span class="skill-pill" title="Deep learning, neural network architectures"><i
+                                        class="fas fa-fire"></i> PyTorch</span>
+                                <span class="skill-pill"
+                                    title="Data manipulation, feature engineering, statistical analysis"><i
+                                        class="fas fa-table"></i> pandas</span>
+                                <span class="skill-pill" title="Vectorized matrix computations, linear algebra"><i
+                                        class="fas fa-calculator"></i> NumPy</span>
+                                <span class="skill-pill" title="Classical ML algorithms, regression, classification"><i
+                                        class="fas fa-chart-line"></i> Scikit-Learn</span>
+                                <span class="skill-pill" title="LLM chaining, prompt engineering, structured outputs"><i
+                                        class="fas fa-link"></i> LangChain</span>
+                                <span class="skill-pill" title="Pretrained models, tokenizers, BERT fine-tuning"><i
+                                        class="fas fa-robot"></i> Hugging Face</span>
+                                <span class="skill-pill"
+                                    title="Large-scale distributed data processing, DataFrame API"><i
+                                        class="fas fa-bolt"></i> PySpark</span>
+                                <span class="skill-pill"
+                                    title="Data visualization, statistical plotting, figure generation"><i
+                                        class="fas fa-chart-area"></i> Matplotlib</span>
+                            </div>
+                        </div>
+                        <div class="compact-skills-row">
+                            <div class="compact-skills-label"><i class="fas fa-database"></i> Data Systems</div>
+                            <div class="compact-skills-pills">
+                                <span class="skill-pill" title="Relational database, CTEs, composite indexing"><i
+                                        class="fas fa-server"></i> PostgreSQL</span>
+                                <span class="skill-pill"
+                                    title="NoSQL key-value store, idempotency keys, sub-10ms queries"><i
+                                        class="fas fa-bolt-lightning"></i> DynamoDB</span>
+                                <span class="skill-pill"
+                                    title="Edge SQLite, Cloudflare Durable Objects storage engine"><i
+                                        class="fas fa-hard-drive"></i> SQLite</span>
+                                <span class="skill-pill" title="Document database, aggregation pipelines"><i
+                                        class="fas fa-leaf"></i> MongoDB</span>
+                                <span class="skill-pill"
+                                    title="Schema-validated ingestion, automated sync, S3 archiving"><i
+                                        class="fas fa-arrows-split-up-and-left"></i> ETL / ELT</span>
+                                <span class="skill-pill" title="Clean contract endpoints, rate limiting, OpenAPI"><i
+                                        class="fas fa-network-wired"></i> RESTful APIs</span>
+                                <span class="skill-pill" title="Distributed cluster computing, resilient datasets"><i
+                                        class="fas fa-bolt"></i> Apache Spark</span>
+                            </div>
+                        </div>
+                        <div class="compact-skills-row">
+                            <div class="compact-skills-label"><i class="fas fa-cloud"></i> Cloud & Infra</div>
+                            <div class="compact-skills-pills">
+                                <span class="skill-pill" title="AWS real-time streaming data ingestion and analytics"><i
+                                        class="fab fa-aws"></i> AWS</span>
+                                <span class="skill-pill"
+                                    title="V8 edge runtime serverless compute, fast global routing"><i
+                                        class="fas fa-cloud-bolt"></i> CF Workers</span>
+                                <span class="skill-pill" title="Zero-egress object storage with edge caching"><i
+                                        class="fas fa-box-archive"></i> Cloudflare R2</span>
+                                <span class="skill-pill"
+                                    title="Containerization, multi-stage builds, isolated environments"><i
+                                        class="fab fa-docker"></i> Docker</span>
+                                <span class="skill-pill"
+                                    title="Distributed version control, branching, code collaboration"><i
+                                        class="fab fa-git-alt"></i> Git</span>
+                                <span class="skill-pill"
+                                    title="Automated build, test, and Cloudflare Pages deployment"><i
+                                        class="fab fa-github"></i> CI/CD</span>
+                            </div>
+                        </div>
+                        <div class="compact-skills-row">
+                            <div class="compact-skills-label"><i class="fas fa-layer-group"></i> Frameworks</div>
+                            <div class="compact-skills-pills">
+                                <span class="skill-pill"
+                                    title="Component-based UI, hooks, responsive web applications"><i
+                                        class="fab fa-react"></i> React</span>
+                                <span class="skill-pill"
+                                    title="High-performance async Python API framework with Pydantic"><i
+                                        class="fas fa-bolt"></i> FastAPI</span>
+                                <span class="skill-pill"
+                                    title="Full-stack Python web framework, Django REST framework, ORM"><i
+                                        class="fas fa-leaf"></i> Django</span>
+                                <span class="skill-pill" title="Asynchronous event-driven server runtime"><i
+                                        class="fab fa-node-js"></i> Node.js</span>
+                                <span class="skill-pill" title="Minimalist Node.js API router and middleware server"><i
+                                        class="fas fa-server"></i> Express.js</span>
+                                <span class="skill-pill" title="Bi-directional WebSocket live telemetry streaming"><i
+                                        class="fas fa-satellite-dish"></i> Socket.IO</span>
+                                <span class="skill-pill"
+                                    title="Dart declarative mobile UI, state management (Provider)"><i
+                                        class="fas fa-feather"></i> Flutter</span>
+                                <span class="skill-pill" title="Shell scripting, CLI pipelines, POSIX commands"><i
+                                        class="fas fa-terminal"></i> Linux / Bash</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div> <!-- END MAIN SCROLL PORTFOLIO VIEW -->
+
+            <!-- PHOTOGRAPHY PAGE VIEW -->
+            <div id="view-photography" class="page-view">
+                <section id="panel-photography" class="panel">
+                    <div class="photo-panel-layout">
+                        <div class="photo-cats" id="photo-category-filters">
+                            <button class="photo-cat active" data-category="all">all</button>
+                            <button class="photo-cat" data-category="california">california</button>
+                            <button class="photo-cat" data-category="japan">japan</button>
+                            <button class="photo-cat" data-category="hawaii">hawaii</button>
+                            <button class="photo-cat" data-category="south_korea">south korea</button>
+                        </div>
+
+                        <div class="photo-grid-layout" id="portfolio-photo-grid">
+                            <!-- Loaded dynamically or displays placeholder cards initially -->
+                            <div class="photo-card" onclick="openFallbackPhoto('featured')">
+                                <img src="assets/featured-photo.png" alt="Featured Photo">
+                            </div>
+                            <div class="photo-card" onclick="openFallbackPhoto('landscape')">
+                                <img src="assets/landscape-photo.png" alt="Landscape Photo">
+                            </div>
+                            <div class="photo-card" onclick="openFallbackPhoto('urban')">
+                                <img src="assets/urban-photo.png" alt="Urban Photo">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- BLOG PAGE VIEW -->
+            <div id="view-blog" class="page-view">
+                <section id="panel-blog" class="panel">
+                    <div class="experience-list" id="blog-cards-container">
+                        <!-- Dynamically rendered from blog/posts.json -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- STATS PAGE VIEW -->
+            <div id="view-stats" class="page-view">
+                <section id="panel-stats" class="panel">
+                    <div class="stats-layout">
+                        <div class="stats-cards-grid">
+                            <div class="stat-card">
+                                <span class="label">Total Views</span>
+                                <div class="value" id="cf-total-views">Loading...</div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="label">Unique Visitors</span>
+                                <div class="value" id="unique-visitors">Loading...</div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="label">Views (24h)</span>
+                                <div class="value" id="requests-24h">Loading...</div>
+                            </div>
+                            <div class="stat-card">
+                                <span class="label">Resume Downloads</span>
+                                <div class="value" id="resume-clicks">Loading...</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-box">
+                            <h4
+                                style="font-weight: 700; margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.9rem;">
+                                7-Day Traffic Trends</h4>
+                            <canvas id="statsChart" style="width: 100%; height: 280px;"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
 
         <!-- Taskbar / Status bar -->
@@ -526,10 +729,6 @@
             <div class="taskbar-left">
                 <button class="start-btn" onclick="alert('Nathan Liu — UC Berkeley Data Science & CS Student')">
                     <i class="fas fa-desktop"></i> nathan.exe
-                </button>
-                <button class="taskbar-app-btn active" id="taskbar-terminal-btn" title="Toggle Terminal (term.exe)"
-                    aria-label="Toggle Terminal">
-                    <i class="fas fa-terminal"></i> term.exe
                 </button>
                 <button class="taskbar-app-btn active" id="taskbar-sticky-btn" title="Toggle Sticky Note"
                     aria-label="Toggle Sticky Note">
@@ -540,6 +739,9 @@
                 </span>
             </div>
             <div class="taskbar-right">
+                <button class="taskbar-app-btn" id="taskbar-top-btn" title="Back to top" aria-label="Back to top">
+                    <i class="fas fa-arrow-up"></i> top.exe
+                </button>
                 <div class="taskbar-stat">
                     <i class="fas fa-eye"></i> active: <strong class="viewer-count">0</strong>
                 </div>

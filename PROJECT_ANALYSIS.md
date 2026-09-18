@@ -264,7 +264,6 @@ During the portfolio's visual overhaul, the **Academic Foundation** (Education p
 | :--- | :--- | :--- |
 | **Computer Science** | `CS 161` | Computer Security |
 | | `CS 162` | Operating Systems and Systems Programming |
-| | `CS 168` | Introduction to the Internet: Architecture and Protocols |
 | | `CS 170` | Efficient Algorithms and Intractable Problems |
 | | `CS 186` | Introduction to Database Systems |
 | | `CS 188` | Introduction to Artificial Intelligence |
@@ -275,9 +274,6 @@ During the portfolio's visual overhaul, the **Academic Foundation** (Education p
 | | `DATA C101` | Data Engineering |
 | | `DATA C104` | Human Contexts and Ethics of Data |
 | | `DATA 140` | Probability for Data Science |
-| | `DATA 144` | Data Mining and Analytics |
-| **Statistics** | `STAT 150` | Stochastic Processes |
-| | `STAT 153` | Introduction to Time Series |
 | **Engineering & Analytics** | `EECS 127` | Optimization Models in Engineering |
 | | `INFO 159` | Natural Language Processing |
 | | `IEOR 162` | Linear Programming and Network Flows |
@@ -292,11 +288,13 @@ During the portfolio's visual overhaul, the **Academic Foundation** (Education p
 A comprehensive audit and implementation cycle established the following enhancements across the portfolio:
 
 ### 7.1 Retro OS Redesign & Refinements
-- ✅ **Minimalist Retro OS Window**: Redesigned `index.html` with tabbed OS chrome on a grid wallpaper.
-- ✅ **Embedded Statistics Dashboard**: Consolidated visitor telemetry into the "Stats" tab running Chart.js trends, replacing legacy `database.html`.
-- ✅ **Dynamic Blog Modal Reader**: Parses standalone blog articles asynchronously inline inside `#blog-modal`.
+- ✅ **Single-Page Scrolling Desktop Architecture**: Remodeled portfolio from tab-swapping to a unified vertical single-page scrolling experience while preserving the Retro OS aesthetic.
+- ✅ **Scrollspy & Dynamic Path Morphing**: Integrated an `IntersectionObserver` scrollspy engine that highlights the active nav tab, morphs `#window-path-text` in real time, and updates the URL cleanly via `history.replaceState`.
+- ✅ **Retro OS File Section Dividers**: Added brutalist file-tag banners (`experience.txt`, `projects.bat`, `skills.cfg`, `academics.doc`, `gallery.exe`, `blog.ini`, `dashboard.sys`) to demarcate sections with authentic OS style.
+- ✅ **Sticky Navigation Dock & Titlebar**: Frosted glass sticky navigation dock and pinned OS titlebar for effortless section jumps on desktop and mobile.
+- ✅ **Embedded Statistics Dashboard**: Consolidated visitor telemetry into the Stats section running Chart.js trends, replacing legacy `database.html`.
+- ✅ **Dynamic Blog Modal Reader**: Parses standalone markdown articles asynchronously inline inside `#blog-modal`.
 - ✅ **Theme Variable Engine**: Global CSS variables supporting light/dark tones with `localStorage` persistence and dynamic Chart.js re-coloring.
-- ✅ **Photos Page Theme Integration**: `pages/photos.html` skinned to inherit OS titlebar chrome, category tabs, and status taskbars.
 
 ### 7.2 Accessibility Enhancements (WCAG 2.1 AA)
 - ✅ **Semantic Buttons**: Converted div scroll indicators to semantic `<button class="scroll-dot" aria-label="...">`.
@@ -351,16 +349,18 @@ A comprehensive audit and implementation cycle established the following enhance
 
 ## 8. Core Subsystems & Feature Deep Dives
 
-### 8.1 SPA Routing & Clean URL Handling
-- **Routing Table**: Clean URLs map to panel sections without page reloads:
+### 8.1 Single-Page Scrolling, SPA Routing & Clean URL Handling
+- **Section Anchor Map**:
   - `/` or `/home` -> `#panel-home` (`C:\nathan\portfolio\home.md`)
   - `/experience` -> `#panel-experience` (`C:\nathan\portfolio\experience.txt`)
   - `/projects` -> `#panel-projects` (`C:\nathan\portfolio\projects.bat`)
+  - `/skills` -> `#panel-skills` (`C:\nathan\portfolio\skills.cfg`)
   - `/education` -> `#panel-education` (`C:\nathan\portfolio\academics.doc`)
   - `/photography` -> `#panel-photography` (`C:\nathan\portfolio\gallery.exe`)
   - `/blog` -> `#panel-blog` (`C:\nathan\portfolio\blog.ini`)
   - `/stats` -> `#panel-stats` (`C:\nathan\portfolio\dashboard.sys`)
-- **History API**: Pushes browser history states (`history.pushState`) and handles `popstate` navigation.
+- **Scrollspy Engine**: Utilizes a zero-overhead `IntersectionObserver` with `-20% 0px -55% 0px` root margins to track the currently active section, synchronizing `.nav-tab.active`, `#window-path-text`, and clean browser URLs via `history.replaceState`.
+- **Direct Link Scroll Restoration**: On direct URL entry (e.g. `/projects` or `/photography`), the controller calculates sticky navigation offsets and smoothly scrolls to the target section on DOM ready.
 - **Server Rewrite Support**: Express (`server.js`) and Cloudflare Workers (`functions/_worker.js`) rewrite clean URL paths without file extensions to serve `index.html`.
 
 ### 8.2 Dynamic Markdown Blog Engine

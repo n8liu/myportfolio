@@ -1,14 +1,14 @@
 // Client-side JavaScript for Retro OS Portfolio Redesign
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const API_BASE = '';
 
     // ----------------------------------------------------
     // Minimalist Interactive Wallpaper (Cursor Glow & Parallax Grid)
     // ----------------------------------------------------
     let mouseTicking = false;
-    window.addEventListener('pointermove', function(e) {
+    window.addEventListener('pointermove', function (e) {
         if (!mouseTicking) {
-            window.requestAnimationFrame(function() {
+            window.requestAnimationFrame(function () {
                 const x = e.clientX;
                 const y = e.clientY;
                 const px = ((x / window.innerWidth) - 0.5) * 2; // -1 to 1
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ----------------------------------------------------
     function makeElementDraggable(windowEl, titlebar) {
         if (!windowEl || !titlebar) return;
-        
+
         let isDragging = false;
         let startX = 0;
         let startY = 0;
@@ -47,25 +47,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function dragStart(e) {
             if (window.innerWidth <= 768) return; // Disable dragging on mobile
-            
+
             // Do not drag if clicking controls, buttons, or editing content
             if (e.target.closest('.win-btn') || e.target.closest('.menu-item') || e.target.closest('.sticky-btn-mini') || e.target.closest('.taskbar-app-btn') || e.target.isContentEditable) return;
 
             isDragging = true;
-            
+
             const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
             const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
-            
+
             startX = clientX - offsetX;
             startY = clientY - offsetY;
-            
+
             windowEl.style.transition = 'none';
             windowEl.classList.add('dragging');
         }
 
         function dragMove(e) {
             if (!isDragging) return;
-            
+
             if (e.cancelable) e.preventDefault();
 
             const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
@@ -85,15 +85,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Expose a reset method
-        windowEl.resetDrag = function() {
+        windowEl.resetDrag = function () {
             offsetX = 0;
             offsetY = 0;
             windowEl.style.transform = '';
         };
     }
 
-    // Apply dragging to main window
-    makeElementDraggable(document.querySelector('.os-window'), document.querySelector('.window-titlebar'));
+    // Apply dragging to main window - disabled for single-page scrolling to allow seamless page scrolling
+    // makeElementDraggable(document.querySelector('.os-window'), document.querySelector('.window-titlebar'));
 
     // Apply dragging to all modal dialogs (like photo viewer and blog reader)
     document.querySelectorAll('.modal-dialog').forEach(modalDialog => {
@@ -119,53 +119,123 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // ----------------------------------------------------
-    // 1. Tab Switching Logic (Carolyn Wang Inspired Layout)
+    // 1. Window-Contained Scrolling & View Management Engine
     // ----------------------------------------------------
     const navTabs = document.querySelectorAll('.nav-tab:not(.theme-toggle)');
-    const panels = document.querySelectorAll('.panel');
     const pathText = document.getElementById('window-path-text');
     const scrollContainer = document.querySelector('.window-body');
 
+    const mainSections = ['home', 'education', 'experience', 'projects', 'skills'];
+    const separatePages = ['photography', 'blog', 'stats'];
+
     const pathMappings = {
         'home': 'C:\\nathan\\portfolio\\home.md',
+        'education': 'C:\\nathan\\portfolio\\academics.doc',
         'experience': 'C:\\nathan\\portfolio\\experience.txt',
         'projects': 'C:\\nathan\\portfolio\\projects.bat',
-        'education': 'C:\\nathan\\portfolio\\academics.doc',
+        'skills': 'C:\\nathan\\portfolio\\skills.cfg',
         'photography': 'C:\\nathan\\portfolio\\gallery.exe',
         'blog': 'C:\\nathan\\portfolio\\blog.ini',
         'stats': 'C:\\nathan\\portfolio\\dashboard.sys'
     };
 
-    function switchTab(tabName) {
-        // Remove active class from all tabs and panels
-        navTabs.forEach(t => t.classList.remove('active'));
-        panels.forEach(p => p.classList.remove('active'));
+    let isProgrammaticScroll = false;
+    let scrollTimeout = null;
 
-        // Find corresponding tab and panel
-        const targetTab = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
-        const targetPanel = document.getElementById(`panel-${tabName}`);
-
-        if (targetTab && targetPanel) {
-            targetTab.classList.add('active');
-            targetPanel.classList.add('active');
-
-            // Update path text in title bar
-            if (pathText) {
-                pathText.textContent = pathMappings[tabName] || `C:\\nathan\\portfolio\\${tabName}.md`;
+    function updateActiveNav(tabName) {
+        navTabs.forEach(t => {
+            if (t.getAttribute('data-tab') === tabName) {
+                t.classList.add('active');
+            } else {
+                t.classList.remove('active');
             }
+        });
 
-            // Scroll window content to top
+        if (pathText && pathMappings[tabName]) {
+            pathText.textContent = pathMappings[tabName];
+        }
+    }
+
+    function showPageView(viewName) {
+        // Hide all page views
+        document.querySelectorAll('.page-view').forEach(view => {
+            view.classList.remove('active');
+        });
+
+        // Determine which view to activate
+        const targetViewId = separatePages.includes(viewName) ? `view-${viewName}` : 'view-portfolio';
+        const targetView = document.getElementById(targetViewId);
+        if (targetView) {
+            targetView.classList.add('active');
+        }
+
+        // Trigger dynamic content on separate pages
+        if (viewName === 'photography') {
+            initPhotographyGallery();
+        } else if (viewName === 'stats') {
+            loadStatsAndRenderChart();
+        } else if (viewName === 'blog') {
+            loadBlogPosts();
+        }
+    }
+
+    function navigateTo(target, updateHistory = true) {
+        if (!target) target = 'home';
+
+        if (separatePages.includes(target)) {
+            // It's a separate page (photography, blog, stats)
+            showPageView(target);
+            updateActiveNav(target);
+
             if (scrollContainer) {
                 scrollContainer.scrollTop = 0;
             }
 
-            // Load tab-specific dynamic content
-            if (tabName === 'stats') {
-                loadStatsAndRenderChart();
-            } else if (tabName === 'photography') {
-                initPhotographyGallery();
+            if (updateHistory) {
+                const newPath = `/${target}`;
+                if (window.location.pathname !== newPath) {
+                    history.pushState({ page: target }, '', newPath);
+                }
+            }
+        } else {
+            // It's one of the main scrolling sections (home, education, experience, projects, skills)
+            const portfolioView = document.getElementById('view-portfolio');
+            const wasSeparatePage = !portfolioView || !portfolioView.classList.contains('active');
+            showPageView('portfolio');
+            updateActiveNav(target);
+
+            const targetPanel = document.getElementById(`panel-${target}`);
+            if (targetPanel && scrollContainer) {
+                isProgrammaticScroll = true;
+                if (scrollTimeout) clearTimeout(scrollTimeout);
+
+                if (target === 'home') {
+                    scrollContainer.scrollTo({ top: 0, behavior: wasSeparatePage ? 'auto' : 'smooth' });
+                } else {
+                    const targetTop = targetPanel.offsetTop - 15;
+                    scrollContainer.scrollTo({ top: targetTop > 0 ? targetTop : 0, behavior: wasSeparatePage ? 'auto' : 'smooth' });
+                }
+
+                scrollTimeout = setTimeout(() => {
+                    isProgrammaticScroll = false;
+                }, 600);
+            }
+
+            if (updateHistory) {
+                const newPath = target === 'home' ? '/' : `/${target}`;
+                if (window.location.pathname !== newPath) {
+                    history.pushState({ page: target }, '', newPath);
+                }
             }
         }
+    }
+
+    // Keep switchTab & scrollToSection as aliases
+    function switchTab(tabName) {
+        navigateTo(tabName, true);
+    }
+    function scrollToSection(tabName, updateHistory = true) {
+        navigateTo(tabName, updateHistory);
     }
 
     function getTabFromPath() {
@@ -195,22 +265,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Bind tab clicks
     navTabs.forEach(tab => {
-        tab.addEventListener('click', function(e) {
+        tab.addEventListener('click', function (e) {
             e.preventDefault();
             const tabName = this.getAttribute('data-tab');
-            switchTab(tabName);
-            // Update URL using History API
-            const newPath = tabName === 'home' ? '/' : `/${tabName}`;
-            if (window.location.pathname !== newPath) {
-                history.pushState({ tab: tabName }, '', newPath);
-            }
+            navigateTo(tabName, true);
         });
     });
 
     // Handle back/forward navigation
-    window.addEventListener('popstate', function(e) {
-        const tabName = (e.state && e.state.tab) || getTabFromPath() || 'home';
-        switchTab(tabName);
+    window.addEventListener('popstate', function (e) {
+        const target = (e.state && e.state.page) || getTabFromPath() || 'home';
+        navigateTo(target, false);
         if (e.state && e.state.post) {
             openBlogModal(e.state.post, false);
         } else if (blogModal && blogModal.classList.contains('active')) {
@@ -218,22 +283,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Check URL path on page load
-    const initialTab = getTabFromPath();
-    const initialPost = getInitialBlogPost();
-    if (initialTab) {
-        switchTab(initialTab);
-        history.replaceState({ tab: initialTab, post: initialPost }, '', window.location.pathname);
-    } else {
-        switchTab('home');
-        history.replaceState({ tab: 'home' }, '', '/');
+    // Scrollspy setup via IntersectionObserver inside .window-body
+    function setupScrollspy() {
+        if (!('IntersectionObserver' in window) || !scrollContainer) return;
+
+        const mainPanels = document.querySelectorAll('#view-portfolio .panel');
+
+        const observer = new IntersectionObserver((entries) => {
+            if (isProgrammaticScroll) return;
+
+            // Only update when view-portfolio is active
+            const portfolioView = document.getElementById('view-portfolio');
+            if (!portfolioView || !portfolioView.classList.contains('active')) return;
+
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.id.replace('panel-', '');
+                    updateActiveNav(sectionId);
+
+                    const newPath = sectionId === 'home' ? '/' : `/${sectionId}`;
+                    if (window.location.pathname !== newPath) {
+                        history.replaceState({ page: sectionId }, '', newPath);
+                    }
+                }
+            });
+        }, {
+            root: scrollContainer,
+            rootMargin: '-10% 0px -60% 0px',
+            threshold: 0
+        });
+
+        mainPanels.forEach(panel => observer.observe(panel));
     }
+
+    // Check URL path on page load
+    const initialTab = getTabFromPath() || 'home';
+    const initialPost = getInitialBlogPost();
+    navigateTo(initialTab, false);
+
+    if (initialPost) {
+        setTimeout(() => {
+            openBlogModal(initialPost, false);
+        }, 150);
+    }
+
+    setupScrollspy();
 
     // ----------------------------------------------------
     // 2. Status Bar Clock Update
     // ----------------------------------------------------
     const clockElement = document.getElementById('taskbar-time');
-    
+
     function updateClock() {
         if (!clockElement) return;
         const now = new Date();
@@ -245,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const hoursStr = String(hours).padStart(2, '0');
         clockElement.textContent = `${hoursStr}:${minutes} ${ampm}`;
     }
-    
+
     setInterval(updateClock, 1000);
     updateClock(); // Initial run
 
@@ -402,6 +502,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ----------------------------------------------------
+    // 3.5. Skills Category Filter Logic
+    // ----------------------------------------------------
+    const skillsCategoryFilters = document.getElementById('skills-category-filters');
+    const skillCards = document.querySelectorAll('.skill-category-card');
+
+    if (skillsCategoryFilters && skillCards.length > 0) {
+        skillsCategoryFilters.addEventListener('click', function (e) {
+            const btn = e.target.closest('.skill-cat');
+            if (!btn) return;
+
+            skillsCategoryFilters.querySelectorAll('.skill-cat').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const selectedCat = btn.getAttribute('data-skill-cat');
+            skillCards.forEach(card => {
+                const cardCat = card.getAttribute('data-category');
+                if (selectedCat === 'all' || cardCat === selectedCat) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        });
+    }
+
+    // ----------------------------------------------------
     // 4. Photography Gallery & Modal Popups
     // ----------------------------------------------------
     let photographyInitialized = false;
@@ -449,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Bind filter button click events
         if (photoCategoryFilters) {
-            photoCategoryFilters.addEventListener('click', function(e) {
+            photoCategoryFilters.addEventListener('click', function (e) {
                 const target = e.target;
                 if (target.classList.contains('photo-cat')) {
                     document.querySelectorAll('.photo-cat').forEach(b => b.classList.remove('active'));
@@ -493,8 +619,8 @@ document.addEventListener('DOMContentLoaded', function() {
             { url: 'assets/urban-photo.png', name: 'Shibuya Crossing', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/125s', aperture: 'f/2.0', iso: '800', location: 'Japan' }
         ];
 
-        const filtered = category === 'all' 
-            ? fallbacks 
+        const filtered = category === 'all'
+            ? fallbacks
             : fallbacks.filter(f => f.location.toLowerCase().includes(category) || category === 'california' && f.location === 'California');
 
         if (filtered.length === 0) {
@@ -566,7 +692,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalCloseBtn.addEventListener('click', closePhotoModal);
     }
     if (photoModal) {
-        photoModal.addEventListener('click', function(e) {
+        photoModal.addEventListener('click', function (e) {
             if (e.target === photoModal) {
                 closePhotoModal();
             }
@@ -574,7 +700,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Global hook for fallback inline clicks in HTML placeholders
-    window.openFallbackPhoto = function(type) {
+    window.openFallbackPhoto = function (type) {
         const fallbacks = {
             'featured': { url: 'assets/featured-photo.png', name: 'Berkeley Sunset', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/250s', aperture: 'f/4.0', iso: '400', location: 'California' },
             'landscape': { url: 'assets/landscape-photo.png', name: 'Pacific Coast Highway', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/500s', aperture: 'f/8.0', iso: '125', location: 'California' },
@@ -688,7 +814,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Attach click listeners to cards
         blogCardsContainer.querySelectorAll('.read-blog-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const postId = this.getAttribute('data-post-id');
                 if (postId) {
@@ -746,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modalBlogFilename) {
             modalBlogFilename.textContent = post.file || `${slug}.md`;
         }
-        
+
         blogModal.classList.add('active');
 
         if (updateHistory) {
@@ -812,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (blogModal) {
-        blogModal.addEventListener('click', function(e) {
+        blogModal.addEventListener('click', function (e) {
             if (e.target === blogModal) {
                 closeBlogModal(true);
             }
@@ -820,7 +946,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Global keyboard listener to close open modals on Escape key
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' || e.key === 'Esc') {
             if (blogModal && blogModal.classList.contains('active')) {
                 closeBlogModal(true);
@@ -837,9 +963,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Resume clicks tracking
     const resumeBtn = document.getElementById('resume-btn');
     if (resumeBtn) {
-        resumeBtn.addEventListener('click', function() {
+        resumeBtn.addEventListener('click', function () {
             fetch(API_BASE + '/api/resume/increment', { method: 'POST' })
-                .catch(() => {});
+                .catch(() => { });
+        });
+    }
+
+    // Back to top button in taskbar
+    const taskbarTopBtn = document.getElementById('taskbar-top-btn');
+    if (taskbarTopBtn) {
+        taskbarTopBtn.addEventListener('click', function () {
+            const portfolioView = document.getElementById('view-portfolio');
+            if (portfolioView && portfolioView.classList.contains('active')) {
+                navigateTo('home', true);
+            } else if (scrollContainer) {
+                scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         });
     }
 
@@ -895,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!stickyNote) return;
         const isHidden = stickyNote.classList.contains('minimized');
         const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
-        
+
         if (shouldShow) {
             stickyNote.classList.remove('minimized');
             if (taskbarStickyBtn) taskbarStickyBtn.classList.add('active');
@@ -920,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Toggle edit mode
         if (stickyEditBtn && stickyContent) {
-            stickyEditBtn.addEventListener('click', function(e) {
+            stickyEditBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const isEditing = stickyContent.getAttribute('contenteditable') === 'true';
                 if (isEditing) {
@@ -938,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Auto-save on input
             let saveTimeout;
-            stickyContent.addEventListener('input', function() {
+            stickyContent.addEventListener('input', function () {
                 clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(saveStickyNote, 500);
             });
@@ -946,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Reset default note
         if (stickyResetBtn && stickyContent) {
-            stickyResetBtn.addEventListener('click', function(e) {
+            stickyResetBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 if (confirm('Reset sticky note to Nathan\'s default desktop log?')) {
                     stickyContent.innerHTML = DEFAULT_STICKY_NOTE;
@@ -959,7 +1098,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Minimize / Fold note
         if (stickyMinBtn) {
-            stickyMinBtn.addEventListener('click', function(e) {
+            stickyMinBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 stickyNote.classList.toggle('folded');
             });
@@ -967,7 +1106,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Close note
         if (stickyCloseBtn) {
-            stickyCloseBtn.addEventListener('click', function(e) {
+            stickyCloseBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 toggleStickyNote(false);
             });
@@ -975,7 +1114,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Taskbar button toggle
         if (taskbarStickyBtn) {
-            taskbarStickyBtn.addEventListener('click', function(e) {
+            taskbarStickyBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 toggleStickyNote();
             });
@@ -1100,11 +1239,12 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'stack':
                 printTerminalLine(`
 <span class="terminal-accent">Technical Skills & Technologies:</span>
-  • <span class="cmd-highlight">Languages:</span>    Python, JavaScript (ES6+), TypeScript, SQL, Java, C, HTML5/CSS3
-  • <span class="cmd-highlight">Frameworks:</span>   Node.js, Express, React, Flask, PyTorch, HuggingFace, Socket.IO
-  • <span class="cmd-highlight">Cloud/Edge:</span>   Cloudflare Workers, Durable Objects, R2, AWS S3, Firebase
-  • <span class="cmd-highlight">Data & DB:</span>    Spark, Pandas, NumPy, Scikit-Learn, SQLite, PostgreSQL
-  • <span class="cmd-highlight">Dev Tools:</span>    Git, Docker, esbuild, Figma, Bash/Linux
+  • <span class="cmd-highlight">Languages:</span>      Python, Java, SQL (PostgreSQL), C/C++, JavaScript, TypeScript, Dart
+  • <span class="cmd-highlight">Cloud & Systems:</span> Git, Docker, AWS (Kinesis, DynamoDB, S3, CloudWatch), Cloudflare Edge
+  • <span class="cmd-highlight">Data & ML:</span>      PyTorch, NumPy, pandas, Matplotlib, PySpark, LangChain, Hugging Face, Scikit-Learn
+  • <span class="cmd-highlight">Web:</span>            React, Node.js, Django, FastAPI, Web3, Express, Flask, React Native, Flutter
+  • <span class="cmd-highlight">Dev Tools:</span>      Linux/Bash, Postman, Figma, Wrangler CLI
+Type <span class="cmd-highlight">'goto skills'</span> to view the full visual skills dashboard!
                 `.trim(), 'output');
                 break;
 
@@ -1211,7 +1351,7 @@ Type <span class="cmd-highlight">'goto stats'</span> to view the full 7-day traf
                     printTerminalLine(`Usage: <span class="cmd-highlight">goto &lt;tab&gt;</span> (e.g. goto projects, goto blog, goto stats)`, 'error');
                 } else {
                     const tab = args[0].toLowerCase();
-                    const validTabs = ['home', 'experience', 'projects', 'education', 'photography', 'blog', 'stats'];
+                    const validTabs = ['home', 'experience', 'projects', 'skills', 'education', 'photography', 'blog', 'stats'];
                     if (validTabs.includes(tab)) {
                         switchTab(tab);
                         const newPath = tab === 'home' ? '/' : `/${tab}`;
@@ -1343,7 +1483,7 @@ dashboard.sys   notes.txt        term.exe
         // Click titlebar when folded to unfold
         const termHeader = terminalWidget.querySelector('.terminal-header');
         if (termHeader) {
-            termHeader.addEventListener('click', function(e) {
+            termHeader.addEventListener('click', function (e) {
                 if (terminalWidget.classList.contains('folded') && !e.target.closest('.terminal-controls')) {
                     toggleFoldTerminal(false);
                 }
@@ -1352,7 +1492,7 @@ dashboard.sys   notes.txt        term.exe
 
         // Input key listener
         if (terminalInput) {
-            terminalInput.addEventListener('keydown', function(e) {
+            terminalInput.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const val = this.value;
@@ -1393,14 +1533,14 @@ dashboard.sys   notes.txt        term.exe
 
         // Click body to focus input
         if (terminalBody && terminalInput) {
-            terminalBody.addEventListener('click', function() {
+            terminalBody.addEventListener('click', function () {
                 terminalInput.focus();
             });
         }
 
         // Quick command pills
         document.querySelectorAll('.term-pill').forEach(pill => {
-            pill.addEventListener('click', function(e) {
+            pill.addEventListener('click', function (e) {
                 e.stopPropagation();
                 const cmd = this.getAttribute('data-cmd');
                 if (cmd) {
@@ -1412,7 +1552,7 @@ dashboard.sys   notes.txt        term.exe
 
         // Minimize / Fold
         if (terminalMinBtn) {
-            terminalMinBtn.addEventListener('click', function(e) {
+            terminalMinBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 toggleFoldTerminal();
             });
@@ -1420,7 +1560,7 @@ dashboard.sys   notes.txt        term.exe
 
         // Close
         if (terminalCloseBtn) {
-            terminalCloseBtn.addEventListener('click', function(e) {
+            terminalCloseBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 toggleTerminal(false);
             });
@@ -1428,7 +1568,7 @@ dashboard.sys   notes.txt        term.exe
 
         // Clear
         if (terminalClearBtn) {
-            terminalClearBtn.addEventListener('click', function(e) {
+            terminalClearBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 clearTerminal();
             });
@@ -1436,7 +1576,7 @@ dashboard.sys   notes.txt        term.exe
 
         // Taskbar terminal buttons
         if (taskbarTerminalBtn) {
-            taskbarTerminalBtn.addEventListener('click', function(e) {
+            taskbarTerminalBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (terminalWidget.classList.contains('minimized')) {
                     toggleTerminal(true);
@@ -1450,7 +1590,7 @@ dashboard.sys   notes.txt        term.exe
         }
 
         if (taskbarStartBtn) {
-            taskbarStartBtn.addEventListener('click', function(e) {
+            taskbarStartBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 if (terminalWidget.classList.contains('minimized')) {
                     toggleTerminal(true);

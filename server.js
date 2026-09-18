@@ -71,7 +71,7 @@ app.get('/blog/:slug', (req, res, next) => {
 });
 
 // Route for other HTML pages - handles clean URLs and SPA routing
-const clientRoutes = ['home', 'experience', 'projects', 'education', 'photography', 'blog', 'stats'];
+const clientRoutes = ['home', 'experience', 'projects', 'skills', 'education', 'photography', 'blog', 'stats'];
 
 app.get('/:page', (req, res, next) => {
     const page = req.params.page;
@@ -231,7 +231,7 @@ app.use((req, res) => {
 });
 
 // Start the server
-server.listen(PORT, () => {
+server.listen(PORT, '127.0.0.1', () => {
     console.log(`Server running at http://localhost:${PORT}`);
     console.log(`Press Ctrl+C to stop the server`);
 });

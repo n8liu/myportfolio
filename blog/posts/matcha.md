@@ -95,8 +95,17 @@ Decent.
 
 ## Los Angelos + Orange County
 
+### rōk coffee and tea - Los Angeles, CA (4/5)
+One of the best matchas, but one of the smallest cups ever.
+
+### Stagger
+
+### ToroTea
+
+### 
+
 ### La La Land - Glendale, CA (1/5)
-Save your soul.
+Save your soul but, I did hear they updated their recipe.
 
 ## Las Vegas
 
