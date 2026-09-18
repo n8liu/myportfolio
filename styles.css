@@ -248,6 +248,7 @@ body.loaded {
     background-color: var(--bg-window);
     scroll-behavior: smooth;
     position: relative;
+    scrollbar-gutter: stable;
 }
 
 /* Custom retro OS brutalist scrollbar */
@@ -297,13 +298,6 @@ body.loaded {
     margin-bottom: 4rem;
 }
 
-#panel-education,
-#panel-experience,
-#panel-projects,
-#panel-skills {
-    content-visibility: auto;
-    contain-intrinsic-size: 0 600px;
-}
 
 /* Retro OS Section Divider Bar */
 .section-divider-bar {
@@ -588,17 +582,20 @@ body.loaded {
 }
 
 /* Cards (PostHog Brutalist Theme) */
-.experience-list,
-.projects-grid {
+.experience-list {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding-right: 6px;
+    padding-bottom: 6px;
 }
 
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    padding-right: 6px;
+    padding-bottom: 6px;
 }
 
 .retro-card {
@@ -614,6 +611,7 @@ body.loaded {
 .retro-card:hover {
     transform: translate(2px, 2px);
     box-shadow: var(--shadow-hover);
+    z-index: 2;
 }
 
 .card-header {
@@ -878,6 +876,8 @@ body.loaded {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
     gap: 1.25rem;
+    padding-right: 6px;
+    padding-bottom: 6px;
 }
 
 .skill-category-card {
@@ -894,6 +894,7 @@ body.loaded {
 .skill-category-card:hover {
     transform: translate(2px, 2px);
     box-shadow: var(--shadow-hover);
+    z-index: 2;
 }
 
 .skill-category-card.hidden {
@@ -1018,6 +1019,8 @@ body.loaded {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    padding-right: 6px;
+    padding-bottom: 6px;
 }
 
 .course-groups {
@@ -1038,6 +1041,7 @@ body.loaded {
 .course-group:hover {
     transform: translate(2px, 2px);
     box-shadow: var(--shadow-hover);
+    z-index: 2;
 }
 
 .course-group h3 {
@@ -1114,6 +1118,8 @@ body.loaded {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 12px;
+    padding-right: 6px;
+    padding-bottom: 6px;
 }
 
 .photo-card {
@@ -1144,6 +1150,8 @@ body.loaded {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
+    padding-right: 6px;
+    padding-bottom: 6px;
 }
 
 .stat-card {
