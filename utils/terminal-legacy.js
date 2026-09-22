@@ -155,7 +155,7 @@ export function initTerminal(context = {}) {
             case 'education':
                 printTerminalLine(`
 <span class="terminal-accent">Education — UC Berkeley (Class of 2026):</span>
-  • Degree: B.A. Data Science & Computer Science (GPA: 3.75)
+  • Degree: B.A. Data Science & Computer Science (GPA: 3.70)
   • CS Core: CS 61A, CS 61B, CS 61C, CS 161, CS 162, CS 170, CS 186, CS 189
   • Data Core: DATA 8, DATA 100, DATA C101, DATA 140, EECS 127
                 `.trim(), 'output');

@@ -2,7 +2,7 @@
 
 During my four years at **UC Berkeley** studying **Computer Science & Data Science**, I took over 20 rigorous technical courses spanning software systems, machine learning theory, data engineering pipelines, advanced probability, and physics.
 
-Berkeley courses have a notorious reputation for intense problem sets, massive 40-hour projects, and brutal exams. Now that I've graduated (Class of 2026, 3.75 GPA), I wanted to look back and give an honest, unvarnished review and rating of every single class I completed—including difficulty, workload, key takeaways, and whether they were worth the grind.
+Berkeley courses have a notorious reputation for intense problem sets, massive 40-hour projects, and brutal exams. Now that I've graduated (Class of 2026, 3.70 GPA), I wanted to look back and give an honest, unvarnished review and rating of every single class I completed—including difficulty, workload, key takeaways, and whether they were worth the grind.
 
 ## Quick Summary Matrix
 
