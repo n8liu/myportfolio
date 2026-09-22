@@ -576,7 +576,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Fetch categories dynamically
         try {
-            const response = await fetch((API_BASE || '') + '/api/categories');
+            // Photography is served by the Pages R2 binding, independently of analytics.
+            const response = await fetch('/api/categories');
             if (response.ok) {
                 const categories = await response.json();
                 if (categories && categories.length > 0) {
@@ -616,42 +617,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function loadPhotosByCategory(category) {
         if (!photoGrid) return;
-        photoGrid.innerHTML = '<div style="font-family: var(--font-mono); padding: 2rem; grid-column: 1/-1; text-align: center;">loading photos...</div>';
+        photoGrid.innerHTML = '<p class="photo-status" role="status">loading photos...</p>';
 
         try {
-            const response = await fetch((API_BASE || '') + `/api/images/${category}`);
-            if (!response.ok) throw new Error('API error');
+            const response = await fetch(`/api/images/${encodeURIComponent(category)}`);
+            if (!response.ok) throw new Error(`Photography API returned ${response.status}`);
             const images = await response.json();
+            if (!Array.isArray(images)) throw new Error('Invalid photography API response');
 
             if (images.length === 0) {
-                photoGrid.innerHTML = '<div style="font-family: var(--font-mono); padding: 2rem; grid-column: 1/-1; text-align: center;">no images found in this category.</div>';
+                photoGrid.innerHTML = '<p class="photo-status" role="status">no photos in this category.</p>';
                 return;
             }
 
             renderPhotos(images);
         } catch (e) {
-            console.warn('Error fetching category images, falling back to static list.', e);
-            loadFallbackPhotos(category);
+            console.warn('Error fetching category images.', e);
+            photoGrid.innerHTML = '<p class="photo-status" role="status">photos unavailable. please try again later.</p>';
         }
-    }
-
-    function loadFallbackPhotos(category) {
-        // Fallback static items
-        const fallbacks = [
-            { url: 'assets/featured-photo.png', name: 'Berkeley Sunset', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/250s', aperture: 'f/4.0', iso: '400', location: 'California' },
-            { url: 'assets/landscape-photo.png', name: 'Pacific Coast', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/500s', aperture: 'f/8.0', iso: '125', location: 'California' },
-            { url: 'assets/urban-photo.png', name: 'Shibuya Crossing', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/125s', aperture: 'f/2.0', iso: '800', location: 'Japan' }
-        ];
-
-        const filtered = category === 'all'
-            ? fallbacks
-            : fallbacks.filter(f => f.location.toLowerCase().includes(category) || category === 'california' && f.location === 'California');
-
-        if (filtered.length === 0) {
-            photoGrid.innerHTML = '<div style="font-family: var(--font-mono); padding: 2rem; grid-column: 1/-1; text-align: center;">no fallback images in this category.</div>';
-            return;
-        }
-        renderPhotos(filtered);
     }
 
     function renderPhotos(images) {
@@ -722,18 +705,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Global hook for fallback inline clicks in HTML placeholders
-    window.openFallbackPhoto = function (type) {
-        const fallbacks = {
-            'featured': { url: 'assets/featured-photo.png', name: 'Berkeley Sunset', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/250s', aperture: 'f/4.0', iso: '400', location: 'California' },
-            'landscape': { url: 'assets/landscape-photo.png', name: 'Pacific Coast Highway', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/500s', aperture: 'f/8.0', iso: '125', location: 'California' },
-            'urban': { url: 'assets/urban-photo.png', name: 'Shibuya Streets', camera: 'Fujifilm X100VI', lens: 'Fujinon 23mm F2.0 (Fixed)', exposure: '1/125s', aperture: 'f/2.0', iso: '800', location: 'Japan' }
-        };
-        if (fallbacks[type]) {
-            openPhotoModal(fallbacks[type]);
-        }
-    };
 
     // ----------------------------------------------------
     // 4.5. Dynamic Markdown Blog Reader

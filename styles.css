@@ -1122,6 +1122,16 @@ body.loaded {
     padding-bottom: 6px;
 }
 
+.photo-status {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
 .photo-card {
     border: var(--border);
     box-shadow: 3px 3px 0px 0px var(--border-color);

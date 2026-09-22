@@ -47,7 +47,7 @@ export default {
       if (path === '/api/categories') {
         return await getCategories(env, corsHeaders);
       } else if (path.startsWith('/api/images/')) {
-        const category = path.split('/').pop();
+        const category = decodeURIComponent(path.split('/').pop());
         return await getImages(category, env, corsHeaders);
       }
     }
@@ -90,6 +90,7 @@ async function serveR2Object(objectKey, env, corsHeaders, request, ctx) {
 
     console.log(`Cache miss. Serving from R2: ${objectKey}`);
     
+    objectKey = decodeURIComponent(objectKey);
     const object = await env.MY_BUCKET.get(objectKey);
     
     if (!object) {
@@ -206,7 +207,7 @@ async function getImages(category, env, corsHeaders) {
       const baseObj = {
         key: object.key,
         name: filename.replace(/\.[^/.]+$/, ""),
-        url: `/img/${object.key}`,
+        url: `/img/${object.key.split('/').map(encodeURIComponent).join('/')}`,
         category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',
         size: object.size,
         uploaded: object.uploaded

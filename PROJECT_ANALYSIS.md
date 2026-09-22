@@ -60,7 +60,6 @@ graph TD
     subgraph Production Cloudflare Edge
         CFPages[Cloudflare Pages Static Files]
         CFWorkers[functions/_worker.js]
-        CFMiddleware[functions/_middleware.js]
         R2[Cloudflare R2 Bucket - myportfolio]
         
         subgraph Durable Objects (SQLite Backend)
@@ -79,7 +78,6 @@ graph TD
     Server <--> R2Local
     
     ClientJS <-->|HTTP API /api/*| CFWorkers
-    CFMiddleware <-->|Asset Proxy /img/*| R2
     CFWorkers <-->|Edge Cache /img/*| R2
     CFWorkers <--> DO_Viewers
     CFWorkers <--> DO_Total
@@ -139,7 +137,7 @@ myportfolio/
 ├── dist/                           # Generated production build artifacts (ephemeral, gitignored)
 ├── functions/                      # Cloudflare Pages / Workers serverless backend
 │   ├── _worker.js                  # Main Worker entrypoint: DO routing, R2 streaming, SPA fallback
-│   ├── _middleware.js              # Cloudflare Pages middleware for R2 image proxying
+│   ├── _middleware.js              # Legacy middleware; ignored by advanced-mode Pages deployment
 │   ├── photos-metadata.json        # Pre-extracted EXIF metadata array for photography assets
 │   ├── resume_counter.js           # Durable Object: Tracks resume downloads
 │   ├── session_tracker.js          # Durable Object: Active session management
@@ -369,6 +367,8 @@ A comprehensive audit and implementation cycle established the following enhance
 - **Dynamic Card Grid & Deep Linking**: Blog cards in `index.html` are dynamically rendered from `blog/posts.json`. The SPA routing engine automatically supports deep-link clean URLs (`/blog/:slug`, `/blog?post=:slug`, or `#blog/:slug`), opening directly to the requested article modal while preserving browser history navigation.
 
 ### 8.3 Photography Gallery & EXIF Metadata System
+- **Request Routing**: The browser loads `/api/categories`, `/api/images/:category`, and `/img/:key` from the site's own origin. Photography does not use the analytics `API_BASE`. Locally these API requests reach Express and return S3-presigned URLs; on Pages they reach the bundled `_worker.js` and its native `MY_BUCKET` binding.
+- **Production Entry Point**: The build outputs `dist/_worker.js`, enabling Pages advanced mode. `functions/_middleware.js` is legacy code and is ignored in this mode ([Cloudflare documentation](https://developers.cloudflare.com/pages/functions/advanced-mode/)). Edit `functions/_worker.js` for production gallery changes.
 - **R2 Storage Architecture**: Photography files are organized by folder categories in Cloudflare R2 (`california/`, `japan/`, `hawaii/`, `south_korea/`).
 - **Metadata Extraction**: `utils/image-metadata.js` parses RAW/JPEG headers with `ExifReader`, creating `functions/photos-metadata.json`.
 - **Edge Cache API**: `functions/_worker.js` handles `/img/:key` with a 1-year immutable cache header (`public, max-age=31536000, s-maxage=31536000, immutable`), cached asynchronously at Cloudflare edge POPs with `caches.default.put()`.
@@ -440,14 +440,14 @@ npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality
    npx esbuild functions/_worker.js --bundle --outfile=dist/_worker.js --format=esm --platform=browser
    ```
 4. **Configuration & URL Injection (`utils/prepare-pages-config.js`)**:
-   - Generates `dist/wrangler.toml` from root `wrangler.toml`, appending `pages_build_output_dir = "dist"`.
-   - Injects the production `API_BASE` (`https://myportfolio.nathanliu528.workers.dev`) into `dist/script.js` and `dist/viewers.js`.
+   - Generates `dist/wrangler.toml` from root `wrangler.toml`, replacing `main` with `pages_build_output_dir = "."`, removing Worker migrations, and binding Durable Objects to the existing `myportfolio` Worker via `script_name`.
+   - Injects the production analytics `API_BASE` (`https://myportfolio.nathanliu528.workers.dev`) into `dist/script.js` and `dist/viewers.js`. Photography always uses the site's own origin.
 
 ### 10.3 GitHub Actions Workflow (`.github/workflows/deploy.yml`)
 - Triggered on push or pull request to `main`.
 - Sets up Node 22 environment.
 - Executes `npm install` and `npm run build` with `API_BASE` env.
-- Deploys `dist/` to Cloudflare Pages using `wrangler pages deploy dist --project-name=myportfolio`.
+- Deploys to Cloudflare Pages using `wrangler pages deploy --cwd dist --project-name=myportfolio`. Running from `dist/` is required so Wrangler discovers the generated Pages configuration and applies its R2 binding.
 
 ---
 
@@ -485,6 +485,12 @@ npm run downsize:90
 
 ## 12. Historical Defect Audit & Resolved Deficiencies
 
+### Photography API routing and Pages bindings (September 2026)
+- **Observed**: The configured standalone Worker's `/api/images/all` returned HTTP 404, triggering static fallback images. The custom domain could not be resolved from the verification environment, and the Pages hostname returned a Cloudflare block page, so live Pages R2 access could not be verified.
+- **Cause in source**: Gallery requests used the injected analytics Worker URL even though the deployed Pages bundle contains the photography handlers. Deployment ran from the repository root, ignoring the generated Pages configuration in `dist/`; that configuration also contained Worker-only migrations and lacked external Durable Object `script_name` references.
+- **Fix**: Use same-origin photography requests, discover the corrected Pages configuration with `--cwd dist`, and encode/decode R2 object keys so spaces, `#`, and `%` survive image URLs. Show minimal monospace loading, empty, and unavailable text; the gallery does not display fallback photos.
+- **Validation**: `npm test` builds production assets and checks gallery routing, R2 listing/streaming, encoded filenames, unavailable messaging, and generated bindings with mocked R2. Live verification remains necessary after deployment.
+
 During historical codebase audits, four significant defects were identified and systematically resolved:
 
 ### ✅ 1. Restored Production Analytics (Frozen Counters)
@@ -514,7 +520,7 @@ When making modifications or adding features to this repository, adhere strictly
 2. **Preserve Empty String Placeholders**:
    In source files like [script.js](file:///Users/natedogl/CODE/myportfolio/script.js) and [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js), keep `const API_BASE = '';` and `const workerBase = '';` as empty strings. The build step automatically injects production URLs in `dist/`. Hardcoding production URLs in root files will break local dev fallback behaviors.
 3. **Configuration Drift & `wrangler.toml`**:
-   Cloudflare Pages requires bindings (Durable Objects, R2, compatibility dates, and migrations) to be present at deploy-time. We generate `dist/wrangler.toml` dynamically from the root `wrangler.toml` using `prepare-pages-config.js`. If you add new bindings or change Durable Object settings, update the root [wrangler.toml](file:///Users/natedogl/CODE/myportfolio/wrangler.toml), NOT the build files.
+   Cloudflare Pages requires R2 and external Durable Object bindings at deploy-time. We generate `dist/wrangler.toml` dynamically from root `wrangler.toml` using `prepare-pages-config.js`, removing Worker migrations and adding external `script_name` references ([Cloudflare configuration documentation](https://developers.cloudflare.com/pages/functions/wrangler-configuration/#durable-objects)). Deploy with `--cwd dist` so Wrangler reads this file. Update root `wrangler.toml` for binding changes. Durable Object migrations remain part of the separately deployed Worker.
 4. **Markdown Blog Authoring Contract**:
    Blog posts are authored as standard `.md` files in `blog/posts/<slug>.md` and registered in `blog/posts.json` with `id`, `title`, `date`, `readTime`, `summary`, and `tags`. Do not create standalone `.html` files for new blog posts.
 5. **Durable Object Isolation**:
