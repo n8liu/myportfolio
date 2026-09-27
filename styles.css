@@ -1228,74 +1228,47 @@ body.loaded {
     opacity: 0;
 }
 
-/* Photography Pagination */
-.photo-pagination {
+/* Photography Infinite Scroll Pagination */
+.photo-infinite-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    justify-content: center;
+    gap: 0.85rem;
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: var(--border-thin);
     font-family: var(--font-mono);
     font-size: 0.85rem;
+    text-align: center;
 }
 
-.photo-pagination[hidden] {
+.photo-infinite-container[hidden] {
     display: none;
 }
 
-.pagination-info {
+.photo-sentinel {
+    width: 100%;
+    height: 1px;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.photo-infinite-status {
     color: var(--text-muted);
+    font-size: 0.85rem;
     user-select: none;
-    font-size: 0.8rem;
 }
 
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-.pagination-btn {
-    padding: 0.35rem 0.75rem;
+.photo-load-more {
+    padding: 0.4rem 1rem;
     font-size: 0.8rem;
     font-family: var(--font-mono);
     font-weight: 700;
 }
 
-.pagination-btn:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: 2px 2px 0px 0px var(--border-color);
-}
-
-.page-num {
-    min-width: 32px;
-    height: 30px;
-    padding: 0 0.4rem;
-    font-size: 0.8rem;
-    font-family: var(--font-mono);
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.page-num.active {
-    background-color: var(--text);
-    color: var(--bg-canvas);
-    box-shadow: none;
-    transform: translate(1px, 1px);
-}
-
-.pagination-ellipsis {
-    color: var(--text-muted);
-    padding: 0 0.25rem;
-    user-select: none;
-    font-family: var(--font-mono);
+.photo-load-more[hidden] {
+    display: none;
 }
 
 /* Stats Dashboard Panel */
@@ -1880,17 +1853,6 @@ body.zooming-out {
 
     .stats-cards-grid {
         grid-template-columns: 1fr 1fr;
-    }
-
-    .photo-pagination {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .pagination-controls {
-        flex-wrap: wrap;
-        justify-content: center;
     }
 }
 

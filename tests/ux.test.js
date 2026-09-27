@@ -228,66 +228,59 @@ test('keepActiveTabVisible centers active mobile tab when out of visible scroll 
     assert.equal(headerNav.scrollToCalls[0].behavior, 'auto');
 });
 
-test('getPaginationPages computes standard compact page lists with ellipses', () => {
-    const getPagesCode = extractFn('getPaginationPages');
-    const context = vm.createContext({});
-    vm.runInContext(getPagesCode, context);
-    const getPages = (cur, total) => [...context.getPaginationPages(cur, total)];
-
-    assert.deepEqual(getPages(1, 1), [1]);
-    assert.deepEqual(getPages(1, 5), [1, 2, 3, 4, 5]);
-    assert.deepEqual(getPages(1, 6), [1, 2, 3, 4, 5, 6]);
-
-    // total > 6, near start
-    assert.deepEqual(getPages(1, 10), [1, 2, 3, 4, '...', 10]);
-    assert.deepEqual(getPages(3, 10), [1, 2, 3, 4, '...', 10]);
-
-    // total > 6, in middle
-    assert.deepEqual(getPages(5, 10), [1, '...', 4, 5, 6, '...', 10]);
-
-    // total > 6, near end
-    assert.deepEqual(getPages(8, 10), [1, '...', 7, 8, 9, 10]);
-    assert.deepEqual(getPages(10, 10), [1, '...', 7, 8, 9, 10]);
-});
-
-test('photography pagination slices photos, prioritizes initial images, and updates controls', () => {
-    const getPagesCode = extractFn('getPaginationPages');
-    const renderPageCode = extractFn('renderPhotosPage');
-    const renderControlsCode = extractFn('renderPaginationControls');
-    const renderPhotosCode = extractFn('renderPhotos', '\n    function getPaginationPages(');
+test('photography infinite scroll renders initial batch, prioritizes first two images, and updates status', () => {
+    const appendBatchCode = extractFn('appendPhotoBatch');
+    const updateStatusCode = extractFn('updateInfiniteStatus');
+    const setupObserverCode = extractFn('setupInfiniteObserver');
+    const renderPhotosCode = extractFn('renderPhotos', '\n    function setupInfiniteObserver(');
 
     const photoGrid = new FakeElement('div');
-    const photoPagination = new FakeElement('nav');
+    const photoInfiniteContainer = new FakeElement('div');
+    const photoSentinel = new FakeElement('div');
+    const photoInfiniteStatus = new FakeElement('div');
+    const photoLoadMoreBtn = new FakeElement('button');
+
     const testPhotos = Array.from({ length: 28 }, (_, i) => ({
         url: `photo_${i + 1}.jpg`,
         name: `Photo ${i + 1}`,
     }));
 
+    let observedElement = null;
+    class FakeIntersectionObserver {
+        observe(el) { observedElement = el; }
+        unobserve() {}
+    }
+
     const context = vm.createContext({
         document: {
             createElement: tag => new FakeElement(tag),
-            getElementById: id => (id === 'panel-photography' ? new FakeElement('section') : null),
+            getElementById: () => null,
         },
-        PHOTOS_PER_PAGE: 12,
+        IntersectionObserver: FakeIntersectionObserver,
+        PHOTOS_PER_BATCH: 12,
         photoGrid,
-        photoPagination,
+        photoInfiniteContainer,
+        photoSentinel,
+        photoInfiniteStatus,
+        photoLoadMoreBtn,
         galleryPhotos: [],
-        currentCategoryPhotos: [],
-        currentGalleryPage: 1,
-        totalGalleryPages: 1,
+        renderedPhotoCount: 0,
+        isAppendingBatch: false,
+        photoInfiniteObserver: null,
         openPhotoModal: () => {},
     });
 
-    vm.runInContext(`${getPagesCode}\n${renderControlsCode}\n${renderPageCode}\n${renderPhotosCode}`, context);
+    vm.runInContext(`${setupObserverCode}\n${updateStatusCode}\n${appendBatchCode}\n${renderPhotosCode}`, context);
 
     // Initial render
     context.renderPhotos(testPhotos);
 
-    assert.equal(context.totalGalleryPages, 3);
-    assert.equal(context.currentGalleryPage, 1);
+    assert.equal(context.renderedPhotoCount, 12);
     assert.equal(photoGrid.children.length, 12);
+    assert.equal(photoInfiniteContainer.hidden, false);
+    assert.equal(photoInfiniteStatus.textContent, 'showing 12 of 28 photos');
 
-    // First 2 images should have fetchpriority="high" and no loading="lazy"
+    // First 2 images have fetchpriority="high" and no loading="lazy"
     const firstImg = photoGrid.children[0].children[0];
     const secondImg = photoGrid.children[1].children[0];
     const thirdImg = photoGrid.children[2].children[0];
@@ -297,35 +290,82 @@ test('photography pagination slices photos, prioritizes initial images, and upda
     assert.equal(secondImg.loading, undefined);
     assert.equal(thirdImg.loading, 'lazy');
     assert.equal(thirdImg.getAttribute('fetchpriority'), undefined);
-
-    // Pagination controls rendered
-    assert.equal(photoPagination.hidden, false);
-    const info = photoPagination.children[0];
-    assert.equal(info.textContent, 'showing 1–12 of 28 photos');
-
-    // Page 2 navigation
-    context.renderPhotosPage(2);
-    assert.equal(context.currentGalleryPage, 2);
-    assert.equal(photoGrid.children.length, 12);
-    assert.equal(photoPagination.children[0].textContent, 'showing 13–24 of 28 photos');
-
-    // Page 3 navigation (remainder 4 photos)
-    context.renderPhotosPage(3);
-    assert.equal(context.currentGalleryPage, 3);
-    assert.equal(photoGrid.children.length, 4);
-    assert.equal(photoPagination.children[0].textContent, 'showing 25–28 of 28 photos');
 });
 
-test('closing photo modal synchronizes active page and focus if stepped across pages', () => {
-    const getPagesCode = extractFn('getPaginationPages');
-    const renderPageCode = extractFn('renderPhotosPage');
-    const renderControlsCode = extractFn('renderPaginationControls');
+test('photography infinite scroll appends subsequent batches and detects completion', () => {
+    const appendBatchCode = extractFn('appendPhotoBatch');
+    const updateStatusCode = extractFn('updateInfiniteStatus');
+
+    const photoGrid = new FakeElement('div');
+    const photoInfiniteContainer = new FakeElement('div');
+    const photoSentinel = new FakeElement('div');
+    const photoInfiniteStatus = new FakeElement('div');
+    const photoLoadMoreBtn = new FakeElement('button');
+
+    const testPhotos = Array.from({ length: 28 }, (_, i) => ({
+        url: `photo_${i + 1}.jpg`,
+        name: `Photo ${i + 1}`,
+    }));
+
+    let unobserved = false;
+    class FakeIntersectionObserver {
+        observe() {}
+        unobserve() { unobserved = true; }
+    }
+
+    const context = vm.createContext({
+        document: {
+            createElement: tag => new FakeElement(tag),
+        },
+        IntersectionObserver: FakeIntersectionObserver,
+        PHOTOS_PER_BATCH: 12,
+        photoGrid,
+        photoInfiniteContainer,
+        photoSentinel,
+        photoInfiniteStatus,
+        photoLoadMoreBtn,
+        galleryPhotos: testPhotos,
+        renderedPhotoCount: 12,
+        isAppendingBatch: false,
+        photoInfiniteObserver: new FakeIntersectionObserver(),
+        openPhotoModal: () => {},
+    });
+
+    vm.runInContext(`${updateStatusCode}\n${appendBatchCode}`, context);
+
+    // Append batch 2 (12 to 24)
+    context.appendPhotoBatch();
+    assert.equal(context.renderedPhotoCount, 24);
+    assert.equal(photoGrid.children.length, 12);
+    assert.equal(photoInfiniteStatus.textContent, 'showing 24 of 28 photos');
+
+    // Append final batch (24 to 28)
+    context.appendPhotoBatch();
+    assert.equal(context.renderedPhotoCount, 28);
+    assert.equal(photoGrid.children.length, 16);
+    assert.equal(photoInfiniteStatus.textContent, 'all 28 photos loaded.');
+    assert.equal(photoLoadMoreBtn.hidden, true);
+    assert.equal(unobserved, true);
+
+    // Further attempts do not append
+    context.appendPhotoBatch();
+    assert.equal(context.renderedPhotoCount, 28);
+    assert.equal(photoGrid.children.length, 16);
+});
+
+test('closing photo modal dynamically loads missing batches and restores focus to active card', () => {
+    const appendBatchCode = extractFn('appendPhotoBatch');
+    const updateStatusCode = extractFn('updateInfiniteStatus');
     const closePhotoModalCode = extractFn('closePhotoModal');
 
     const photoGrid = new FakeElement('div');
-    const photoPagination = new FakeElement('nav');
+    const photoInfiniteContainer = new FakeElement('div');
+    const photoSentinel = new FakeElement('div');
+    const photoInfiniteStatus = new FakeElement('div');
+    const photoLoadMoreBtn = new FakeElement('button');
     const photoModal = new FakeElement('div');
-    const testPhotos = Array.from({ length: 25 }, (_, i) => ({
+
+    const testPhotos = Array.from({ length: 30 }, (_, i) => ({
         url: `photo_${i + 1}.jpg`,
         name: `Photo ${i + 1}`,
     }));
@@ -334,29 +374,36 @@ test('closing photo modal synchronizes active page and focus if stepped across p
     const context = vm.createContext({
         document: {
             createElement: tag => new FakeElement(tag),
-            getElementById: () => null,
         },
-        PHOTOS_PER_PAGE: 12,
+        PHOTOS_PER_BATCH: 12,
         photoGrid,
-        photoPagination,
+        photoInfiniteContainer,
+        photoSentinel,
+        photoInfiniteStatus,
+        photoLoadMoreBtn,
         photoModal,
         galleryPhotos: testPhotos,
-        currentCategoryPhotos: testPhotos,
-        currentGalleryPage: 1,
-        totalGalleryPages: 3,
-        activePhotoIndex: 14, // Photo #15 is on page 2 (index 14)
+        renderedPhotoCount: 0,
+        isAppendingBatch: false,
+        photoInfiniteObserver: null,
+        activePhotoIndex: 18, // User stepped into photo 18 while modal open
         modalReturnFocus: null,
         hideAccessibleModal: m => { hiddenModal = m; },
+        openPhotoModal: () => {},
     });
 
-    vm.runInContext(`${getPagesCode}\n${renderControlsCode}\n${renderPageCode}\n${closePhotoModalCode}`, context);
+    vm.runInContext(`${updateStatusCode}\n${appendBatchCode}\n${closePhotoModalCode}`, context);
 
-    // Close modal after stepping to photo index 14
+    // Simulate only first batch loaded in grid
+    context.appendPhotoBatch();
+    assert.equal(context.renderedPhotoCount, 12);
+    assert.equal(photoGrid.children.length, 12);
+
+    // Close modal should append second batch (reaching 24) so photo 18 exists
     context.closePhotoModal();
 
     assert.equal(hiddenModal, photoModal);
-    assert.equal(context.currentGalleryPage, 2);
-    assert.equal(photoGrid.children.length, 12);
-    // Index 14 on page 2 corresponds to card index 2 (14 - 12)
-    assert.equal(context.modalReturnFocus, photoGrid.children[2]);
+    assert.equal(context.renderedPhotoCount, 24);
+    assert.equal(photoGrid.children.length, 24);
+    assert.equal(context.modalReturnFocus, photoGrid.children[18]);
 });

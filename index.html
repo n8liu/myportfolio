@@ -641,7 +641,11 @@
                             <p class="photo-status" role="status">loading photos...</p>
                         </div>
 
-                        <nav class="photo-pagination" id="photo-pagination" aria-label="Photography pagination" hidden></nav>
+                        <div class="photo-infinite-container" id="photo-infinite-container" hidden>
+                            <div class="photo-sentinel" id="photo-sentinel" aria-hidden="true"></div>
+                            <div class="photo-infinite-status" id="photo-infinite-status" role="status" aria-live="polite"></div>
+                            <button type="button" class="btn-retro photo-load-more" id="photo-load-more" hidden>load more photos &darr;</button>
+                        </div>
                     </div>
                 </section>
             </div>

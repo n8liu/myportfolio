@@ -806,16 +806,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----------------------------------------------------
     // 4. Photography Gallery & Modal Popups
     // ----------------------------------------------------
-    const PHOTOS_PER_PAGE = 12;
+    const PHOTOS_PER_BATCH = 12;
     let photographyInitialized = false;
     let galleryRequest = 0;
     let galleryPhotos = [];
-    let currentCategoryPhotos = [];
-    let currentGalleryPage = 1;
-    let totalGalleryPages = 1;
+    let renderedPhotoCount = 0;
+    let isAppendingBatch = false;
     let activePhotoIndex = 0;
+    let photoInfiniteObserver = null;
     const photoGrid = document.getElementById('portfolio-photo-grid');
-    const photoPagination = document.getElementById('photo-pagination');
+    const photoInfiniteContainer = document.getElementById('photo-infinite-container');
+    const photoSentinel = document.getElementById('photo-sentinel');
+    const photoInfiniteStatus = document.getElementById('photo-infinite-status');
+    const photoLoadMoreBtn = document.getElementById('photo-load-more');
     const photoCategoryFilters = document.getElementById('photo-category-filters');
     const photoModal = document.getElementById('photo-modal');
     const modalImage = document.getElementById('modal-image');
@@ -871,6 +874,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
+        if (photoLoadMoreBtn) {
+            photoLoadMoreBtn.addEventListener('click', () => appendPhotoBatch());
+        }
+
         // Initial load
         loadPhotosByCategory('all');
     }
@@ -878,8 +885,8 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadPhotosByCategory(category) {
         if (!photoGrid) return;
         const request = typeof galleryRequest !== 'undefined' ? ++galleryRequest : 0;
-        if (typeof photoPagination !== 'undefined' && photoPagination) {
-            photoPagination.hidden = true;
+        if (typeof photoInfiniteContainer !== 'undefined' && photoInfiniteContainer) {
+            photoInfiniteContainer.hidden = true;
         }
         if (typeof setLoadState === 'function') {
             setLoadState(photoGrid, 'loading photos...', null, true);
@@ -896,9 +903,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (images.length === 0) {
                 if (typeof galleryPhotos !== 'undefined') galleryPhotos = [];
-                if (typeof currentCategoryPhotos !== 'undefined') currentCategoryPhotos = [];
-                if (typeof photoPagination !== 'undefined' && photoPagination) {
-                    photoPagination.hidden = true;
+                if (typeof renderedPhotoCount !== 'undefined') renderedPhotoCount = 0;
+                if (typeof photoInfiniteContainer !== 'undefined' && photoInfiniteContainer) {
+                    photoInfiniteContainer.hidden = true;
                 }
                 if (typeof setLoadState === 'function') {
                     setLoadState(photoGrid, 'no photos in this category.');
@@ -917,8 +924,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.warn('Error fetching category images.', e);
             }
             if (typeof galleryRequest !== 'undefined' && request !== galleryRequest) return;
-            if (typeof photoPagination !== 'undefined' && photoPagination) {
-                photoPagination.hidden = true;
+            if (typeof photoInfiniteContainer !== 'undefined' && photoInfiniteContainer) {
+                photoInfiniteContainer.hidden = true;
             }
             if (typeof setLoadState === 'function') {
                 setLoadState(photoGrid, 'photos unavailable.', () => loadPhotosByCategory(category));
@@ -928,43 +935,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function renderPhotos(images, page = 1) {
+    function renderPhotos(images) {
         if (!photoGrid) return;
-        galleryPhotos = images;
-        currentCategoryPhotos = images;
-        totalGalleryPages = Math.max(1, Math.ceil(images.length / PHOTOS_PER_PAGE));
-        renderPhotosPage(page, false);
-    }
-
-    function getPaginationPages(current, total) {
-        if (total <= 6) {
-            const pages = [];
-            for (let i = 1; i <= total; i++) pages.push(i);
-            return pages;
-        }
-
-        const pages = [1];
-        if (current <= 3) {
-            pages.push(2, 3, 4, '...', total);
-        } else if (current >= total - 2) {
-            pages.push('...', total - 3, total - 2, total - 1, total);
-        } else {
-            pages.push('...', current - 1, current, current + 1, '...', total);
-        }
-        return pages;
-    }
-
-    function renderPhotosPage(page, shouldScroll = false) {
-        if (!photoGrid) return;
-        currentGalleryPage = Math.max(1, Math.min(page, totalGalleryPages));
-
-        const startIdx = (currentGalleryPage - 1) * PHOTOS_PER_PAGE;
-        const endIdx = Math.min(startIdx + PHOTOS_PER_PAGE, currentCategoryPhotos.length);
-        const pagePhotos = currentCategoryPhotos.slice(startIdx, endIdx);
-
         photoGrid.innerHTML = '';
+        galleryPhotos = images;
+        renderedPhotoCount = 0;
 
-        pagePhotos.forEach((image, index) => {
+        setupInfiniteObserver();
+        appendPhotoBatch();
+    }
+
+    function setupInfiniteObserver() {
+        if (photoInfiniteObserver && photoSentinel) {
+            photoInfiniteObserver.unobserve(photoSentinel);
+        }
+        if (typeof IntersectionObserver !== 'undefined' && photoSentinel) {
+            photoInfiniteObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !isAppendingBatch && renderedPhotoCount < galleryPhotos.length) {
+                        appendPhotoBatch();
+                    }
+                });
+            }, {
+                root: (typeof scrollContainer !== 'undefined' && scrollContainer) ? scrollContainer : null,
+                rootMargin: '300px',
+                threshold: 0
+            });
+        }
+    }
+
+    function appendPhotoBatch() {
+        if (!photoGrid || isAppendingBatch) return;
+        if (renderedPhotoCount >= galleryPhotos.length) {
+            updateInfiniteStatus();
+            return;
+        }
+
+        isAppendingBatch = true;
+        const startIdx = renderedPhotoCount;
+        const endIdx = Math.min(startIdx + PHOTOS_PER_BATCH, galleryPhotos.length);
+        const batch = galleryPhotos.slice(startIdx, endIdx);
+
+        batch.forEach((image, index) => {
+            const globalIndex = startIdx + index;
             const card = document.createElement('button');
             card.type = 'button';
             card.setAttribute('aria-label', `Open photo: ${image.name || 'Untitled'}`);
@@ -979,7 +992,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Modern Web guidance: fetchpriority="high" on initial above-the-fold images,
             // loading="lazy" on remaining images.
-            if (index < 2) {
+            if (globalIndex < 2) {
                 img.setAttribute('fetchpriority', 'high');
             } else {
                 img.loading = 'lazy';
@@ -1000,99 +1013,44 @@ document.addEventListener('DOMContentLoaded', function () {
             photoGrid.appendChild(card);
         });
 
-        renderPaginationControls();
-
-        if (shouldScroll) {
-            const scrollTarget = document.getElementById('panel-photography') || photoGrid;
-            if (scrollTarget && typeof scrollTarget.scrollIntoView === 'function') {
-                scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
+        renderedPhotoCount = endIdx;
+        isAppendingBatch = false;
+        updateInfiniteStatus();
     }
 
-    function renderPaginationControls() {
-        if (!photoPagination) return;
-        if (totalGalleryPages <= 1 || currentCategoryPhotos.length === 0) {
-            photoPagination.hidden = true;
-            photoPagination.innerHTML = '';
+    function updateInfiniteStatus() {
+        if (!photoInfiniteContainer) return;
+        if (!galleryPhotos || galleryPhotos.length === 0) {
+            photoInfiniteContainer.hidden = true;
+            if (typeof photoInfiniteObserver !== 'undefined' && photoInfiniteObserver && photoSentinel) {
+                photoInfiniteObserver.unobserve(photoSentinel);
+            }
             return;
         }
 
-        photoPagination.hidden = false;
-        photoPagination.innerHTML = '';
+        photoInfiniteContainer.hidden = false;
 
-        const startIdx = (currentGalleryPage - 1) * PHOTOS_PER_PAGE + 1;
-        const endIdx = Math.min(currentGalleryPage * PHOTOS_PER_PAGE, currentCategoryPhotos.length);
-        const total = currentCategoryPhotos.length;
-
-        const info = document.createElement('div');
-        info.className = 'pagination-info';
-        info.textContent = `showing ${startIdx}–${endIdx} of ${total} photos`;
-
-        const controls = document.createElement('div');
-        controls.className = 'pagination-controls';
-
-        // Prev button
-        const prevBtn = document.createElement('button');
-        prevBtn.type = 'button';
-        prevBtn.className = 'btn-retro pagination-btn';
-        prevBtn.id = 'photo-page-prev';
-        prevBtn.innerHTML = '&larr; prev';
-        prevBtn.setAttribute('aria-label', 'Previous photo page');
-        if (currentGalleryPage <= 1) {
-            prevBtn.disabled = true;
-        } else {
-            prevBtn.addEventListener('click', () => {
-                renderPhotosPage(currentGalleryPage - 1, true);
-            });
-        }
-        controls.appendChild(prevBtn);
-
-        // Page buttons and ellipses
-        const pageItems = getPaginationPages(currentGalleryPage, totalGalleryPages);
-        pageItems.forEach(item => {
-            if (item === '...') {
-                const ellipsis = document.createElement('span');
-                ellipsis.className = 'pagination-ellipsis';
-                ellipsis.textContent = '...';
-                ellipsis.setAttribute('aria-hidden', 'true');
-                controls.appendChild(ellipsis);
-            } else {
-                const pageBtn = document.createElement('button');
-                pageBtn.type = 'button';
-                pageBtn.className = 'btn-retro page-num';
-                pageBtn.textContent = String(item);
-                pageBtn.setAttribute('aria-label', `Page ${item}`);
-                if (item === currentGalleryPage) {
-                    pageBtn.classList.add('active');
-                    pageBtn.setAttribute('aria-current', 'page');
-                } else {
-                    pageBtn.addEventListener('click', () => {
-                        renderPhotosPage(item, true);
-                    });
-                }
-                controls.appendChild(pageBtn);
+        if (renderedPhotoCount >= galleryPhotos.length) {
+            if (photoInfiniteStatus) {
+                photoInfiniteStatus.textContent = `all ${galleryPhotos.length} photos loaded.`;
             }
-        });
-
-        // Next button
-        const nextBtn = document.createElement('button');
-        nextBtn.type = 'button';
-        nextBtn.className = 'btn-retro pagination-btn';
-        nextBtn.id = 'photo-page-next';
-        nextBtn.innerHTML = 'next &rarr;';
-        nextBtn.setAttribute('aria-label', 'Next photo page');
-        if (currentGalleryPage >= totalGalleryPages) {
-            nextBtn.disabled = true;
+            if (photoLoadMoreBtn) {
+                photoLoadMoreBtn.hidden = true;
+            }
+            if (typeof photoInfiniteObserver !== 'undefined' && photoInfiniteObserver && photoSentinel) {
+                photoInfiniteObserver.unobserve(photoSentinel);
+            }
         } else {
-            nextBtn.addEventListener('click', () => {
-                renderPhotosPage(currentGalleryPage + 1, true);
-            });
+            if (photoInfiniteStatus) {
+                photoInfiniteStatus.textContent = `showing ${renderedPhotoCount} of ${galleryPhotos.length} photos`;
+            }
+            if (typeof photoInfiniteObserver !== 'undefined' && photoSentinel && photoInfiniteObserver) {
+                photoInfiniteObserver.observe(photoSentinel);
+            }
+            if (photoLoadMoreBtn) {
+                photoLoadMoreBtn.hidden = (typeof IntersectionObserver !== 'undefined' && typeof photoInfiniteObserver !== 'undefined' && Boolean(photoInfiniteObserver));
+            }
         }
-        controls.appendChild(nextBtn);
-
-        photoPagination.appendChild(info);
-        photoPagination.appendChild(controls);
     }
 
     function openPhotoModal(photo) {
@@ -1140,11 +1098,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (modalImage.complete && modalImage.naturalWidth > 0) modalImage.onload();
         modalPhotoName.textContent = photo.name || 'Untitled Image';
 
-        // Update return focus to current card if gallery card is present on the current page
-        const cardIndexOnPage = activePhotoIndex - (currentGalleryPage - 1) * PHOTOS_PER_PAGE;
+        // Update return focus to current card if gallery card is present
         const allCards = photoGrid?.querySelectorAll('.photo-card');
-        if (allCards && cardIndexOnPage >= 0 && allCards[cardIndexOnPage]) {
-            modalReturnFocus = allCards[cardIndexOnPage];
+        if (allCards && allCards[activePhotoIndex]) {
+            modalReturnFocus = allCards[activePhotoIndex];
         }
 
         // EXIF data mapping
@@ -1161,14 +1118,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function closePhotoModal() {
         if (photoModal) {
             if (galleryPhotos && galleryPhotos.length > 0 && activePhotoIndex >= 0) {
-                const targetPage = Math.floor(activePhotoIndex / PHOTOS_PER_PAGE) + 1;
-                if (targetPage !== currentGalleryPage) {
-                    renderPhotosPage(targetPage, false);
+                while (renderedPhotoCount <= activePhotoIndex && renderedPhotoCount < galleryPhotos.length) {
+                    appendPhotoBatch();
                 }
-                const cardIndexOnPage = activePhotoIndex - (currentGalleryPage - 1) * PHOTOS_PER_PAGE;
                 const allCards = photoGrid?.querySelectorAll('.photo-card');
-                if (allCards && cardIndexOnPage >= 0 && allCards[cardIndexOnPage]) {
-                    modalReturnFocus = allCards[cardIndexOnPage];
+                if (allCards && allCards[activePhotoIndex]) {
+                    modalReturnFocus = allCards[activePhotoIndex];
+                    if (typeof allCards[activePhotoIndex].scrollIntoView === 'function') {
+                        allCards[activePhotoIndex].scrollIntoView({ block: 'nearest' });
+                    }
                 }
             }
             hideAccessibleModal(photoModal);
@@ -1178,6 +1136,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function stepPhoto(direction) {
         if (!galleryPhotos || galleryPhotos.length < 2) return;
         activePhotoIndex = (activePhotoIndex + direction + galleryPhotos.length) % galleryPhotos.length;
+        while (renderedPhotoCount <= activePhotoIndex && renderedPhotoCount < galleryPhotos.length) {
+            appendPhotoBatch();
+        }
         openPhotoModal(galleryPhotos[activePhotoIndex]);
     }
     document.getElementById('photo-prev')?.addEventListener('click', () => stepPhoto(-1));
