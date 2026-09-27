@@ -13,8 +13,10 @@
 6. [Academic Foundation & Minimalist Redesign Case Study](#6-academic-foundation--minimalist-redesign-case-study)
 7. [Completed Improvements, UX, Accessibility & SEO Upgrades](#7-completed-improvements-ux-accessibility--seo-upgrades)
 8. [Core Subsystems & Feature Deep Dives](#8-core-subsystems--feature-deep-dives)
-   - [8.1 SPA Routing & Clean URL Handling](#81-spa-routing--clean-url-handling)
-   - [8.2 Dynamic Blog Reader (DOMParser Modal Engine)](#82-dynamic-blog-reader-domparser-modal-engine)
+   - [8.1 Single-Page Scrolling, SPA Routing & Clean URL Handling](#81-single-page-scrolling-spa-routing--clean-url-handling)
+   - [Skills: Categorized Badges](#skills-categorized-badges)
+   - [Experience: Leadership & Community Subsection](#experience-leadership--community-subsection)
+   - [8.2 Dynamic Markdown Blog Engine](#82-dynamic-markdown-blog-engine)
    - [8.3 Photography Gallery & EXIF Metadata System](#83-photography-gallery--exif-metadata-system)
    - [8.4 Stateful Edge Analytics & Durable Objects](#84-stateful-edge-analytics--durable-objects)
 9. [Comprehensive API Reference (Dev & Production)](#9-comprehensive-api-reference-dev--production)
@@ -187,6 +189,23 @@ The visual system is defined in [styles.css](file:///Users/natedogl/CODE/myportf
 --grid-color: rgba(30, 30, 30, 0.035);
 ```
 
+### Current Layout & Typography (September 2026)
+
+These values describe the current source in `index.html` and `styles.css`; earlier redesign examples below are historical.
+
+| Element | Current styling | Responsive behavior |
+| :--- | :--- | :--- |
+| Main OS window (`.os-window`) | `max-width: 1197px; width: 100%` | Constrained to the available viewport width |
+| Navigation (`.header-nav`) | Independent `max-width: 1000px` | Uses the existing compact, horizontally scrollable mobile layout |
+| Section titles (`.section-divider-title`) | `1.53rem`, bold monospace, lowercase | Same font size on mobile; wraps naturally |
+| Section dividers | Single thin bottom border, no background or shadow | Reduced gap and bottom margin at 768px or less |
+| Filename labels (`.section-divider-file`) | `0.7rem`, muted text, no enclosing badge | Kept on one line |
+| Education (`#panel-education`) | `padding-top: 3.5rem` | Applies on desktop and mobile |
+| Profile frame (`.profile-pic-frame`) | `width: min(375px, 100%); aspect-ratio: 1` | Width becomes `min(270px, 100%)` at 768px or less |
+| Experience columns (`.experience-columns`) | Two equal columns with a `2rem` gap | Stacks work experience above leadership at 768px or less |
+
+The profile retains its circular border, offset shadow, and `object-fit: cover`. Experience and leadership share the existing retro card styles, while section headings and skill badges use lighter decoration.
+
 ### Key UI Features & Micro-Interactions
 - **Interactive Ambient Wallpaper**: Mouse pointer movement updates `--mouse-x`, `--mouse-y`, `--mouse-px`, `--mouse-py` on `document.documentElement` to smoothly shift an ambient spotlight and parallax background grid.
 - **Retro OS Window Chrome**: Features a classic titlebar with icon, dynamic file path (`C:\nathan\portfolio\...`), window control buttons (`_`, `口`, `X`), a retro menu bar (`File`, `Edit`, `View`, `Tools`, `Help`), and a bottom taskbar with a live digital clock and active viewer count.
@@ -287,12 +306,22 @@ A comprehensive audit and implementation cycle established the following enhance
 
 ### 7.1 Retro OS Redesign & Refinements
 - ✅ **Single-Page Scrolling Desktop Architecture**: Remodeled portfolio from tab-swapping to a unified vertical single-page scrolling experience while preserving the Retro OS aesthetic.
-- ✅ **Scrollspy & Dynamic Path Morphing**: Integrated an `IntersectionObserver` scrollspy engine that highlights the active nav tab, morphs `#window-path-text` in real time, and updates the URL cleanly via `history.replaceState`.
-- ✅ **Retro OS File Section Dividers**: Added brutalist file-tag banners (`experience.txt`, `projects.bat`, `skills.cfg`, `academics.doc`, `gallery.exe`, `blog.ini`, `dashboard.sys`) to demarcate sections with authentic OS style.
+- ✅ **Scrollspy & Dynamic Path Morphing**: Integrated a scroll-position tracker that highlights the active nav tab, updates `#window-path-text`, and synchronizes the URL via `history.replaceState`. Updates are batched with `requestAnimationFrame`, and reaching the bottom explicitly selects the final section.
+- ✅ **Minimal File Section Dividers**: Education, experience, projects, and skills use `1.53rem` monospace headings, muted filename labels, and a single thin underline. Semantic `h2` titles replace the former icon banners; backgrounds, boxed filename badges, and shadows are removed for a lighter Retro OS style.
+- ✅ **Sliding Navigation Highlight**: A decorative `.nav-highlight` moves and resizes behind the active tab over 240ms. `updateActiveNav()` synchronizes it for clicks, scrollspy, and history navigation, and sets `aria-current="location"`. ResizeObserver and font readiness keep positioning aligned; reduced-motion preferences disable transitions.
 - ✅ **Sticky Navigation Dock & Titlebar**: Frosted glass sticky navigation dock and pinned OS titlebar for effortless section jumps on desktop and mobile.
 - ✅ **Embedded Statistics Dashboard**: Consolidated visitor telemetry into the Stats section running Chart.js trends, replacing legacy `database.html`.
 - ✅ **Dynamic Blog Modal Reader**: Parses standalone markdown articles asynchronously inline inside `#blog-modal`.
 - ✅ **Theme Variable Engine**: Global CSS variables supporting light/dark tones with `localStorage` persistence and dynamic Chart.js re-coloring.
+
+### Motion Refinements
+- **Page changes**: `navigateTo()` wraps cross-view changes in a 180ms View Transition scoped visually to `.window-body`, leaving OS chrome steady. Initial navigation and scrolling within the portfolio remain immediate at the routing layer. Unsupported browsers use a simple incoming fade. A navigation version counter prevents stale callbacks from applying older tab clicks. See the [View Transition API documentation](https://developer.mozilla.org/en-US/docs/Web/API/Document/startViewTransition).
+- **Section entrances**: An IntersectionObserver rooted in `.window-body` adds a 200ms fade and 6px upward entrance once per section per page load. Content is not hidden while waiting for observation.
+- **Modal entrances**: Image and blog overlays fade in over 180ms, with dialogs scaling from 0.98 to 1. The individual `scale` property keeps entrance animation separate from drag transforms.
+- **Photo loading**: Gallery images fade in over 180ms after loading; cached images are revealed immediately. Existing 180px tiles reserve layout space, and failed images expose fallback alt text.
+- **Tactile feedback**: Shared buttons and cards use 120ms transitions, a 1px hover translation, and a 2px pressed translation with reduced shadow.
+- **Reduced motion**: CSS minimizes animations and transitions and disables smooth scrolling; JavaScript skips page transitions, section reveals, and pointer wallpaper updates. Changing the preference also skips an active page transition.
+- **Validation**: `tests/motion.test.js` checks initial/in-page navigation, cross-view updates, superseded callbacks, history intent, reduced-motion behavior, and unsupported-browser fallback. Production build and all seven Node tests pass; these tests do not substitute for browser visual review.
 
 ### 7.2 Accessibility Enhancements (WCAG 2.1 AA)
 - ✅ **Semantic Buttons**: Converted div scroll indicators to semantic `<button class="scroll-dot" aria-label="...">`.
@@ -324,12 +353,12 @@ A comprehensive audit and implementation cycle established the following enhance
 }
 ```
 
-### 7.4 Interactive Project Cards
-- ✅ **Expandable Highlights**: Added hover details showing key features and technical stack highlights with smooth `max-height` and opacity transitions.
-  - **SimplyMail**: OAuth 2.0, real-time sync, 50% faster load times.
-  - **Spotify Analytics**: Top tracks analysis, genre distribution, data export.
-  - **Pokédex API**: Autocomplete search, evolution chains, type calculator.
-  - **Live Semantic Market / Flow**: Streaming embeddings, vector clustering, Gemini AI integration.
+### 7.4 Project Cards
+- **Uniform sizing**: `.projects-grid` uses equal-width columns and `grid-auto-rows: 1fr` so every project card shares the tallest card’s height. Flex card bodies align action buttons at the bottom without fixed heights or clipped descriptions.
+- **Current layout**: `.projects-grid` displays `.retro-card` entries with titles, status badges, concise descriptions, technology pills, and demo links where provided. Per-project GitHub buttons are consolidated into a final “More projects on GitHub” card linking to `https://github.com/n8liu` with the shared button style and safe new-tab attributes. Cards use the shared offset shadow and hover movement.
+- **Current order**: CardboardDex, Live Semantic Market, Clickbait Classifier, FleetManager, ItineraryAI, The IBD Digest, Spotify Analytics, SimplyMail, and More projects on GitHub.
+- **FleetManager**: Marked `Completed (2025)`. Describes backend ownership of an electric-vehicle fleet platform: telemetry and electrical-utility ingestion, AWS S3 storage, backend API delivery, end-to-end debugging, and predictive maintenance using driver behavior and utilization data. Technology pills: Python, Django, PostgreSQL, AWS S3. No code or demo link is currently supplied.
+- **Historical implementation**: Earlier project cards used expandable hover highlights for SimplyMail, Spotify Analytics, Pokédex API, and Live Semantic Market. The current markup presents descriptions directly.
 
 ### 7.5 Personal About Note
 - ✅ **Personal Philosophy**: Added personal paragraph regarding photography, fitness, and continuous learning philosophy styled with an italic purple accent border.
@@ -357,9 +386,36 @@ A comprehensive audit and implementation cycle established the following enhance
   - `/photography` -> `#panel-photography` (`C:\nathan\portfolio\gallery.exe`)
   - `/blog` -> `#panel-blog` (`C:\nathan\portfolio\blog.ini`)
   - `/stats` -> `#panel-stats` (`C:\nathan\portfolio\dashboard.sys`)
-- **Scrollspy Engine**: Utilizes a zero-overhead `IntersectionObserver` with `-20% 0px -55% 0px` root margins to track the currently active section, synchronizing `.nav-tab.active`, `#window-path-text`, and clean browser URLs via `history.replaceState`.
+- **Scrollspy Engine**: A passive `.window-body` scroll listener batches updates with `requestAnimationFrame`. The last section heading above 35% of the visible scroll area determines the active section; within 2px of the bottom, the final panel is selected explicitly so Skills does not need to reach that line. Resize events and ResizeObserver refresh tracking after layout changes. Separate page views and programmatic navigation are excluded. Regression coverage in `tests/scrollspy.test.js` verifies bottom detection, reverse scrolling, event batching, and navigation guards.
 - **Direct Link Scroll Restoration**: On direct URL entry (e.g. `/projects` or `/photography`), the controller calculates sticky navigation offsets and smoothly scrolls to the target section on DOM ready.
 - **Server Rewrite Support**: Express (`server.js`) and Cloudflare Workers (`functions/_worker.js`) rewrite clean URL paths without file extensions to serve `index.html`.
+
+### Skills: Categorized Badges
+- **Layout**: `#panel-skills` uses a semantic definition list (`.skills-summary`) with five category rows, monospace category labels, individual skill badges, and subtle horizontal separators. Badges use dark text, warm neutral backgrounds, and thin borders for readability.
+- **Categories**: Languages, Data & AI, Data Systems, Cloud & Infrastructure, and Frameworks.
+- **Badge styling**: `.skill-label` uses bold `0.85rem` monospace text, `var(--text)` foreground, `var(--bg-canvas)` background, a 1px muted border, and a 3px radius. Badges wrap with a `0.5rem` gap.
+- **Responsive behavior**: Category rows use a `15rem` label column plus a flexible badge column; labels and badges stack at widths of 768px or less.
+- **Visual simplification**: Removed the outer card, decorative icons, badge shadows, hover effects, and tooltip-only descriptions. Existing skills are retained; Linux / Bash is grouped under Cloud & Infrastructure.
+
+### Experience: Leadership & Community Subsection
+- **Location**: Inside `#panel-experience` in `index.html`, beside the professional experience column on desktop and below it at widths of 768px or less. The `.experience-columns` grid keeps both columns equal in width and aligns their minimal headings.
+- **Design**: Both columns use the same minimal heading style and `.experience-list` layout. Leadership organizations reuse `.retro-card`, `.card-title`, `.card-subtitle`, and `.retro-badge` for matching borders, shadows, spacing, typography, and dates.
+- **Work experience**: The interviewing placeholder is followed by Data Engineer Intern at Carbon Sustain, Software Engineer at UnifIBD, and Data Science Intern at L.A. Lucky Import & Export Inc. Happy Lemon appears exclusively in leadership & community.
+- **Leadership content**: Organization titles and locations appear once per card; `.community-roles` groups individual roles with separate date badges that wrap on narrow screens.
+
+| Organization | Role | Dates |
+| :--- | :--- | :--- |
+| Cal Vietnamese Student Association, Berkeley | Famhead | Jan. 2026 – May 2026 |
+| Cal Vietnamese Student Association, Berkeley | Historian | May 2025 – Jan. 2026 |
+| Cal Vietnamese Student Association, Berkeley | Secretary | Jan. 2025 – May 2025 |
+| Cal Vietnamese Student Association, Berkeley | Intercollegiate Council (ICC) Intern | Aug. 2024 – May 2025 |
+| Associated Students of the University of California | Web Design Director | Feb. 2025 – May 2026 |
+| Associated Students of the University of California | Photography Director | Sep. 2025 – May 2026 |
+| Happy Lemon USA | Operations Shift Manager | Oct. 2022 – Jun. 2024 |
+| Happy Lemon USA | Bobarista | Sep. 2021 – Oct. 2022 |
+
+- **Company links**: Work experience company names link to [Carbon Sustain](https://www.carbonsustain.io/), [UnifIBD](https://unifibd.com/), and [L.A. Lucky](https://www.lalucky.com/). They open in new tabs with `rel="noopener noreferrer"`. `.card-subtitle a` inherits the subtitle color, retains an underline, and changes to the accent color on hover or keyboard focus. Location text remains outside the links.
+- **Accessibility & Routing**: The subsection is labelled by its heading and remains part of `/experience`; it does not create a separate navigation panel.
 
 ### 8.2 Dynamic Markdown Blog Engine
 - **Decoupled Markdown Content**: Blog posts are authored in clean, portable Markdown format (`blog/posts/*.md`) with metadata declared in `blog/posts.json`. Individual post HTML files are no longer required.

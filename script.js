@@ -24,9 +24,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Minimalist Interactive Wallpaper (Cursor Glow & Parallax Grid)
     // ----------------------------------------------------
     let mouseTicking = false;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const isTouchDevice = window.matchMedia('(hover: none)').matches;
     if (!isTouchDevice) {
         window.addEventListener('pointermove', function (e) {
+            if (reducedMotion.matches) return;
             if (!mouseTicking) {
                 window.requestAnimationFrame(function () {
                     const x = e.clientX;
@@ -136,6 +138,35 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. Window-Contained Scrolling & View Management Engine
     // ----------------------------------------------------
     const navTabs = document.querySelectorAll('.nav-tab:not(.theme-toggle)');
+    const headerNav = document.querySelector('.header-nav');
+    const navHighlight = document.createElement('span');
+    navHighlight.className = 'nav-highlight';
+    navHighlight.setAttribute('aria-hidden', 'true');
+    if (headerNav) headerNav.appendChild(navHighlight);
+
+    function positionNavHighlight() {
+        const activeTab = headerNav?.querySelector('.nav-tab.active');
+        if (!activeTab) return;
+        navHighlight.style.width = `${activeTab.offsetWidth}px`;
+        navHighlight.style.height = `${activeTab.offsetHeight}px`;
+        navHighlight.style.transform = `translate(${activeTab.offsetLeft}px, ${activeTab.offsetTop}px)`;
+        if (!headerNav.classList.contains('nav-highlight-ready')) {
+            // Establish the initial position before enabling transitions.
+            navHighlight.getBoundingClientRect();
+            headerNav.classList.add('nav-highlight-ready');
+        }
+    }
+
+    if (headerNav) {
+        if ('ResizeObserver' in window) {
+            const navResizeObserver = new ResizeObserver(positionNavHighlight);
+            navResizeObserver.observe(headerNav);
+            navTabs.forEach(tab => navResizeObserver.observe(tab));
+        } else {
+            window.addEventListener('resize', positionNavHighlight);
+        }
+        document.fonts?.ready.then(positionNavHighlight);
+    }
     const pathText = document.getElementById('window-path-text');
     const scrollContainer = document.querySelector('.window-body');
 
@@ -155,15 +186,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let isProgrammaticScroll = false;
     let scrollTimeout = null;
+    let pageTransition = null;
+    let navigationVersion = 0;
+    let navigationInitialized = false;
+    reducedMotion.addEventListener('change', () => {
+        if (reducedMotion.matches) pageTransition?.skipTransition();
+    });
 
     function updateActiveNav(tabName) {
         navTabs.forEach(t => {
             if (t.getAttribute('data-tab') === tabName) {
                 t.classList.add('active');
+                t.setAttribute('aria-current', 'location');
             } else {
                 t.classList.remove('active');
+                t.removeAttribute('aria-current');
             }
         });
+        positionNavHighlight();
 
         if (pathText && pathMappings[tabName]) {
             pathText.textContent = pathMappings[tabName];
@@ -171,6 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showPageView(viewName) {
+        const previousView = document.querySelector('.page-view.active');
         // Hide all page views
         document.querySelectorAll('.page-view').forEach(view => {
             view.classList.remove('active');
@@ -181,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const targetView = document.getElementById(targetViewId);
         if (targetView) {
             targetView.classList.add('active');
+            targetView.classList.toggle('page-enter', previousView !== targetView && !document.startViewTransition);
         }
 
         // Trigger dynamic content on separate pages
@@ -194,6 +236,29 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function navigateTo(target, updateHistory = true) {
+        const version = ++navigationVersion;
+        const targetViewId = separatePages.includes(target) ? `view-${target}` : 'view-portfolio';
+        const switchingViews = document.querySelector('.page-view.active')?.id !== targetViewId;
+        pageTransition?.skipTransition();
+        pageTransition = null;
+
+        if (navigationInitialized && switchingViews && !reducedMotion.matches && document.startViewTransition) {
+            const transition = document.startViewTransition(() => {
+                // A newer click supersedes callbacks waiting for a snapshot.
+                if (version === navigationVersion) performNavigation(target, updateHistory);
+            });
+            pageTransition = transition;
+            transition.ready.catch(() => {}); // Skipped transitions still apply their DOM update.
+            transition.finished.catch(error => console.warn('Page transition failed.', error)).finally(() => {
+                if (pageTransition === transition) pageTransition = null;
+            });
+        } else {
+            performNavigation(target, updateHistory);
+        }
+        navigationInitialized = true;
+    }
+
+    function performNavigation(target, updateHistory = true) {
         if (!target) target = 'home';
 
         if (separatePages.includes(target)) {
@@ -224,10 +289,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (scrollTimeout) clearTimeout(scrollTimeout);
 
                 if (target === 'home') {
-                    scrollContainer.scrollTo({ top: 0, behavior: wasSeparatePage ? 'auto' : 'smooth' });
+                    scrollContainer.scrollTo({ top: 0, behavior: wasSeparatePage || reducedMotion.matches ? 'auto' : 'smooth' });
                 } else {
                     const targetTop = targetPanel.offsetTop - 15;
-                    scrollContainer.scrollTo({ top: targetTop > 0 ? targetTop : 0, behavior: wasSeparatePage ? 'auto' : 'smooth' });
+                    scrollContainer.scrollTo({ top: targetTop > 0 ? targetTop : 0, behavior: wasSeparatePage || reducedMotion.matches ? 'auto' : 'smooth' });
                 }
 
                 scrollTimeout = setTimeout(() => {
@@ -297,37 +362,53 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Scrollspy setup via IntersectionObserver inside .window-body
+    // Track the reading position, including short sections at the bottom of the window.
     function setupScrollspy() {
-        if (!('IntersectionObserver' in window) || !scrollContainer) return;
+        if (!scrollContainer) return;
+        const mainPanels = [...document.querySelectorAll('#view-portfolio .panel')];
+        const portfolioView = document.getElementById('view-portfolio');
+        if (!mainPanels.length || !portfolioView) return;
+        let framePending = false;
 
-        const mainPanels = document.querySelectorAll('#view-portfolio .panel');
+        function syncScrollspy() {
+            framePending = false;
+            if (isProgrammaticScroll || !portfolioView.classList.contains('active')) return;
 
-        const observer = new IntersectionObserver((entries) => {
-            if (isProgrammaticScroll) return;
-
-            // Only update when view-portfolio is active
-            const portfolioView = document.getElementById('view-portfolio');
-            if (!portfolioView || !portfolioView.classList.contains('active')) return;
-
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const sectionId = entry.target.id.replace('panel-', '');
-                    updateActiveNav(sectionId);
-
-                    const newPath = sectionId === 'home' ? '/' : `/${sectionId}`;
-                    if (window.location.pathname !== newPath) {
-                        history.replaceState({ page: sectionId }, '', newPath);
-                    }
+            const remainingScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollContainer.scrollTop;
+            const atBottom = scrollContainer.scrollTop > 0 && remainingScroll <= 2;
+            let currentPanel = mainPanels[0];
+            if (atBottom) {
+                currentPanel = mainPanels[mainPanels.length - 1];
+            } else {
+                const readingLine = scrollContainer.getBoundingClientRect().top + scrollContainer.clientHeight * 0.35;
+                for (const panel of mainPanels) {
+                    if (panel.getBoundingClientRect().top <= readingLine) currentPanel = panel;
+                    else break;
                 }
-            });
-        }, {
-            root: scrollContainer,
-            rootMargin: '-10% 0px -60% 0px',
-            threshold: 0
-        });
+            }
 
-        mainPanels.forEach(panel => observer.observe(panel));
+            const sectionId = currentPanel.id.replace('panel-', '');
+            updateActiveNav(sectionId);
+            const newPath = sectionId === 'home' ? '/' : `/${sectionId}`;
+            if (window.location.pathname !== newPath) {
+                history.replaceState({ page: sectionId }, '', newPath);
+            }
+        }
+
+        function scheduleScrollspy() {
+            if (framePending) return;
+            framePending = true;
+            requestAnimationFrame(syncScrollspy);
+        }
+
+        scrollContainer.addEventListener('scroll', scheduleScrollspy, { passive: true });
+        window.addEventListener('resize', scheduleScrollspy);
+        if ('ResizeObserver' in window) {
+            const resizeObserver = new ResizeObserver(scheduleScrollspy);
+            resizeObserver.observe(scrollContainer);
+            resizeObserver.observe(portfolioView);
+        }
+        scheduleScrollspy();
     }
 
     // Check URL path on page load
@@ -342,6 +423,18 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     setupScrollspy();
+
+    // Reveal each section once, without hiding content while waiting for observation.
+    if ('IntersectionObserver' in window && scrollContainer) {
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                if (!reducedMotion.matches) entry.target.classList.add('section-enter');
+                revealObserver.unobserve(entry.target);
+            });
+        }, { root: scrollContainer, threshold: 0, rootMargin: '0px 0px -24px 0px' });
+        document.querySelectorAll('.page-view .panel').forEach(panel => revealObserver.observe(panel));
+    }
 
     // ----------------------------------------------------
     // 2. Status Bar Clock Update
@@ -650,9 +743,17 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
                 imgUrl = '/' + imgUrl;
             }
-            img.src = imgUrl;
             img.alt = image.name || 'Portfolio photo';
             img.loading = 'lazy';
+            img.classList.add('photo-loading');
+            const revealImage = () => img.classList.remove('photo-loading');
+            img.addEventListener('load', revealImage, { once: true });
+            img.addEventListener('error', () => {
+                revealImage();
+                img.alt = 'Photo unavailable';
+            }, { once: true });
+            img.src = imgUrl;
+            if (img.complete && img.naturalWidth > 0) revealImage();
 
             card.appendChild(img);
             card.addEventListener('click', () => openPhotoModal(image));
