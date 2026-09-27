@@ -14,6 +14,7 @@ export class TotalCounter {
       return new Response(null, { headers: corsHeaders });
     }
     if (url.pathname.endsWith('/increment')) {
+      if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
       let total = (await this.state.storage.get('total')) || 0;
       total++;
       await this.state.storage.put('total', total);
@@ -30,10 +31,6 @@ export class TotalCounter {
       let ts = (await this.state.storage.get('timestamps')) || [];
       let count = ts.filter(t => now - t < 24*3600*1000).length;
       return new Response(JSON.stringify({ requests24h: count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
-    } else if (url.pathname.endsWith('/reset')) {
-      await this.state.storage.put('total', 0);
-      await this.state.storage.put('timestamps', []);
-      return new Response(JSON.stringify({ total: 0 }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
     } else if (url.pathname.endsWith('/history7d')) {
       let now = Date.now();
       let ts = (await this.state.storage.get('timestamps')) || [];
@@ -51,9 +48,10 @@ export class TotalCounter {
         days.push(d.getTime());
       }
       return new Response(JSON.stringify({ days, counts: buckets }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
-    } else {
+    } else if (url.pathname === '/api/total') {
       let total = (await this.state.storage.get('total')) || 0;
       return new Response(JSON.stringify({ total }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
     }
+    return new Response('Not found', { status: 404 });
   }
 }

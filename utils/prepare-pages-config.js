@@ -43,6 +43,10 @@ try {
 
 // 2. Inject API_BASE into script.js and viewers.js in dist
 const apiBase = process.env.API_BASE || 'https://myportfolio.nathanliu528.workers.dev';
+const parsedApiBase = new URL(apiBase);
+if (parsedApiBase.protocol !== 'https:' || parsedApiBase.origin !== apiBase) {
+  throw new Error('API_BASE must be an HTTPS origin without credentials, query parameters, or a path');
+}
 console.log(`Injecting production API base URL: ${apiBase}`);
 
 const scriptDistPath = path.join(projectRoot, 'dist', 'script.js');
@@ -52,7 +56,7 @@ try {
   if (fs.existsSync(scriptDistPath)) {
     let content = fs.readFileSync(scriptDistPath, 'utf8');
     // Replace const API_BASE = ''; or const API_BASE = "";
-    content = content.replace(/const\s+API_BASE\s*=\s*['"]['"];?/, `const API_BASE = '${apiBase}';`);
+    content = content.replace(/const\s+API_BASE\s*=\s*['"]['"];?/, `const API_BASE = ${JSON.stringify(apiBase)};`);
     fs.writeFileSync(scriptDistPath, content);
     console.log('Successfully injected API_BASE into dist/script.js');
   } else {
@@ -62,7 +66,7 @@ try {
   if (fs.existsSync(viewersDistPath)) {
     let content = fs.readFileSync(viewersDistPath, 'utf8');
     // Replace const workerBase = ''; or const workerBase = "";
-    content = content.replace(/const\s+workerBase\s*=\s*['"]['"];?/, `const workerBase = '${apiBase}';`);
+    content = content.replace(/const\s+workerBase\s*=\s*['"]['"];?/, `const workerBase = ${JSON.stringify(apiBase)};`);
     fs.writeFileSync(viewersDistPath, content);
     console.log('Successfully injected workerBase into dist/viewers.js');
   } else {

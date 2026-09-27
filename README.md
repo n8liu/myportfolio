@@ -98,15 +98,19 @@ Inspired by Carolyn Wang's portfolio layout and PostHog's retro-brutalist theme,
 
 ## Local Development
 
+Security checks run with `npm test` and `npm audit`. The build and both local serving modes use an explicit public-file allowlist; server source, environment files, and tooling are not served. Markdown is sanitized before rendering. Production analytics writes require POST and are rate-limited; no public analytics reset endpoint exists. See `PROJECT_ANALYSIS.md` for quotas and deployment details.
+
 1. **Clone the repository**
    ```bash
    git clone https://github.com/n8liu/myportfolio3.0.git
    cd myportfolio3.0
    ```
 
-2. **Install dependencies**
+2. **Use Node 24.15+ and install locked dependencies**
    ```bash
-   npm install
+   nvm install 24
+   nvm use 24
+   npm ci
    ```
 
 3. **Configure environment**

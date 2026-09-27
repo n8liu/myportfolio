@@ -36,3 +36,8 @@ new_sqlite_classes = [ "ResumeCounter" ]
 [[migrations]]
 tag = "v5"
 new_sqlite_classes = [ "UniqueVisitors" ]
+
+# Already applied in production. Keep migration history even for retired features.
+[[migrations]]
+tag = "v6"
+new_sqlite_classes = [ "InstagramCounter", "GitHubCounter", "EmailCounter", "LinkedInCounter" ]

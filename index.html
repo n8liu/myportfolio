@@ -97,9 +97,8 @@
         <div class="window-menubar">
             <div class="menu-item" onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with care.')">File</div>
             <div class="menu-item"
-                onclick="alert('This document is read-only. You can edit notes in the Sticky Note widget!')">Edit</div>
+                onclick="alert('This document is read-only.')">Edit</div>
             <div class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</div>
-            <div class="menu-item" onclick="if (window.toggleStickyNote) window.toggleStickyNote(true);">Notes</div>
             <div class="menu-item" onclick="document.querySelector('[data-tab=\'stats\']').click()">Stats</div>
             <div class="menu-item" onclick="alert('Email nathan.dtliu@gmail.com for help.')">Help</div>
         </div>
@@ -700,10 +699,6 @@
                 <button class="start-btn" onclick="alert('Nathan Liu — UC Berkeley Data Science & CS Student')">
                     <i class="fas fa-desktop"></i> nathan.exe
                 </button>
-                <button class="taskbar-app-btn active" id="taskbar-sticky-btn" title="Toggle Sticky Note"
-                    aria-label="Toggle Sticky Note">
-                    <i class="fas fa-sticky-note"></i> notes.txt
-                </button>
                 <span class="taskbar-status">
                     <span class="taskbar-dot"></span> System Status: Open to Work
                 </span>
@@ -722,42 +717,6 @@
         </div>
     </main>
 
-
-    <!-- Retro Sticky Note Widget -->
-    <aside class="sticky-note" id="sticky-note" aria-label="Desktop Sticky Note">
-        <div class="sticky-tape" aria-hidden="true"></div>
-        <div class="sticky-note-header">
-            <span class="sticky-note-title"><i class="fas fa-sticky-note"></i> notes.txt</span>
-            <div class="sticky-note-controls">
-                <button class="sticky-btn-mini" id="sticky-note-edit" title="Edit Note" aria-label="Edit Note">
-                    <i class="fas fa-pen"></i>
-                </button>
-                <button class="sticky-btn-mini" id="sticky-note-reset" title="Reset Default Notes"
-                    aria-label="Reset Default Notes">
-                    <i class="fas fa-rotate-left"></i>
-                </button>
-                <button class="sticky-btn-mini" id="sticky-note-minimize" title="Fold/Unfold Note"
-                    aria-label="Fold Note">_</button>
-                <button class="sticky-btn-mini close" id="sticky-note-close" title="Close Note"
-                    aria-label="Close Note">×</button>
-            </div>
-        </div>
-        <div class="sticky-note-body" id="sticky-note-content" contenteditable="false" spellcheck="false">
-            <p class="sticky-heading"><strong>⚡ NATHAN'S NOTES</strong></p>
-            <ul class="sticky-list">
-                <li><strong>Status:</strong> 🎓 Graduated UC Berkeley! Seeking 2026 Full-Time Data Engineering / SWE
-                    roles.</li>
-                <li><strong>Watching:</strong> <em>Twinkling Watermelon</em> (KDrama)</li>
-                <li><strong>Building:</strong> Currently collaborating on a open-source project!</li>
-                <li><strong>Gear:</strong>Fujifilm X100VI & Sony ZVE10 II</li>
-            </ul>
-            <p class="sticky-tip"><em>Pro-tip: Drag me around or click ✏️ to type your own note!</em></p>
-        </div>
-        <div class="sticky-note-footer">
-            <span class="sticky-note-hint"><i class="fas fa-info-circle"></i> click ✏️ to edit</span>
-            <span class="sticky-note-status" id="sticky-save-status">synced</span>
-        </div>
-    </aside>
 
     <!-- Photo Modal Dialog (Retro OS alert style) -->
     <div class="modal-overlay" id="photo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-photo-name" tabindex="-1">
@@ -838,6 +797,7 @@
     </div>
 
     <!-- Scripts (marked and chart.js are loaded on-demand dynamically) -->
+    <script src="/vendor/purify.min.js" defer></script>
     <script src="/script.js" defer></script>
     <script src="/viewers.js" defer></script>
 </body>

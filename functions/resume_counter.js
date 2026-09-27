@@ -17,6 +17,7 @@ export class ResumeCounter {
     }
 
     if (url.pathname.endsWith('/increment')) {
+      if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
       let clicks = (await this.state.storage.get('clicks')) || 0;
       clicks++;
       await this.state.storage.put('clicks', clicks);

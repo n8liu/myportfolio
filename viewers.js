@@ -37,25 +37,9 @@ class ViewerCounter {
   async initCloudflare() {
     const workerBase = '';
     try {
-      // Register connection
-      const response = await fetch(`${workerBase}/api/viewers/connect`);
-      const data = await response.json();
-      this.updateUI(data.count);
-      
-      // Set up polling to keep the count updated
+      // Each document gets its own ID, including duplicated tabs and reloads.
+      this.sessionId = crypto.randomUUID();
       this.startPolling(workerBase);
-      
-      // Register disconnect event on page unload
-      window.addEventListener('beforeunload', async () => {
-        try {
-          await fetch(`${workerBase}/api/viewers/disconnect`, { 
-            method: 'POST',
-            keepalive: true 
-          });
-        } catch (error) {
-          console.error('Error disconnecting viewer:', error);
-        }
-      });
 
       // Only increment total page views and unique visitors if this is NOT a reload or back/forward
       let isNewVisit = true;
@@ -80,32 +64,37 @@ class ViewerCounter {
 
   startPolling(workerBase) {
     let pollingInterval = null;
+    let inFlight = false;
+    let pageActive = true;
 
     const poll = async () => {
-      if (document.hidden) return;
+      if (!pageActive || document.hidden || inFlight) return;
+      inFlight = true;
+      const sessionId = this.sessionId;
       try {
-        const response = await fetch(`${workerBase}/api/viewers`);
+        const response = await fetch(`${workerBase}/api/viewers/heartbeat?session=${sessionId}`, {
+          method: 'POST', cache: 'no-store', signal: AbortSignal.timeout(10000)
+        });
+        if (!response.ok) throw new Error(`Viewer API returned ${response.status}`);
         const data = await response.json();
-        this.updateUI(data.count);
+        if (pageActive && sessionId === this.sessionId) this.updateUI(data.count);
       } catch (error) {
         console.error('Error polling viewer count:', error);
+      } finally {
+        inFlight = false;
       }
     };
 
     const start = () => {
-      if (!pollingInterval) {
+      if (!pollingInterval && pageActive && !document.hidden) {
         pollingInterval = setInterval(poll, 5000);
       }
     };
-
     const stop = () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval);
-        pollingInterval = null;
-      }
+      if (pollingInterval) clearInterval(pollingInterval);
+      pollingInterval = null;
     };
 
-    // Pause polling when tab is hidden, resume immediately when visible
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         stop();
@@ -114,7 +103,24 @@ class ViewerCounter {
         start();
       }
     });
+    window.addEventListener('pagehide', () => {
+      pageActive = false;
+      stop();
+      // Best effort only: the server expires the lease if this never arrives.
+      fetch(`${workerBase}/api/viewers/disconnect?session=${this.sessionId}`, {
+        method: 'POST', keepalive: true, cache: 'no-store'
+      }).catch(() => {});
+    });
+    window.addEventListener('pageshow', event => {
+      if (!event.persisted) return;
+      // A new ID prevents a delayed disconnect from removing a restored tab.
+      this.sessionId = crypto.randomUUID();
+      pageActive = true;
+      poll();
+      start();
+    });
 
+    poll();
     start();
   }
 

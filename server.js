@@ -5,6 +5,8 @@ import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { rateLimit } from 'express-rate-limit';
+import { isPublicFile, vendorFiles } from './utils/public-files.js';
 import { getCategories, getImagesFromCategory, getAllImages } from './utils/cloudflare.js';
 
 dotenv.config();
@@ -30,9 +32,20 @@ const app = express();
 const server = http.createServer(app);
 const io = new SocketIO(server);
 const PORT = process.env.PORT || 3000;
+const serveBuild = process.env.SERVE_BUILD === '1';
+const publicDirectory = serveBuild ? path.join(__dirname, 'dist') : __dirname;
 
-// Serve static files from the root directory
-app.use(express.static(__dirname));
+// Serve only deliberately public files; never expose repository/tooling files.
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    if (!isPublicFile(req.path)) return next();
+    const name = decodeURIComponent(req.path).replace(/^\/+/, '');
+    if (!serveBuild && Object.hasOwn(vendorFiles, name)) return res.sendFile(path.join(__dirname, vendorFiles[name]));
+    return express.static(publicDirectory, { dotfiles: 'deny', index: false })(req, res, next);
+});
+app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }));
 
 // Add JSON body parser
 app.use(express.json());
@@ -59,7 +72,7 @@ io.on('connection', (socket) => {
 
 // Route for the home page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(publicDirectory, 'index.html'));
 });
 
 // Route for single blog post deep links (e.g. /blog/:slug)
@@ -67,7 +80,7 @@ app.get('/blog/:slug', (req, res, next) => {
     if (req.params.slug.includes('.')) {
         return next();
     }
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(publicDirectory, 'index.html'));
 });
 
 // Route for other HTML pages - handles clean URLs and SPA routing
@@ -79,16 +92,10 @@ app.get('/:page', (req, res, next) => {
     
     // If it's a client-side SPA route, serve index.html
     if (clientRoutes.includes(pageName.toLowerCase())) {
-        return res.sendFile(path.join(__dirname, 'index.html'));
+        return res.sendFile(path.join(publicDirectory, 'index.html'));
     }
     
-    // Otherwise, try to serve the file from pages directory
-    res.sendFile(path.join(__dirname, 'pages', `${pageName}.html`), (err) => {
-        if (err) {
-            // If file not found, let it fall through to 404 handler
-            next();
-        }
-    });
+    next();
 });
 
 // API endpoint to get all image categories
@@ -230,8 +237,11 @@ app.use((req, res) => {
     res.status(404).send('404: Page not found');
 });
 
-// Start the server
-server.listen(PORT, '127.0.0.1', () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-    console.log(`Press Ctrl+C to stop the server`);
-});
+// Importing the app for security tests must not start a listening server.
+export { app };
+if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+    server.listen(PORT, '127.0.0.1', () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+        console.log(`Press Ctrl+C to stop the server`);
+    });
+}

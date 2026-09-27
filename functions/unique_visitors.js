@@ -19,6 +19,7 @@ export class UniqueVisitors {
     const todayStr = new Date(now).toISOString().split('T')[0];
 
     if (url.pathname.endsWith('/increment')) {
+      if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
       let ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || '';
       if (!ip) {
         ip = Math.random().toString(36).slice(2);

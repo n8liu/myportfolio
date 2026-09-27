@@ -1,9 +1,13 @@
+import { handleAnalytics } from './analytics-security.js';
+import { isPublicFile } from '../utils/public-files.js';
 import { ViewerCounter } from './viewers';
 import { SessionTracker } from './session_tracker';
 import { TotalCounter } from './total_counter';
 import { ResumeCounter } from './resume_counter';
 import { UniqueVisitors } from './unique_visitors';
 import photosMetadata from './photos-metadata.json';
+// Keep the v6 namespaces exported without restoring retired social-counter routes.
+export { InstagramCounter, GitHubCounter, EmailCounter, LinkedInCounter } from './retired_counters.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -16,31 +20,11 @@ export default {
       'Access-Control-Allow-Headers': 'Content-Type',
     };
 
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
+    if (/^\/api\/(viewers|resume|unique|total)(?:\/|$)/.test(path)) {
+      return handleAnalytics(request, env);
     }
-
-    // 1. Durable Object routing (Stats & Viewers)
-    if (path.startsWith('/api/viewers')) {
-      const id = env.VIEWER_COUNTER.idFromName("global");
-      const obj = env.VIEWER_COUNTER.get(id);
-      return obj.fetch(request);
-    }
-    else if (path.startsWith('/api/resume')) {
-      const id = env.RESUME_COUNTER.idFromName('global');
-      const obj = env.RESUME_COUNTER.get(id);
-      return obj.fetch(request);
-    }
-    else if (path.startsWith('/api/unique')) {
-      const id = env.UNIQUE_VISITORS.idFromName('global');
-      const obj = env.UNIQUE_VISITORS.get(id);
-      return obj.fetch(request);
-    }
-    else if (path.startsWith('/api/total')) {
-      const id = env.TOTAL_COUNTER.idFromName("global");
-      const obj = env.TOTAL_COUNTER.get(id);
-      return obj.fetch(request);
-    }
+    if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+    if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', { status: 405 });
 
     // 2. R2 and Photography API routing
     if (path.startsWith('/api/')) {
@@ -60,11 +44,12 @@ export default {
     if (env.ASSETS) {
       // For client-side clean sub-routes without an extension (like /photography, /experience, etc.),
       // serve the root index.html so client-side routing can take over.
-      const isCleanRoute = !path.includes('.') && path !== '/';
+      const isCleanRoute = /^\/(?:home|experience|projects|skills|education|photography|blog|stats)(?:\/[a-z0-9-]+)?$/.test(path);
       if (isCleanRoute) {
         const indexRequest = new Request(new URL('/index.html', request.url), request);
         return env.ASSETS.fetch(indexRequest);
       }
+      if (path !== '/' && !isPublicFile(path)) return new Response('Not found', { status: 404 });
       return env.ASSETS.fetch(request);
     }
 

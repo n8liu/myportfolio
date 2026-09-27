@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             container.appendChild(state);
         } else {
-            container.innerHTML = `<div class="load-state"><p role="status">${message}</p>${retry ? '<button class="btn-retro">retry</button>' : ''}</div>`;
+            container.innerHTML = `<div class="load-state"><p role="status">${escapeHtml(message)}</p>${retry ? '<button class="btn-retro">retry</button>' : ''}</div>`;
         }
 
         if (hadFocus && typeof container.focus === 'function') {
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (window.innerWidth <= 768) return; // Disable dragging on mobile
 
             // Do not drag if clicking controls, buttons, or editing content
-            if (e.target.closest('.win-btn') || e.target.closest('.menu-item') || e.target.closest('.sticky-btn-mini') || e.target.closest('.taskbar-app-btn') || e.target.isContentEditable) return;
+            if (e.target.closest('.win-btn') || e.target.closest('.menu-item') || e.target.closest('.taskbar-app-btn') || e.target.isContentEditable) return;
 
             isDragging = true;
 
@@ -245,14 +245,6 @@ document.addEventListener('DOMContentLoaded', function () {
             makeElementDraggable(modalDialog, modalTitlebar);
         }
     });
-
-    // Apply dragging to Sticky Note widget
-    const stickyNoteEl = document.getElementById('sticky-note');
-    const stickyHeaderEl = stickyNoteEl ? stickyNoteEl.querySelector('.sticky-note-header') : null;
-    if (stickyNoteEl && stickyHeaderEl) {
-        makeElementDraggable(stickyNoteEl, stickyHeaderEl);
-    }
-
 
     // ----------------------------------------------------
     // 1. Window-Contained Scrolling & View Management Engine
@@ -664,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Load Chart.js dynamically on-demand if not already loaded
             if (typeof window.Chart === 'undefined') {
                 try {
-                    await loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js');
+                    await loadScript('/vendor/chart.umd.js');
                 } catch (loadErr) {
                     throw loadErr;
                 }
@@ -1253,21 +1245,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let cachedBlogPosts = DEFAULT_BLOG_POSTS;
 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+    }
+
     function renderBlogCards(posts) {
         if (!blogCardsContainer) return;
         blogCardsContainer.innerHTML = '';
         posts.forEach(post => {
+            if (!/^[a-z0-9-]+$/.test(post.id)) return;
             const card = document.createElement('div');
             card.className = 'retro-card';
             card.innerHTML = `
                 <div class="card-header">
-                    <h3 class="card-title">${post.title}</h3>
+                    <h3 class="card-title">${escapeHtml(post.title)}</h3>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <span class="retro-badge"><i class="far fa-clock"></i> ${post.readTime}</span>
-                        <span class="retro-badge">${post.date}</span>
+                        <span class="retro-badge"><i class="far fa-clock"></i> ${escapeHtml(post.readTime)}</span>
+                        <span class="retro-badge">${escapeHtml(post.date)}</span>
                     </div>
                 </div>
-                <p style="margin-bottom: 1rem;">${post.summary}</p>
+                <p style="margin-bottom: 1rem;">${escapeHtml(post.summary)}</p>
                 <a href="/blog/${post.id}" data-post-id="${post.id}" class="btn-retro read-blog-btn">
                     <i class="fas fa-book-open"></i> Read Post
                 </a>
@@ -1314,6 +1313,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const slug = String(postIdentifier)
             .replace(/^(\/)?blog\//, '')
             .replace(/\.(html|md)$/, '');
+        if (!/^[a-z0-9-]+$/.test(slug)) return;
 
         const post = cachedBlogPosts.find(p => p.id === slug) || {
             id: slug,
@@ -1360,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Load marked on-demand if not already present
             if (typeof window.marked === 'undefined' || typeof window.marked.parse !== 'function') {
                 try {
-                    await loadScript('https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js');
+                    await loadScript('/vendor/marked.umd.js');
                 } catch (loadErr) {
                     console.warn('Could not load marked from CDN, falling back to basic renderer', loadErr);
                 }
@@ -1372,14 +1372,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Fallback basic paragraph renderer
                 renderedHtml = markdownText
                     .split('\n\n')
-                    .map(p => `<p>${p}</p>`)
+                    .map(p => `<p>${escapeHtml(p)}</p>`)
                     .join('');
             }
 
             modalBlogTitle.textContent = post.title;
             modalBlogDate.textContent = post.date;
             modalBlogContent.setAttribute('aria-busy', 'false');
-            modalBlogContent.innerHTML = renderedHtml;
+            if (window.DOMPurify?.isSupported) {
+                modalBlogContent.innerHTML = window.DOMPurify.sanitize(renderedHtml, {
+                    USE_PROFILES: { html: true },
+                    FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
+                    FORBID_ATTR: ['style', 'id', 'name']
+                });
+            } else {
+                // Fail closed if the sanitizer fails to load or is unsupported.
+                modalBlogContent.textContent = markdownText;
+            }
         } catch (error) {
             console.error("Error loading blog post:", error);
             modalBlogTitle.textContent = "Error Loading Post";
@@ -1464,148 +1473,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
-    }
-
-    // ----------------------------------------------------
-    // 6. Retro Sticky Note Widget Logic
-    // ----------------------------------------------------
-    const stickyNote = document.getElementById('sticky-note');
-    const stickyContent = document.getElementById('sticky-note-content');
-    const stickyEditBtn = document.getElementById('sticky-note-edit');
-    const stickyResetBtn = document.getElementById('sticky-note-reset');
-    const stickyMinBtn = document.getElementById('sticky-note-minimize');
-    const stickyCloseBtn = document.getElementById('sticky-note-close');
-    const taskbarStickyBtn = document.getElementById('taskbar-sticky-btn');
-    const stickySaveStatus = document.getElementById('sticky-save-status');
-
-    const DEFAULT_STICKY_NOTE = `
-<p class="sticky-heading"><strong>NATHAN'S DESKTOP LOG</strong></p>
-<ul class="sticky-list">
-    <li><strong>Status:</strong> 🎓 Graduated UC Berkeley! Seeking 2026 Full-Time Data Engineering / SWE roles.</li>
-    <li><strong>Watching:</strong> <em>Twinkling Watermelon</em> (KDrama)</li>
-    <li><strong>Building:</strong> Currently collaborating on a open-source project!</li>
-    <li><strong>Gear:</strong> Fujifilm X100VI & Sony ZVE10 II</li>
-</ul>
-<p class="sticky-tip"><em>💡 Pro-tip: Drag me around or click ✏️ to type your own note!</em></p>
-    `.trim();
-
-    function loadStickyNote() {
-        if (!stickyContent) return;
-        const saved = localStorage.getItem('portfolio-sticky-note');
-        if (saved && saved.trim()) {
-            stickyContent.innerHTML = saved;
-        } else {
-            stickyContent.innerHTML = DEFAULT_STICKY_NOTE;
-        }
-    }
-
-    function saveStickyNote() {
-        if (!stickyContent) return;
-        if (stickySaveStatus) {
-            stickySaveStatus.textContent = 'saving...';
-            stickySaveStatus.className = 'sticky-note-status saving';
-        }
-        localStorage.setItem('portfolio-sticky-note', stickyContent.innerHTML);
-        setTimeout(() => {
-            if (stickySaveStatus) {
-                stickySaveStatus.textContent = 'saved ✓';
-                stickySaveStatus.className = 'sticky-note-status';
-            }
-        }, 350);
-    }
-
-    function toggleStickyNote(forceState) {
-        if (!stickyNote) return;
-        const isHidden = stickyNote.classList.contains('minimized');
-        const shouldShow = typeof forceState === 'boolean' ? forceState : isHidden;
-
-        if (shouldShow) {
-            stickyNote.classList.remove('minimized');
-            if (taskbarStickyBtn) taskbarStickyBtn.classList.add('active');
-            localStorage.setItem('portfolio-sticky-visible', 'true');
-        } else {
-            stickyNote.classList.add('minimized');
-            if (taskbarStickyBtn) taskbarStickyBtn.classList.remove('active');
-            localStorage.setItem('portfolio-sticky-visible', 'false');
-        }
-    }
-
-    if (stickyNote) {
-        loadStickyNote();
-
-        // Restore saved visibility state (default to minimized on screens <= 1024px to declutter viewport)
-        const savedVisible = localStorage.getItem('portfolio-sticky-visible');
-        if (savedVisible === 'false' || (savedVisible === null && window.innerWidth <= 1024)) {
-            toggleStickyNote(false);
-        } else {
-            toggleStickyNote(true);
-        }
-
-        // Toggle edit mode
-        if (stickyEditBtn && stickyContent) {
-            stickyEditBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const isEditing = stickyContent.getAttribute('contenteditable') === 'true';
-                if (isEditing) {
-                    stickyContent.setAttribute('contenteditable', 'false');
-                    stickyEditBtn.classList.remove('active');
-                    stickyEditBtn.setAttribute('title', 'Edit Note');
-                    saveStickyNote();
-                } else {
-                    stickyContent.setAttribute('contenteditable', 'true');
-                    stickyEditBtn.classList.add('active');
-                    stickyEditBtn.setAttribute('title', 'Done Editing');
-                    stickyContent.focus();
-                }
-            });
-
-            // Auto-save on input
-            let saveTimeout;
-            stickyContent.addEventListener('input', function () {
-                clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(saveStickyNote, 500);
-            });
-        }
-
-        // Reset default note
-        if (stickyResetBtn && stickyContent) {
-            stickyResetBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                if (confirm('Reset sticky note to Nathan\'s default desktop log?')) {
-                    stickyContent.innerHTML = DEFAULT_STICKY_NOTE;
-                    stickyContent.setAttribute('contenteditable', 'false');
-                    if (stickyEditBtn) stickyEditBtn.classList.remove('active');
-                    saveStickyNote();
-                }
-            });
-        }
-
-        // Minimize / Fold note
-        if (stickyMinBtn) {
-            stickyMinBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                stickyNote.classList.toggle('folded');
-            });
-        }
-
-        // Close note
-        if (stickyCloseBtn) {
-            stickyCloseBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                toggleStickyNote(false);
-            });
-        }
-
-        // Taskbar button toggle
-        if (taskbarStickyBtn) {
-            taskbarStickyBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                toggleStickyNote();
-            });
-        }
-
-        // Expose toggle globally
-        window.toggleStickyNote = toggleStickyNote;
     }
 
     // Fade in page body

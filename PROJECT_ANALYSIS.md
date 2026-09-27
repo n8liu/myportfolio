@@ -108,11 +108,11 @@ graph TD
 | **Data Visualization** | Chart.js 4.4.2 (UMD CDN) | 7-day traffic telemetry line chart with dynamic theming |
 | **Dev Server** | Express 4.21.2 + Socket.IO 4.8.1 | Local static file server, live WebSocket viewer counter |
 | **Serverless Edge** | Cloudflare Pages & Workers | Functions runtime (`_worker.js`, `_middleware.js`) |
-| **Edge State Storage** | Cloudflare Durable Objects (SQLite) | Distributed stateful counters & visitor tracking (migrations v1-v5) |
+| **Edge State Storage** | Cloudflare Durable Objects (SQLite) | Distributed stateful counters & visitor tracking (migrations v1-v6) |
 | **Object Storage** | Cloudflare R2 + `@aws-sdk/client-s3` | High-res photography storage with Edge caching (`caches.default`) |
 | **Image Processing** | `ExifReader`, `imagemagick` | EXIF extraction and multi-resolution downsizing scripts |
 | **Bundler & Build** | `esbuild` + Node.js build scripts | Bundle worker into ESM, inject production `API_BASE` |
-| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 18 isolated unit & subsystem tests verifying routing, motion, state & UX |
+| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 32 unit, subsystem, and security tests verifying routing, motion, state & UX |
 | **CI / CD** | GitHub Actions (`deploy.yml`) | Automated build and deploy to Cloudflare Pages on push |
 
 ---
@@ -223,8 +223,7 @@ The profile retains its circular border, offset shadow, and `object-fit: cover`.
 ### Key UI Features & Micro-Interactions
 - **Interactive Ambient Wallpaper**: Mouse pointer movement updates `--mouse-x`, `--mouse-y`, `--mouse-px`, `--mouse-py` on `document.documentElement` to smoothly shift an ambient spotlight and parallax background grid.
 - **Retro OS Window Chrome**: Features a classic titlebar with icon, dynamic file path (`C:\nathan\portfolio\...`), window control buttons (`_`, `口`, `X`), a retro menu bar (`File`, `Edit`, `View`, `Tools`, `Help`), and a bottom taskbar with a live digital clock and active viewer count.
-- **Draggable Windows**: Both the main OS desktop window and all modal popups (`image_viewer.exe`, `blog_post.txt`, `notes.txt`) can be dragged via their titlebars using `makeElementDraggable()` in `script.js` (disabled on mobile <= 768px).
-- **Interactive Sticky Note Widget (`notes.txt`)**: A floating desktop Post-It note widget with washi tape accent, fold/minimize states, taskbar integration (`#taskbar-sticky-btn`), editable content with debounced `localStorage` auto-saving, and quick reset controls.
+- **Draggable Windows**: Both the main OS desktop window and all modal popups (`image_viewer.exe`, `blog_post.txt`) can be dragged via their titlebars using `makeElementDraggable()` in `script.js` (disabled on mobile <= 768px).
 - **Interactive Retro Terminal Console (`term.exe`)**: A bottom-left docked and draggable retro CLI console with interactive commands (`about`, `skills`, `projects`, `education`, `blog`, `matcha`, `photos`, `stats`, `goto`, `theme`, `contact`, `clear`), command history with up/down arrow cycling, tab completion, and taskbar launch controls.
 - **Tactile Button Press**: Interactive cards and buttons use a brutalist offset shadow (`4px 4px 0px #1e1e1e`) that translates `translate(1px, 1px)` on hover and `translate(2px, 2px)` on click with reduced shadow.
 
@@ -472,7 +471,7 @@ A comprehensive audit and implementation cycle established the following enhance
 
 ### 8.2 Dynamic Markdown Blog Engine
 - **Decoupled Markdown Content**: Blog posts are authored in clean, portable Markdown format (`blog/posts/*.md`) with metadata declared in `blog/posts.json`. Individual post HTML files are no longer required.
-- **Client-Side Markdown Rendering**: The reader utilizes `marked.js` to parse markdown content asynchronously on-the-fly and render rich elements (tables, code blocks, blockquotes, lists, badges) directly inside `#blog-modal` (`blog_post.txt`).
+- **Client-Side Markdown Rendering**: The reader uses locally served `marked.js` and DOMPurify to parse and sanitize markdown before rendering rich elements (tables, code blocks, blockquotes, lists, badges) directly inside `#blog-modal` (`blog_post.txt`).
 - **Dynamic Card Grid & Deep Linking**: Blog cards in `index.html` are dynamically rendered from `blog/posts.json`. The SPA routing engine automatically supports deep-link clean URLs (`/blog/:slug`, `/blog?post=:slug`, or `#blog/:slug`), opening directly to the requested article modal while preserving browser history navigation.
 
 ### 8.3 Photography Gallery, EXIF Metadata & Infinite Scroll Pagination System
@@ -491,8 +490,10 @@ A comprehensive audit and implementation cycle established the following enhance
 Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
 
 1. **`ViewerCounter` (`functions/viewers.js`)**:
-   - Manages active concurrent visitors.
-   - Endpoint: `/api/viewers/connect` (increments), `/api/viewers/disconnect` (decrements on `beforeunload` with `keepalive: true`), `/api/viewers` (polls count every 5s).
+   - Counts recently active tabs using per-document session IDs and 90-second leases stored under `viewer-session:`. Visible tabs POST heartbeats every 5 seconds; duplicate heartbeats do not increase the count. Hidden tabs stop renewing and expire, then rejoin when visible.
+   - `pagehide` sends a best-effort disconnect with `keepalive`; missed requests are handled by lease expiry. Reads and Durable Object alarms prune expired sessions. Storage transactions serialize updates, and the old accumulated `viewers` value is discarded.
+   - Endpoints: POST `/api/viewers/heartbeat?session=<id>` (upsert lease), POST `/api/viewers/connect?session=<id>` (same behavior), POST `/api/viewers/disconnect?session=<id>` (remove only that lease), GET `/api/viewers` (read count). Legacy requests without an ID cannot change membership. Responses use `Cache-Control: no-store`.
+   - The client retries failed initial heartbeats and creates a fresh session on back/forward-cache restoration. `tests/viewers.test.js` covers expiry, renewal, duplicate requests, legacy migration, failed requests, and page lifecycle behavior.
 2. **`TotalCounter` (`functions/total_counter.js`)**:
    - Tracks lifetime views and rolling 24-hour request counts.
    - Generates 7-day daily traffic buckets for Chart.js.
@@ -506,7 +507,7 @@ Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
    - Endpoints: `/api/resume/increment`, `/api/resume/count`.
 
 ### 8.5 Automated Test Suites & Regression Safety Net
-The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 18 unit and subsystem regression tests that execute against production builds in under 400ms:
+The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 32 unit, subsystem, and security regression tests that execute against production builds:
 
 1. **`tests/motion.test.js` (View Transitions & SPA Motion Engine)**:
    - Validates that initial page loads and in-page anchor scrolling remain immediate with zero transition latency.
@@ -545,8 +546,9 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 | `/api/images/:category` | `GET` | Lists photos in category (`all` for all) | `[{"key":"...","url":"...","camera":"...","exif":{...}}]` |
 | `/img/:key` | `GET` | Proxies raw image from R2 with Edge Cache | Binary image stream |
 | `/api/viewers` | `GET` | Returns current active viewer count | `{"count": 3}` |
-| `/api/viewers/connect` | `GET` | Increments active viewer count | `{"count": 4}` |
-| `/api/viewers/disconnect`| `POST`| Decrements active viewer count | `{"count": 3}` |
+| `/api/viewers/connect?session=<id>` | `POST` | Creates or renews a 90-second tab lease | `{"count": 4}` |
+| `/api/viewers/heartbeat?session=<id>` | `POST` | Renews a tab lease without double counting | `{"count": 4}` |
+| `/api/viewers/disconnect?session=<id>`| `POST`| Removes the specified tab lease | `{"count": 3}` |
 | `/api/total` | `GET` | Returns total page view count | `{"total": 1530}` |
 | `/api/total/increment` | `POST`| Increments total page views | `{"total": 1531}` |
 | `/api/total/requests24h`| `GET` | Requests in the last 24 hours | `{"requests24h": 87}` |
@@ -563,12 +565,12 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 
 ### 10.1 NPM Scripts Reference
 ```bash
-npm test                 # Run production build and execute full test runner suite (18 tests across 4 test files)
+npm test                 # Run production build and execute full test runner suite (32 tests across 6 test files)
 npm run dev              # Start local Express + Socket.IO server on port 3000 with nodemon
 npm start                # Start production Node server locally
 npm run build            # Full production build: compiles assets into dist/, bundles worker, prepares Pages config
-npm run serve            # Serve dist/ directory locally on port 8080 via http-server
-npm run deploy           # Run build, source .env, and deploy dist/ to Cloudflare Pages
+npm run serve            # Serve dist/ directory locally on port 8080 with the restricted Express public-file allowlist
+npm run deploy           # Build, source .env, deploy the owning Worker, then Cloudflare Pages
 npm run analyze:images   # Scan assets/ folder and output image size optimization report
 npm run analyze:photos   # Scan photos/ folder and output image size optimization report
 npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality using ImageMagick
@@ -576,7 +578,7 @@ npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality
 
 ### 10.2 Build Pipeline Execution Sequence (`npm run build`)
 1. **Clean**: Deletes and re-creates the `dist/` directory.
-2. **Asset Copying**: Recursively copies `*.html`, `*.css`, `*.js`, `_headers`, `blog/`, `assets/`, and `utils/` to `dist/`.
+2. **Asset Copying**: `utils/build.js` uses the shared allowlist in `utils/public-files.js`: only the four browser entry files, public blog files, approved asset formats, and explicit dependency browser bundles enter `dist/`. Server source, utilities, dotfiles, private keys, and symlinks in asset directories are excluded. Worker/config build artifacts are blocked by the Pages request handler.
 3. **Worker Bundling**: Uses `esbuild` to bundle `functions/_worker.js` with all Durable Object dependencies into ESM:
    ```bash
    npx esbuild functions/_worker.js --bundle --outfile=dist/_worker.js --format=esm --platform=browser
@@ -585,12 +587,16 @@ npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality
    - Generates `dist/wrangler.toml` from root `wrangler.toml`, replacing `main` with `pages_build_output_dir = "."`, removing Worker migrations, and binding Durable Objects to the existing `myportfolio` Worker via `script_name`.
    - Injects the production analytics `API_BASE` (`https://myportfolio.nathanliu528.workers.dev`) into `dist/script.js` and `dist/viewers.js`. Photography always uses the site's own origin.
 5. **Automated Subsystem Verification (`npm test`)**:
-   - Executes all 18 isolated unit and regression tests across `tests/motion.test.js`, `tests/photography.test.js`, `tests/scrollspy.test.js`, and `tests/ux.test.js`.
+   - Executes all 32 tests across motion, photography, scrollspy, UX, viewer sessions, and security suites. Security tests include a localhost Express listener; sandboxed test runs need local networking permission.
+
+### Durable Object migration history
+Production has already applied migration `v6`, which created `InstagramCounter`, `GitHubCounter`, `EmailCounter`, and `LinkedInCounter`. Keep that original entry in `wrangler.toml`: removing it makes Wrangler replay earlier creation migrations and fail with error 10074. The retired classes remain exported from `functions/retired_counters.js` with inactive HTTP 410 handlers, preserving their namespaces and stored data. Their routes and bindings remain removed. Do not delete their namespaces as part of an unrelated deployment fix.
 
 ### 10.3 GitHub Actions Workflow (`.github/workflows/deploy.yml`)
 - Triggered on push or pull request to `main`.
-- Sets up Node 22 environment.
-- Executes `npm install` and `npm run build` with `API_BASE` env.
+- Sets up Node 24 (minimum supported local version: 24.15.0).
+- Executes `npm ci`, `npm audit --audit-level=moderate`, and `npm test` with `API_BASE` env. Pull requests run verification only; deployments run on pushes to `main`.
+- On pushes to `main`, deploys the owning analytics Worker first with `wrangler deploy --config wrangler.toml`. Pages deployment alone does not update the external Durable Object code. Pull requests do not deploy this production Worker.
 - Deploys to Cloudflare Pages using `wrangler pages deploy --cwd dist --project-name=myportfolio`. Running from `dist/` is required so Wrangler discovers the generated Pages configuration and applies its R2 binding.
 
 ---
@@ -629,6 +635,15 @@ npm run downsize:90
 - 📝 Interactive map integration for photo travel locations
 
 ---
+
+## Security hardening (September 2026)
+
+- **Secrets**: Local environment files, `.dev.vars*`, private keys/certificates, credentials files, and `.wrangler/` state are ignored. `.env.example` may contain placeholders only. Build configuration validates `API_BASE` as an HTTPS origin without credentials, paths, or query parameters, and serializes it safely into JavaScript. Public Worker URLs and bucket names are identifiers, not credentials.
+- **Analytics access**: `functions/analytics-security.js` explicitly lists valid routes/methods. The public reset endpoint is removed; increments and viewer mutations require POST. CORS allows the production site origins and the request's own origin. Missing Cloudflare client IPs and disallowed browser origins are rejected. Origin validation is not authentication: clients can spoof Origin, so quotas are enforced independently.
+- **Abuse controls**: The existing `SessionTracker` namespace enforces 120 analytics requests/minute/IP, 3 total and unique increments/minute/IP per endpoint, 10 resume increments/minute/IP, and 5 simultaneous viewer sessions/IP. Viewer IDs are bound to their client IP so another address cannot disconnect them. Quotas are transactional; rate-limit state uses a daily IP digest and expires via alarms. No new migration is required. Shared networks may hit these limits, and distributed abuse still requires edge-level WAF/bot controls.
+- **HTML safety**: Blog manifest fields are escaped and slugs restricted. DOMPurify sanitizes parsed Markdown with an HTML-only profile and no forms, styles, IDs, or names. If the sanitizer is unavailable, content is rendered as plain text. DOMPurify, marked, and Chart.js are served from explicit locked dependency files rather than fetched from external script CDNs.
+- **Public files**: Both Express modes (source and built preview), production asset routing, and the build share a public-file allowlist. Server/config/tooling files are not public assets. Add public files deliberately through `utils/public-files.js`. Security headers include nosniff, referrer policy, and frame denial for static Pages assets.
+- **Dependencies and CI**: Removed unused AWS SDK v2, ImageMagick wrapper, and http-server dependencies. Patched remaining dependencies, including Wrangler and its matching Cloudflare types. CI uses Node 24, `npm ci`, tests, and a dependency audit before main-branch deployment; checkout does not persist Git credentials. The implementation audit reported zero known vulnerabilities; rerun audits as advisories change.
 
 ## 12. Historical Defect Audit & Resolved Deficiencies
 

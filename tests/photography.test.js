@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import test from 'node:test';
 import { unstable_readConfig } from 'wrangler';
 import worker from '../dist/_worker.js';
+import * as workerExports from '../dist/_worker.js';
 
 const origin = 'https://portfolio.example';
 const key = 'Japan/Tokyo #1 100%.jpg';
@@ -139,5 +140,22 @@ test('generated Pages config binds R2 and existing Worker Durable Objects', () =
   assert.equal(config.durable_objects.bindings.length, 5);
   for (const binding of config.durable_objects.bindings) {
     assert.equal(binding.script_name, 'myportfolio');
+  }
+});
+
+test('Worker preserves deployed v6 migration and exports retired namespaces without deleting data', async () => {
+  const config = unstable_readConfig({ config: path.resolve('wrangler.toml') });
+  assert.equal(config.migrations.at(-1).tag, 'v6');
+  const retired = ['InstagramCounter', 'GitHubCounter', 'EmailCounter', 'LinkedInCounter'];
+  assert.deepEqual(config.migrations.at(-1).new_sqlite_classes, retired);
+  for (const migration of config.migrations) {
+    assert.ok(!migration.deleted_classes?.length);
+    for (const name of migration.new_sqlite_classes || []) {
+      assert.equal(typeof workerExports[name], 'function');
+    }
+  }
+  for (const name of retired) {
+    const counter = new workerExports[name]();
+    assert.equal((await counter.fetch(new Request('https://counter.example/count'))).status, 410);
   }
 });
