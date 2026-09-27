@@ -12,13 +12,21 @@
 5. [Design System & CSS Token Specifications](#5-design-system--css-token-specifications)
 6. [Academic Foundation & Minimalist Redesign Case Study](#6-academic-foundation--minimalist-redesign-case-study)
 7. [Completed Improvements, UX, Accessibility & SEO Upgrades](#7-completed-improvements-ux-accessibility--seo-upgrades)
+   - [7.1 Retro OS Redesign & Refinements](#71-retro-os-redesign--refinements)
+   - [7.2 Accessibility Enhancements (WCAG 2.1 AA)](#72-accessibility-enhancements-wcag-21-aa)
+   - [7.3 SEO & Structured Data Optimization](#73-seo--structured-data-optimization)
+   - [7.4 Project Cards Architecture](#74-project-cards-architecture)
+   - [7.5 Personal Philosophy & About Note](#75-personal-philosophy--about-note)
+   - [7.6 Modal Focus, Mobile Navigation & Standardized State Engine](#76-modal-focus-mobile-navigation--standardized-state-engine-september-2026)
+   - [7.7 Photography Infinite Scroll Pagination & High-Priority Image Optimization](#77-photography-infinite-scroll-pagination--high-priority-image-optimization-september-2026)
 8. [Core Subsystems & Feature Deep Dives](#8-core-subsystems--feature-deep-dives)
    - [8.1 Single-Page Scrolling, SPA Routing & Clean URL Handling](#81-single-page-scrolling-spa-routing--clean-url-handling)
    - [Skills: Categorized Badges](#skills-categorized-badges)
    - [Experience: Leadership & Community Subsection](#experience-leadership--community-subsection)
    - [8.2 Dynamic Markdown Blog Engine](#82-dynamic-markdown-blog-engine)
-   - [8.3 Photography Gallery & EXIF Metadata System](#83-photography-gallery--exif-metadata-system)
+   - [8.3 Photography Gallery, EXIF Metadata & Infinite Scroll Pagination System](#83-photography-gallery-exif-metadata--infinite-scroll-pagination-system)
    - [8.4 Stateful Edge Analytics & Durable Objects](#84-stateful-edge-analytics--durable-objects)
+   - [8.5 Automated Test Suites & Regression Safety Net](#85-automated-test-suites--regression-safety-net)
 9. [Comprehensive API Reference (Dev & Production)](#9-comprehensive-api-reference-dev--production)
 10. [Build, Optimization & CI/CD Pipelines](#10-build-optimization--cicd-pipelines)
 11. [Performance Optimization, Image Pipelines & Recommendations](#11-performance-optimization-image-pipelines--recommendations)
@@ -104,6 +112,7 @@ graph TD
 | **Object Storage** | Cloudflare R2 + `@aws-sdk/client-s3` | High-res photography storage with Edge caching (`caches.default`) |
 | **Image Processing** | `ExifReader`, `imagemagick` | EXIF extraction and multi-resolution downsizing scripts |
 | **Bundler & Build** | `esbuild` + Node.js build scripts | Bundle worker into ESM, inject production `API_BASE` |
+| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 18 isolated unit & subsystem tests verifying routing, motion, state & UX |
 | **CI / CD** | GitHub Actions (`deploy.yml`) | Automated build and deploy to Cloudflare Pages on push |
 
 ---
@@ -146,6 +155,11 @@ myportfolio/
 │   ├── total_counter.js            # Durable Object: 7-day request history & total view counter
 │   ├── unique_visitors.js          # Durable Object: IP-deduplicated unique visitor counts + auto-prune
 │   └── viewers.js                  # Durable Object: Real-time concurrent viewer counter
+├── tests/                          # Automated Node test runner suites (node:test)
+│   ├── motion.test.js              # View Transitions, rapid navigation, reduced-motion fallback tests
+│   ├── photography.test.js         # Pages R2 routing, worker cache headers, config bindings, error tests
+│   ├── scrollspy.test.js           # Scrollspy bottom detection, reverse scrolling, navigation guards
+│   └── ux.test.js                  # Standardized load states, modal accessibility, tab visibility, infinite scroll
 ├── utils/                          # Build tools, asset optimizers, and cloud utilities
 │   ├── cloudflare.js               # AWS SDK v3 R2 client (category listing & signed URLs)
 │   ├── downsize-images.js          # ImageMagick multi-resolution downscaler (large, medium, thumb)
@@ -330,6 +344,48 @@ A comprehensive audit and implementation cycle established the following enhance
 - ✅ **Security on External Links**: Enforced `rel="noopener noreferrer"` across all external anchor tags.
 - ✅ **High-Contrast Focus Outlines**: Enhanced focus rings with high-visibility purple outlines for keyboard accessibility.
 
+```html
+<!-- Accessibility Implementation Pattern -->
+<button class="scroll-dot" data-section="main" aria-label="Navigate to main section"></button>
+<a href="https://www.linkedin.com/in/n8liu/" target="_blank" rel="noopener noreferrer" aria-label="Visit Nathan's LinkedIn profile">
+  <i class="fab fa-linkedin" aria-hidden="true"></i>
+</a>
+```
+
+### 7.3 SEO & Structured Data Optimization
+- ✅ **Meta Tags**: Added description, keywords, viewport, and OpenGraph/Twitter Card social sharing tags.
+- ✅ **Schema.org JSON-LD**: Embedded `Person` schema markup containing UC Berkeley education, job title, social profiles, and core competency entities.
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Nathan Liu",
+  "jobTitle": "Data Science & Computer Science Student",
+  "worksFor": { "@type": "EducationalOrganization", "name": "UC Berkeley" },
+  "knowsAbout": ["Machine Learning", "Data Science", "Full Stack Development", "Python", "JavaScript"]
+}
+```
+
+### 7.4 Project Cards Architecture
+- **Uniform sizing**: `.projects-grid` uses equal-width columns and `grid-auto-rows: 1fr` so every project card shares the tallest card’s height. Flex card bodies align action buttons at the bottom without fixed heights or clipped descriptions.
+- **Current layout**: `.projects-grid` displays `.retro-card` entries with titles, status badges, concise descriptions, technology pills, and demo links where provided. Per-project GitHub buttons are consolidated into a final “More projects on GitHub” card linking to `https://github.com/n8liu` with the shared button style and safe new-tab attributes. Cards use the shared offset shadow and hover movement.
+- **Current order**: CardboardDex, Live Semantic Market, Clickbait Classifier, FleetManager, ItineraryAI, The IBD Digest, Spotify Analytics, SimplyMail, and More projects on GitHub.
+- **FleetManager**: Marked `Completed (2025)`. Describes backend ownership of an electric-vehicle fleet platform: telemetry and electrical-utility ingestion, AWS S3 storage, backend API delivery, end-to-end debugging, and predictive maintenance using driver behavior and utilization data. Technology pills: Python, Django, PostgreSQL, AWS S3. No code or demo link is currently supplied.
+- **Historical implementation**: Earlier project cards used expandable hover highlights for SimplyMail, Spotify Analytics, Pokédex API, and Live Semantic Market. The current markup presents descriptions directly.
+
+### 7.5 Personal Philosophy & About Note
+- ✅ **Personal Philosophy**: Added personal paragraph regarding photography, fitness, and continuous learning philosophy styled with an italic purple accent border.
+
+```css
+.personal-note {
+  font-style: italic;
+  background: rgba(81, 57, 137, 0.1);
+  border-left: 3px solid #513989;
+  padding: 15px;
+}
+```
+
 ### 7.6 Modal Focus, Mobile Navigation & Standardized State Engine (September 2026)
 - ✅ **Polished Photo Viewer (`image_viewer.exe`)**:
   - Implemented sequential photo navigation with previous (`#photo-prev`) and next (`#photo-next`) buttons, counter indicator (`#photo-counter` with `role="status"` and `aria-live="polite"`), and automated disabled state toggling for single-photo categories.
@@ -368,48 +424,6 @@ A comprehensive audit and implementation cycle established the following enhance
   - When the modal is closed, the active card button is guaranteed in the DOM, scrolled into view, and receives restored keyboard focus.
 - ✅ **Automated Test Coverage**:
   - Unit tests in `tests/ux.test.js` validate initial 12-item batch rendering, image priority attributes, subsequent batch appending up to completion, and modal close batch loading with focus restoration.
-
-```html
-<!-- Accessibility Implementation Pattern -->
-<button class="scroll-dot" data-section="main" aria-label="Navigate to main section"></button>
-<a href="https://www.linkedin.com/in/n8liu/" target="_blank" rel="noopener noreferrer" aria-label="Visit Nathan's LinkedIn profile">
-  <i class="fab fa-linkedin" aria-hidden="true"></i>
-</a>
-```
-
-### 7.3 SEO & Structured Data Optimization
-- ✅ **Meta Tags**: Added description, keywords, viewport, and OpenGraph/Twitter Card social sharing tags.
-- ✅ **Schema.org JSON-LD**: Embedded `Person` schema markup containing UC Berkeley education, job title, social profiles, and core competency entities.
-
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Nathan Liu",
-  "jobTitle": "Data Science & Computer Science Student",
-  "worksFor": { "@type": "EducationalOrganization", "name": "UC Berkeley" },
-  "knowsAbout": ["Machine Learning", "Data Science", "Full Stack Development", "Python", "JavaScript"]
-}
-```
-
-### 7.4 Project Cards
-- **Uniform sizing**: `.projects-grid` uses equal-width columns and `grid-auto-rows: 1fr` so every project card shares the tallest card’s height. Flex card bodies align action buttons at the bottom without fixed heights or clipped descriptions.
-- **Current layout**: `.projects-grid` displays `.retro-card` entries with titles, status badges, concise descriptions, technology pills, and demo links where provided. Per-project GitHub buttons are consolidated into a final “More projects on GitHub” card linking to `https://github.com/n8liu` with the shared button style and safe new-tab attributes. Cards use the shared offset shadow and hover movement.
-- **Current order**: CardboardDex, Live Semantic Market, Clickbait Classifier, FleetManager, ItineraryAI, The IBD Digest, Spotify Analytics, SimplyMail, and More projects on GitHub.
-- **FleetManager**: Marked `Completed (2025)`. Describes backend ownership of an electric-vehicle fleet platform: telemetry and electrical-utility ingestion, AWS S3 storage, backend API delivery, end-to-end debugging, and predictive maintenance using driver behavior and utilization data. Technology pills: Python, Django, PostgreSQL, AWS S3. No code or demo link is currently supplied.
-- **Historical implementation**: Earlier project cards used expandable hover highlights for SimplyMail, Spotify Analytics, Pokédex API, and Live Semantic Market. The current markup presents descriptions directly.
-
-### 7.5 Personal About Note
-- ✅ **Personal Philosophy**: Added personal paragraph regarding photography, fitness, and continuous learning philosophy styled with an italic purple accent border.
-
-```css
-.personal-note {
-  font-style: italic;
-  background: rgba(81, 57, 137, 0.1);
-  border-left: 3px solid #513989;
-  padding: 15px;
-}
-```
 
 ---
 
@@ -461,7 +475,7 @@ A comprehensive audit and implementation cycle established the following enhance
 - **Client-Side Markdown Rendering**: The reader utilizes `marked.js` to parse markdown content asynchronously on-the-fly and render rich elements (tables, code blocks, blockquotes, lists, badges) directly inside `#blog-modal` (`blog_post.txt`).
 - **Dynamic Card Grid & Deep Linking**: Blog cards in `index.html` are dynamically rendered from `blog/posts.json`. The SPA routing engine automatically supports deep-link clean URLs (`/blog/:slug`, `/blog?post=:slug`, or `#blog/:slug`), opening directly to the requested article modal while preserving browser history navigation.
 
-### 8.3 Photography Gallery, EXIF Metadata & Pagination System
+### 8.3 Photography Gallery, EXIF Metadata & Infinite Scroll Pagination System
 - **Request Routing**: The browser loads `/api/categories`, `/api/images/:category`, and `/img/:key` from the site's own origin. Photography does not use the analytics `API_BASE`. Locally these API requests reach Express and return S3-presigned URLs; on Pages they reach the bundled `_worker.js` and its native `MY_BUCKET` binding.
 - **Production Entry Point**: The build outputs `dist/_worker.js`, enabling Pages advanced mode. `functions/_middleware.js` is legacy code and is ignored in this mode ([Cloudflare documentation](https://developers.cloudflare.com/pages/functions/advanced-mode/)). Edit `functions/_worker.js` for production gallery changes.
 - **R2 Storage Architecture**: Photography files are organized by folder categories in Cloudflare R2 (`california/`, `japan/`, `hawaii/`, `south_korea/`).
@@ -487,6 +501,34 @@ Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
 4. **`ResumeCounter` (`functions/resume_counter.js`)**:
    - Tracks downloads of `Nathan_Liu_Resume.pdf`.
    - Endpoints: `/api/resume/increment`, `/api/resume/count`.
+
+### 8.5 Automated Test Suites & Regression Safety Net
+The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 18 unit and subsystem regression tests that execute against production builds in under 400ms:
+
+1. **`tests/motion.test.js` (View Transitions & SPA Motion Engine)**:
+   - Validates that initial page loads and in-page anchor scrolling remain immediate with zero transition latency.
+   - Verifies cross-view changes between `/home`, `/photography`, `/blog`, and `/stats` activate scoped View Transitions (`document.startViewTransition`).
+   - Ensures rapid multi-tab clicks discard stale asynchronous snapshot callbacks and enforce history intent.
+   - Validates that `prefers-reduced-motion` and unsupported browser environments bypass snapshot transitions cleanly without errors.
+2. **`tests/photography.test.js` (Pages R2 Backend & Edge Cache)**:
+   - Verifies the Pages worker bundles `MY_BUCKET` binding and correctly lists R2 category folders.
+   - Tests R2 key escaping and verifies exact key resolution (handling special characters like `#`, `%`, and spaces).
+   - Validates Edge Cache headers (`public, max-age=31536000, s-maxage=31536000, immutable`) and `caches.default.put()` caching.
+   - Tests gallery loader resilience in an isolated VM context with mocked browser globals, asserting that client-side gallery calls always use the Pages origin instead of `API_BASE` and gracefully show fallback status when R2 is offline.
+   - Validates the generated `dist/wrangler.toml` Pages config binds external Durable Objects to `myportfolio`.
+3. **`tests/scrollspy.test.js` (Scroll Position Tracker & Path Synchronization)**:
+   - Tests reading line boundary detection (35% visible scroll container line).
+   - Verifies bottom-of-page selection logic so `#panel-skills` is reliably highlighted even when its heading cannot physically reach the reading line.
+   - Tests reverse scrolling and `requestAnimationFrame` event coalescing.
+   - Verifies that separate full-page views and programmatic scrolling do not trigger spurious scrollspy overrides.
+4. **`tests/ux.test.js` (Accessibility, State Engine & Infinite Scroll)**:
+   - **`setLoadState`**: Verifies standardized busy spinners (`<progress class="loading-spinner">`) with `aria-busy="true"`, accessible alert banners (`role="alert"`), and brutalist retry buttons (`.btn-retro.load-retry-btn`).
+   - **`showAccessibleModal` / `hideAccessibleModal`**: Verifies background `inert` attribute application across sibling elements, focus targeting on open, and focus restoration to the triggering button on dismiss.
+   - **`trapModalFocus`**: Tests keyboard `Tab` and `Shift+Tab` cycling to guarantee focus cannot escape active dialogs (`image_viewer.exe`, `blog_post.txt`).
+   - **`keepActiveTabVisible`**: Verifies horizontal scroll offset calculations on narrow screens (`@media (max-width: 768px)`), centering active `.nav-tab` within `.header-nav`.
+   - **Infinite Scroll Batch Slicing**: Validates that collections are sliced into 12-item batches (`PHOTOS_PER_BATCH = 12`), with `fetchpriority="high"` strictly applied to the first 2 above-the-fold images and `loading="lazy"` on all remaining items.
+   - **Sentinel & Completion**: Verifies incremental batch appending, live counter updates (`showing X of Y photos`), and completion state (`all Y photos loaded.`) with sentinel unobserving.
+   - **Modal Synchronizer**: Verifies that stepping beyond the rendered set dynamically appends batches, scrolling the active card into view and restoring keyboard focus on modal dismiss.
 
 ---
 
@@ -518,6 +560,7 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 
 ### 10.1 NPM Scripts Reference
 ```bash
+npm test                 # Run production build and execute full test runner suite (18 tests across 4 test files)
 npm run dev              # Start local Express + Socket.IO server on port 3000 with nodemon
 npm start                # Start production Node server locally
 npm run build            # Full production build: compiles assets into dist/, bundles worker, prepares Pages config
@@ -538,6 +581,8 @@ npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality
 4. **Configuration & URL Injection (`utils/prepare-pages-config.js`)**:
    - Generates `dist/wrangler.toml` from root `wrangler.toml`, replacing `main` with `pages_build_output_dir = "."`, removing Worker migrations, and binding Durable Objects to the existing `myportfolio` Worker via `script_name`.
    - Injects the production analytics `API_BASE` (`https://myportfolio.nathanliu528.workers.dev`) into `dist/script.js` and `dist/viewers.js`. Photography always uses the site's own origin.
+5. **Automated Subsystem Verification (`npm test`)**:
+   - Executes all 18 isolated unit and regression tests across `tests/motion.test.js`, `tests/photography.test.js`, `tests/scrollspy.test.js`, and `tests/ux.test.js`.
 
 ### 10.3 GitHub Actions Workflow (`.github/workflows/deploy.yml`)
 - Triggered on push or pull request to `main`.
@@ -564,6 +609,9 @@ npm run downsize:90
 #### High Priority
 - ✅ Accessibility compliance (WCAG 2.1 Level AA achieved)
 - ✅ Structured SEO meta tags and JSON-LD Person schema
+- ✅ Photography infinite scroll pagination & high-priority image optimization (`fetchpriority="high"` + `loading="lazy"`)
+- ✅ Standardized loading & retry state architecture (`setLoadState`)
+- ✅ Accessible modal focus trapping & mobile tab visibility preservation
 - 🔄 Ongoing Image optimization via `downsize-images.js`
 - 🔄 Dynamic EXIF parsing integration
 
@@ -580,6 +628,17 @@ npm run downsize:90
 ---
 
 ## 12. Historical Defect Audit & Resolved Deficiencies
+
+### Photography Infinite Scroll, Modal Focus & Mobile Tab Alignment (September 2026)
+- **Observed**: Large photo galleries previously rendered all images simultaneously, producing heavy initial network payloads and slower Largest Contentful Paint (LCP). Additionally, the photo modal lacked sequential keyboard controls, mobile tab navigation would scroll out of visible view on small screens, and modal dialogs did not constrain keyboard tab focus.
+- **Cause**: Absence of progressive batch slicing, missing `fetchpriority` hints, unmanaged focus state on dynamic overlays, and lack of automatic horizontal scrolling for the sticky mobile nav.
+- **Fix**:
+  - Implemented infinite scroll pagination (`PHOTOS_PER_BATCH = 12`) with an `IntersectionObserver` observing `#photo-sentinel` (300px root margin) and accessible `#photo-load-more` button fallback.
+  - Applied modern web guidance for image loading: `fetchpriority="high"` on the first 2 images without `loading="lazy"`, and `loading="lazy"` on all remaining items.
+  - Added sequential navigation (`#photo-prev`, `#photo-next`, `ArrowLeft`/`ArrowRight`), live status counter, and retry callbacks inside `image_viewer.exe`.
+  - Added `showAccessibleModal` / `hideAccessibleModal` using native background `inert` attribute isolation, `trapModalFocus`, and Escape key dismissal.
+  - Implemented `keepActiveTabVisible` centering active `.nav-tab` horizontally in `.header-nav` on narrow viewports.
+  - Added `tests/ux.test.js` covering all state transitions, focus cycles, and batch appending.
 
 ### Photography API routing and Pages bindings (September 2026)
 - **Observed**: The configured standalone Worker's `/api/images/all` returned HTTP 404, triggering static fallback images. The custom domain could not be resolved from the verification environment, and the Pages hostname returned a Cloudflare block page, so live Pages R2 access could not be verified.
@@ -623,3 +682,11 @@ When making modifications or adding features to this repository, adhere strictly
    Always use key prefixing when listing keys in Durable Objects (`this.state.storage.list({ prefix: '...' })`). Never call an unbounded `storage.list()` across the entire namespace.
 6. **ES Module Compliance**:
    Do not introduce CommonJS syntax (`require`, `module.exports`, `__dirname` without `fileURLToPath`). All `.js` files must remain 100% ESM compliant.
+7. **`tests/photography.test.js` VM Slice Constraint**:
+   `tests/photography.test.js` extracts `loadPhotosByCategory` from `dist/script.js` by slicing between `    async function loadPhotosByCategory(` and `    function renderPhotos(`. This snippet is executed in a minimal Node `vm` context with mocked browser globals. Any global variables or DOM nodes referenced inside `loadPhotosByCategory` (e.g. `photoInfiniteContainer`, `galleryRequest`, `setLoadState`, `renderedPhotoCount`) MUST be safely guarded with `typeof variable !== 'undefined'` checks to prevent `ReferenceError` crashes during test execution.
+8. **Host vs. VM Realm Array Prototype Equality**:
+   In Node.js `vm` tests, arrays created within a VM context do not share the host realm's `Array.prototype`. Direct `assert.deepStrictEqual(vmArray, hostArray)` fails with reference mismatch errors. Always convert or spread VM arrays (`[...vmResult]`) into host arrays before asserting strict deep equality.
+9. **Modern Image Priority Specification Rules**:
+   Per modern browser specifications, never specify both `fetchpriority="high"` and `loading="lazy"` on the same image element. High priority must only be assigned to initial above-the-fold candidates (first 2 images), while subsequent images receive `loading="lazy"`.
+10. **Build Sandbox Permissions on macOS**:
+    The production build script executes `rm -rf dist`. In permission-gated or sandboxed CLI environments on macOS, removing pre-existing build directories requires elevated access (`BypassSandbox: true`).
