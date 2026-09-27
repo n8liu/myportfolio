@@ -640,6 +640,8 @@
                         <div class="photo-grid-layout" id="portfolio-photo-grid">
                             <p class="photo-status" role="status">loading photos...</p>
                         </div>
+
+                        <nav class="photo-pagination" id="photo-pagination" aria-label="Photography pagination" hidden></nav>
                     </div>
                 </section>
             </div>
@@ -657,6 +659,7 @@
             <div id="view-stats" class="page-view">
                 <section id="panel-stats" class="panel">
                     <div class="stats-layout">
+                        <div id="stats-status"></div>
                         <div class="stats-cards-grid">
                             <div class="stat-card">
                                 <span class="label">Total Views</span>
@@ -753,22 +756,28 @@
     </aside>
 
     <!-- Photo Modal Dialog (Retro OS alert style) -->
-    <div class="modal-overlay" id="photo-modal">
+    <div class="modal-overlay" id="photo-modal" role="dialog" aria-modal="true" aria-labelledby="modal-photo-name" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-titlebar">
                 <div class="window-title">
                     <i class="fas fa-image"></i> image_viewer.exe
                 </div>
                 <div class="window-controls">
-                    <button class="win-btn close" id="modal-close-btn">X</button>
+                    <button class="win-btn close" id="modal-close-btn" aria-label="Close photo viewer">X</button>
                 </div>
             </div>
             <div class="modal-body">
                 <div class="modal-img-container">
                     <img id="modal-image" src="" alt="Photo Details">
+                    <div id="photo-image-status"></div>
                 </div>
                 <div class="modal-details">
                     <h4 id="modal-photo-name">Photo Title</h4>
+                    <div class="photo-viewer-controls">
+                        <button class="btn-retro" id="photo-prev" aria-label="Previous photo">←</button>
+                        <span id="photo-counter" role="status" aria-live="polite"></span>
+                        <button class="btn-retro" id="photo-next" aria-label="Next photo">→</button>
+                    </div>
                     <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem;">
                         <div class="exif-row">
                             <span class="exif-label">camera</span>
@@ -801,7 +810,7 @@
     </div>
 
     <!-- Blog Modal Dialog (Retro OS text reader style) -->
-    <div class="modal-overlay" id="blog-modal" role="dialog" aria-modal="true" aria-labelledby="modal-blog-title">
+    <div class="modal-overlay" id="blog-modal" role="dialog" aria-modal="true" aria-labelledby="modal-blog-title" tabindex="-1">
         <div class="modal-dialog blog-modal-dialog">
             <div class="modal-titlebar">
                 <div class="window-title">

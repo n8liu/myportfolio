@@ -1197,6 +1197,18 @@ body.loaded {
     position: relative;
     cursor: pointer;
     transition: all 0.1s ease;
+    padding: 0;
+    margin: 0;
+    display: block;
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+}
+
+.photo-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 .photo-card:hover {
@@ -1214,6 +1226,76 @@ body.loaded {
 
 .photo-card img.photo-loading {
     opacity: 0;
+}
+
+/* Photography Pagination */
+.photo-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: var(--border-thin);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+.photo-pagination[hidden] {
+    display: none;
+}
+
+.pagination-info {
+    color: var(--text-muted);
+    user-select: none;
+    font-size: 0.8rem;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.pagination-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 2px 2px 0px 0px var(--border-color);
+}
+
+.page-num {
+    min-width: 32px;
+    height: 30px;
+    padding: 0 0.4rem;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-num.active {
+    background-color: var(--text);
+    color: var(--bg-canvas);
+    box-shadow: none;
+    transform: translate(1px, 1px);
+}
+
+.pagination-ellipsis {
+    color: var(--text-muted);
+    padding: 0 0.25rem;
+    user-select: none;
+    font-family: var(--font-mono);
 }
 
 /* Stats Dashboard Panel */
@@ -1386,18 +1468,25 @@ body.loaded {
 }
 
 .modal-img-container {
-    background-color: #000000;
+    background-color: #0c0b0a;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     border-right: var(--border-thin);
+    min-height: 240px;
 }
 
 .modal-img-container img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    transition: opacity 0.18s ease;
+}
+
+.modal-img-container img[hidden] {
+    display: none;
 }
 
 .modal-details {
@@ -1430,6 +1519,183 @@ body.loaded {
 
 .exif-val {
     font-weight: 700;
+}
+
+/* Photo Viewer Controls & Counter */
+.photo-viewer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-top: var(--border-thin);
+    border-bottom: var(--border-thin);
+}
+
+.photo-viewer-controls .btn-retro {
+    min-width: 38px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.photo-viewer-controls .btn-retro:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 2px 2px 0px 0px var(--border-color);
+}
+
+#photo-counter {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    user-select: none;
+}
+
+/* Modal Image Container Status Overlay */
+#photo-image-status {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    background: rgba(12, 11, 10, 0.75);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    z-index: 2;
+}
+
+#photo-image-status:empty {
+    display: none;
+}
+
+#photo-image-status .load-state {
+    color: #f4f1ea;
+    padding: 1rem;
+}
+
+#photo-image-status .load-state p {
+    color: #f4f1ea;
+}
+
+#photo-image-status .load-state .loading-spinner {
+    --spinner-color: var(--bg-active);
+    --track-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Standardized Loading, Retry & Empty States across Photos, Blog, and Stats */
+.load-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem 1rem;
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    grid-column: 1 / -1;
+}
+
+.load-state p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.load-state .btn-retro {
+    margin-top: 0.25rem;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+#stats-status {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+#stats-status:empty {
+    display: none;
+}
+
+/* Accessible Indeterminate Loading Spinner */
+progress.loading-spinner {
+    --size: 28px;
+    --thickness: 3px;
+    --spinner-color: var(--accent);
+    --track-color: rgba(30, 30, 30, 0.12);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    appearance: none;
+    border: none;
+    background: conic-gradient(from 0deg, var(--spinner-color) 160deg, transparent 0) var(--track-color);
+    animation: progress-spin 1.2s linear infinite;
+}
+
+progress.loading-spinner:indeterminate::-webkit-progress-bar {
+    display: none;
+    background: none;
+}
+progress.loading-spinner:indeterminate::-webkit-progress-value {
+    display: none;
+    background: none;
+}
+progress.loading-spinner:indeterminate::-moz-progress-bar {
+    display: none;
+    background: none;
+}
+
+@supports (background-clip: border-area) {
+    progress.loading-spinner {
+        background-clip: border-area;
+        border: var(--thickness) solid transparent;
+        background-origin: border-box;
+    }
+}
+
+@supports not (background-clip: border-area) {
+    progress.loading-spinner {
+        --clip-boundary: calc(100% - var(--thickness));
+        mask-image: radial-gradient(
+            farthest-side,
+            transparent var(--clip-boundary),
+            black var(--clip-boundary)
+        );
+        -webkit-mask-image: radial-gradient(
+            farthest-side,
+            transparent var(--clip-boundary),
+            black var(--clip-boundary)
+        );
+    }
+}
+
+@keyframes progress-spin {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    progress.loading-spinner {
+        animation: none;
+        opacity: 0.6;
+    }
 }
 
 
@@ -1520,6 +1786,8 @@ body.zooming-out {
         overflow-x: auto;
         justify-content: flex-start;
         -webkit-overflow-scrolling: touch;
+        scroll-padding: 0 0.5rem;
+        scroll-behavior: smooth;
         scrollbar-width: none;
         border-radius: 4px;
         box-shadow: 2px 2px 0px 0px var(--border-color);
@@ -1600,12 +1868,29 @@ body.zooming-out {
 
     .modal-img-container {
         height: 330px;
+        min-height: 240px;
         border-right: none;
         border-bottom: var(--border-thin);
     }
 
+    .photo-viewer-controls .btn-retro {
+        min-height: 36px;
+        min-width: 44px;
+    }
+
     .stats-cards-grid {
         grid-template-columns: 1fr 1fr;
+    }
+
+    .photo-pagination {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .pagination-controls {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }
 

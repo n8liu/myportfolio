@@ -2,6 +2,122 @@
 document.addEventListener('DOMContentLoaded', function () {
     const API_BASE = '';
 
+    let activeModal = null;
+    let modalReturnFocus = null;
+    const inertBackground = new Map();
+    let statsLoading = false;
+
+    function setLoadState(container, message = '', retry = null, busy = false) {
+        if (!container) return;
+        const hadFocus = typeof document !== 'undefined' && container.contains && container.contains(document.activeElement);
+        if (typeof container.setAttribute === 'function') {
+            container.setAttribute('aria-busy', String(busy));
+        }
+        if (typeof container.replaceChildren === 'function') {
+            container.replaceChildren();
+        } else {
+            container.innerHTML = '';
+        }
+        if (!message) return;
+
+        if (typeof document !== 'undefined' && typeof document.createElement === 'function') {
+            const state = document.createElement('div');
+            state.className = 'load-state';
+            if (busy) {
+                const spinner = document.createElement('progress');
+                spinner.className = 'loading-spinner';
+                spinner.setAttribute('aria-label', message || 'Loading');
+                state.appendChild(spinner);
+            }
+            const text = document.createElement('p');
+            text.setAttribute('role', busy ? 'status' : (retry ? 'alert' : 'status'));
+            text.textContent = message;
+            state.appendChild(text);
+            if (retry && typeof retry === 'function') {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn-retro load-retry-btn';
+                button.textContent = 'retry';
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    retry();
+                });
+                state.appendChild(button);
+            }
+            container.appendChild(state);
+        } else {
+            container.innerHTML = `<div class="load-state"><p role="status">${message}</p>${retry ? '<button class="btn-retro">retry</button>' : ''}</div>`;
+        }
+
+        if (hadFocus && typeof container.focus === 'function') {
+            container.tabIndex = -1;
+            container.focus({ preventScroll: true });
+        }
+    }
+
+    async function fetchJSON(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+        return response.json();
+    }
+
+    function trapModalFocus(modal, e) {
+        if (e.key !== 'Tab') return;
+        const focusables = modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (!focusables.length) {
+            e.preventDefault();
+            return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+            if (document.activeElement === first || document.activeElement === modal) {
+                e.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    }
+
+    function showAccessibleModal(modal, firstFocus) {
+        if (!modal) return;
+        if (activeModal === modal) return;
+        if (activeModal) hideAccessibleModal(activeModal);
+        modalReturnFocus = document.activeElement;
+        activeModal = modal;
+        for (const child of document.body.children) {
+            if (child === modal || child.contains(modal)) continue;
+            inertBackground.set(child, child.inert);
+            child.inert = true;
+        }
+        modal.classList.add('active');
+        const focusTarget = firstFocus || modal.querySelector('button.close, button, [tabindex]:not([tabindex="-1"])') || modal;
+        if (focusTarget && typeof focusTarget.focus === 'function') {
+            focusTarget.focus({ preventScroll: true });
+        }
+    }
+
+    function hideAccessibleModal(modal) {
+        if (!modal) return;
+        modal.classList.remove('active');
+        if (activeModal !== modal) return;
+        for (const [element, wasInert] of inertBackground) {
+            element.inert = wasInert;
+        }
+        inertBackground.clear();
+        activeModal = null;
+        const fallback = document.querySelector('.nav-tab.active');
+        const target = modalReturnFocus?.isConnected && typeof modalReturnFocus.focus === 'function'
+            ? modalReturnFocus : fallback;
+        target?.focus({ preventScroll: true });
+        modalReturnFocus = null;
+    }
+
     // Lightweight dynamic script loader for on-demand libraries (Chart.js, marked)
     const scriptCache = new Map();
     function loadScript(src) {
@@ -13,7 +129,11 @@ document.addEventListener('DOMContentLoaded', function () {
             script.src = src;
             script.async = true;
             script.onload = resolve;
-            script.onerror = reject;
+            script.onerror = () => {
+                scriptCache.delete(src);
+                script.remove();
+                reject(new Error('Could not load script'));
+            };
             document.head.appendChild(script);
         });
         scriptCache.set(src, promise);
@@ -144,9 +264,34 @@ document.addEventListener('DOMContentLoaded', function () {
     navHighlight.setAttribute('aria-hidden', 'true');
     if (headerNav) headerNav.appendChild(navHighlight);
 
+    function keepActiveTabVisible(smooth = true) {
+        if (!headerNav) return;
+        const activeTab = headerNav.querySelector('.nav-tab.active');
+        if (!activeTab) return;
+        if (headerNav.scrollWidth <= headerNav.clientWidth) return;
+
+        const navLeft = headerNav.scrollLeft;
+        const navWidth = headerNav.clientWidth;
+        const tabLeft = activeTab.offsetLeft;
+        const tabWidth = activeTab.offsetWidth;
+        const padding = 12;
+
+        const isCutOffLeft = tabLeft < navLeft + padding;
+        const isCutOffRight = (tabLeft + tabWidth) > (navLeft + navWidth - padding);
+
+        if (isCutOffLeft || isCutOffRight) {
+            const targetLeft = tabLeft - (navWidth - tabWidth) / 2;
+            headerNav.scrollTo({
+                left: Math.max(0, targetLeft),
+                behavior: !smooth || (typeof reducedMotion !== 'undefined' && reducedMotion.matches) ? 'auto' : 'smooth'
+            });
+        }
+    }
+
     function positionNavHighlight() {
         const activeTab = headerNav?.querySelector('.nav-tab.active');
         if (!activeTab) return;
+        keepActiveTabVisible(headerNav.classList.contains('nav-highlight-ready'));
         navHighlight.style.width = `${activeTab.offsetWidth}px`;
         navHighlight.style.height = `${activeTab.offsetHeight}px`;
         navHighlight.style.transform = `translate(${activeTab.offsetLeft}px, ${activeTab.offsetTop}px)`;
@@ -156,6 +301,21 @@ document.addEventListener('DOMContentLoaded', function () {
             headerNav.classList.add('nav-highlight-ready');
         }
     }
+
+    navTabs.forEach(tab => {
+        tab.addEventListener('focus', () => {
+            if (headerNav && headerNav.scrollWidth > headerNav.clientWidth) {
+                const tabLeft = tab.offsetLeft;
+                const tabWidth = tab.offsetWidth;
+                const navWidth = headerNav.clientWidth;
+                const targetLeft = tabLeft - (navWidth - tabWidth) / 2;
+                headerNav.scrollTo({
+                    left: Math.max(0, targetLeft),
+                    behavior: typeof reducedMotion !== 'undefined' && reducedMotion.matches ? 'auto' : 'smooth'
+                });
+            }
+        });
+    });
 
     if (headerNav) {
         if ('ResizeObserver' in window) {
@@ -414,13 +574,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check URL path on page load
     const initialTab = getTabFromPath() || 'home';
     const initialPost = getInitialBlogPost();
-    navigateTo(initialTab, false);
-
-    if (initialPost) {
-        setTimeout(() => {
-            openBlogModal(initialPost, false);
-        }, 150);
-    }
+    queueMicrotask(() => navigateTo(initialTab, false));
 
     setupScrollspy();
 
@@ -467,38 +621,38 @@ document.addEventListener('DOMContentLoaded', function () {
         const views24hEl = document.getElementById('requests-24h');
         const resumeClicksEl = document.getElementById('resume-clicks');
 
-        // Fetch counts
-        fetch(API_BASE + '/api/total')
-            .then(res => res.json())
-            .then(data => {
-                if (totalViewsEl) totalViewsEl.textContent = data.total ?? '0';
-            }).catch(() => { if (totalViewsEl) totalViewsEl.textContent = '?'; });
-
-        fetch(API_BASE + '/api/unique/count')
-            .then(res => res.json())
-            .then(data => {
-                if (uniqueViewsEl) uniqueViewsEl.textContent = data.count ?? '0';
-            }).catch(() => { if (uniqueViewsEl) uniqueViewsEl.textContent = '?'; });
-
-        fetch(API_BASE + '/api/total/requests24h')
-            .then(res => res.json())
-            .then(data => {
-                if (views24hEl) views24hEl.textContent = data.requests24h ?? '0';
-            }).catch(() => { if (views24hEl) views24hEl.textContent = '?'; });
-
-        fetch(API_BASE + '/api/resume/count')
-            .then(res => res.json())
-            .then(data => {
-                if (resumeClicksEl) resumeClicksEl.textContent = data.clicks ?? '0';
-            }).catch(() => { if (resumeClicksEl) resumeClicksEl.textContent = '?'; });
-
-        // Fetch histories and render Chart.js
+        if (statsLoading) return;
+        statsLoading = true;
+        const status = document.getElementById('stats-status');
+        const chartCanvas = document.getElementById('statsChart');
+        if (chartCanvas) chartCanvas.hidden = true;
+        setLoadState(status, 'loading stats...', null, true);
+        const counters = [
+            [totalViewsEl, '/api/total', 'total'],
+            [uniqueViewsEl, '/api/unique/count', 'count'],
+            [views24hEl, '/api/total/requests24h', 'requests24h'],
+            [resumeClicksEl, '/api/resume/count', 'clicks'],
+        ];
+        const counts = await Promise.allSettled(counters.map(async ([element, endpoint, field]) => {
+            if (element) element.textContent = '…';
+            try {
+                const data = await fetchJSON(API_BASE + endpoint);
+                if (typeof data[field] !== 'number') throw new Error('Invalid counter');
+                if (element) element.textContent = data[field];
+            } catch (error) {
+                if (element) element.textContent = '—';
+                throw error;
+            }
+        }));
+        let failed = counts.some(result => result.status === 'rejected');
         try {
             const [totalRes, uniqueRes] = await Promise.all([
-                fetch(API_BASE + '/api/total/history7d').then(r => r.json()),
-                fetch(API_BASE + '/api/unique/history7d').then(r => r.json())
+                fetchJSON(API_BASE + '/api/total/history7d'),
+                fetchJSON(API_BASE + '/api/unique/history7d')
             ]);
-
+            if (![totalRes, uniqueRes].every(data => Array.isArray(data.days) && Array.isArray(data.counts))) {
+                throw new Error('Invalid chart data');
+            }
             const labels = totalRes.days.map(ts => {
                 const d = new Date(ts);
                 return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -512,8 +666,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     await loadScript('https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js');
                 } catch (loadErr) {
-                    console.error('Could not load Chart.js from CDN', loadErr);
-                    return;
+                    throw loadErr;
                 }
             }
 
@@ -526,6 +679,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const textCol = '#1e1e1e';
             const gridCol = 'rgba(30, 30, 30, 0.05)';
 
+            ctx.hidden = false;
             statsChartInstance = new window.Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
@@ -615,6 +769,11 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         } catch (error) {
             console.error('Error rendering stats chart:', error);
+            failed = true;
+            if (chartCanvas) chartCanvas.hidden = true;
+        } finally {
+            statsLoading = false;
+            setLoadState(status, failed ? 'some stats are unavailable.' : '', failed ? loadStatsAndRenderChart : null);
         }
     }
 
@@ -647,8 +806,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----------------------------------------------------
     // 4. Photography Gallery & Modal Popups
     // ----------------------------------------------------
+    const PHOTOS_PER_PAGE = 12;
     let photographyInitialized = false;
+    let galleryRequest = 0;
+    let galleryPhotos = [];
+    let currentCategoryPhotos = [];
+    let currentGalleryPage = 1;
+    let totalGalleryPages = 1;
+    let activePhotoIndex = 0;
     const photoGrid = document.getElementById('portfolio-photo-grid');
+    const photoPagination = document.getElementById('photo-pagination');
     const photoCategoryFilters = document.getElementById('photo-category-filters');
     const photoModal = document.getElementById('photo-modal');
     const modalImage = document.getElementById('modal-image');
@@ -710,32 +877,97 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function loadPhotosByCategory(category) {
         if (!photoGrid) return;
-        photoGrid.innerHTML = '<p class="photo-status" role="status">loading photos...</p>';
+        const request = typeof galleryRequest !== 'undefined' ? ++galleryRequest : 0;
+        if (typeof photoPagination !== 'undefined' && photoPagination) {
+            photoPagination.hidden = true;
+        }
+        if (typeof setLoadState === 'function') {
+            setLoadState(photoGrid, 'loading photos...', null, true);
+        } else {
+            photoGrid.innerHTML = '<p class="photo-status" role="status">loading photos...</p>';
+        }
 
         try {
             const response = await fetch(`/api/images/${encodeURIComponent(category)}`);
             if (!response.ok) throw new Error(`Photography API returned ${response.status}`);
             const images = await response.json();
+            if (typeof galleryRequest !== 'undefined' && request !== galleryRequest) return;
             if (!Array.isArray(images)) throw new Error('Invalid photography API response');
 
             if (images.length === 0) {
-                photoGrid.innerHTML = '<p class="photo-status" role="status">no photos in this category.</p>';
+                if (typeof galleryPhotos !== 'undefined') galleryPhotos = [];
+                if (typeof currentCategoryPhotos !== 'undefined') currentCategoryPhotos = [];
+                if (typeof photoPagination !== 'undefined' && photoPagination) {
+                    photoPagination.hidden = true;
+                }
+                if (typeof setLoadState === 'function') {
+                    setLoadState(photoGrid, 'no photos in this category.');
+                } else {
+                    photoGrid.innerHTML = '<p class="photo-status" role="status">no photos in this category.</p>';
+                }
                 return;
             }
 
+            if (typeof photoGrid.setAttribute === 'function') {
+                photoGrid.setAttribute('aria-busy', 'false');
+            }
             renderPhotos(images);
         } catch (e) {
-            console.warn('Error fetching category images.', e);
-            photoGrid.innerHTML = '<p class="photo-status" role="status">photos unavailable. please try again later.</p>';
+            if (typeof console !== 'undefined' && console.warn) {
+                console.warn('Error fetching category images.', e);
+            }
+            if (typeof galleryRequest !== 'undefined' && request !== galleryRequest) return;
+            if (typeof photoPagination !== 'undefined' && photoPagination) {
+                photoPagination.hidden = true;
+            }
+            if (typeof setLoadState === 'function') {
+                setLoadState(photoGrid, 'photos unavailable.', () => loadPhotosByCategory(category));
+            } else {
+                photoGrid.innerHTML = '<p class="photo-status" role="status">photos unavailable. please try again later.</p>';
+            }
         }
     }
 
-    function renderPhotos(images) {
+    function renderPhotos(images, page = 1) {
         if (!photoGrid) return;
+        galleryPhotos = images;
+        currentCategoryPhotos = images;
+        totalGalleryPages = Math.max(1, Math.ceil(images.length / PHOTOS_PER_PAGE));
+        renderPhotosPage(page, false);
+    }
+
+    function getPaginationPages(current, total) {
+        if (total <= 6) {
+            const pages = [];
+            for (let i = 1; i <= total; i++) pages.push(i);
+            return pages;
+        }
+
+        const pages = [1];
+        if (current <= 3) {
+            pages.push(2, 3, 4, '...', total);
+        } else if (current >= total - 2) {
+            pages.push('...', total - 3, total - 2, total - 1, total);
+        } else {
+            pages.push('...', current - 1, current, current + 1, '...', total);
+        }
+        return pages;
+    }
+
+    function renderPhotosPage(page, shouldScroll = false) {
+        if (!photoGrid) return;
+        currentGalleryPage = Math.max(1, Math.min(page, totalGalleryPages));
+
+        const startIdx = (currentGalleryPage - 1) * PHOTOS_PER_PAGE;
+        const endIdx = Math.min(startIdx + PHOTOS_PER_PAGE, currentCategoryPhotos.length);
+        const pagePhotos = currentCategoryPhotos.slice(startIdx, endIdx);
+
         photoGrid.innerHTML = '';
 
-        images.forEach(image => {
-            const card = document.createElement('div');
+        pagePhotos.forEach((image, index) => {
+            const card = document.createElement('button');
+            card.type = 'button';
+            card.setAttribute('aria-label', `Open photo: ${image.name || 'Untitled'}`);
             card.className = 'photo-card';
 
             const img = document.createElement('img');
@@ -744,7 +976,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 imgUrl = '/' + imgUrl;
             }
             img.alt = image.name || 'Portfolio photo';
-            img.loading = 'lazy';
+
+            // Modern Web guidance: fetchpriority="high" on initial above-the-fold images,
+            // loading="lazy" on remaining images.
+            if (index < 2) {
+                img.setAttribute('fetchpriority', 'high');
+            } else {
+                img.loading = 'lazy';
+            }
+
             img.classList.add('photo-loading');
             const revealImage = () => img.classList.remove('photo-loading');
             img.addEventListener('load', revealImage, { once: true });
@@ -759,6 +999,100 @@ document.addEventListener('DOMContentLoaded', function () {
             card.addEventListener('click', () => openPhotoModal(image));
             photoGrid.appendChild(card);
         });
+
+        renderPaginationControls();
+
+        if (shouldScroll) {
+            const scrollTarget = document.getElementById('panel-photography') || photoGrid;
+            if (scrollTarget && typeof scrollTarget.scrollIntoView === 'function') {
+                scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    }
+
+    function renderPaginationControls() {
+        if (!photoPagination) return;
+        if (totalGalleryPages <= 1 || currentCategoryPhotos.length === 0) {
+            photoPagination.hidden = true;
+            photoPagination.innerHTML = '';
+            return;
+        }
+
+        photoPagination.hidden = false;
+        photoPagination.innerHTML = '';
+
+        const startIdx = (currentGalleryPage - 1) * PHOTOS_PER_PAGE + 1;
+        const endIdx = Math.min(currentGalleryPage * PHOTOS_PER_PAGE, currentCategoryPhotos.length);
+        const total = currentCategoryPhotos.length;
+
+        const info = document.createElement('div');
+        info.className = 'pagination-info';
+        info.textContent = `showing ${startIdx}–${endIdx} of ${total} photos`;
+
+        const controls = document.createElement('div');
+        controls.className = 'pagination-controls';
+
+        // Prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'btn-retro pagination-btn';
+        prevBtn.id = 'photo-page-prev';
+        prevBtn.innerHTML = '&larr; prev';
+        prevBtn.setAttribute('aria-label', 'Previous photo page');
+        if (currentGalleryPage <= 1) {
+            prevBtn.disabled = true;
+        } else {
+            prevBtn.addEventListener('click', () => {
+                renderPhotosPage(currentGalleryPage - 1, true);
+            });
+        }
+        controls.appendChild(prevBtn);
+
+        // Page buttons and ellipses
+        const pageItems = getPaginationPages(currentGalleryPage, totalGalleryPages);
+        pageItems.forEach(item => {
+            if (item === '...') {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'pagination-ellipsis';
+                ellipsis.textContent = '...';
+                ellipsis.setAttribute('aria-hidden', 'true');
+                controls.appendChild(ellipsis);
+            } else {
+                const pageBtn = document.createElement('button');
+                pageBtn.type = 'button';
+                pageBtn.className = 'btn-retro page-num';
+                pageBtn.textContent = String(item);
+                pageBtn.setAttribute('aria-label', `Page ${item}`);
+                if (item === currentGalleryPage) {
+                    pageBtn.classList.add('active');
+                    pageBtn.setAttribute('aria-current', 'page');
+                } else {
+                    pageBtn.addEventListener('click', () => {
+                        renderPhotosPage(item, true);
+                    });
+                }
+                controls.appendChild(pageBtn);
+            }
+        });
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'btn-retro pagination-btn';
+        nextBtn.id = 'photo-page-next';
+        nextBtn.innerHTML = 'next &rarr;';
+        nextBtn.setAttribute('aria-label', 'Next photo page');
+        if (currentGalleryPage >= totalGalleryPages) {
+            nextBtn.disabled = true;
+        } else {
+            nextBtn.addEventListener('click', () => {
+                renderPhotosPage(currentGalleryPage + 1, true);
+            });
+        }
+        controls.appendChild(nextBtn);
+
+        photoPagination.appendChild(info);
+        photoPagination.appendChild(controls);
     }
 
     function openPhotoModal(photo) {
@@ -775,25 +1109,79 @@ document.addEventListener('DOMContentLoaded', function () {
             imgUrl = '/' + imgUrl;
         }
 
+        activePhotoIndex = Math.max(0, galleryPhotos.indexOf(photo));
+        const photoCounter = document.getElementById('photo-counter');
+        const prevBtn = document.getElementById('photo-prev');
+        const nextBtn = document.getElementById('photo-next');
+
+        if (photoCounter) {
+            photoCounter.textContent = `${activePhotoIndex + 1} / ${galleryPhotos.length || 1}`;
+        }
+        if (prevBtn) {
+            prevBtn.disabled = galleryPhotos.length < 2;
+        }
+        if (nextBtn) {
+            nextBtn.disabled = galleryPhotos.length < 2;
+        }
+
+        const imageStatus = document.getElementById('photo-image-status');
+        modalImage.hidden = true;
+        setLoadState(imageStatus, 'loading photo...', null, true);
+        modalImage.onload = () => {
+            modalImage.hidden = false;
+            setLoadState(imageStatus);
+        };
+        modalImage.onerror = () => {
+            modalImage.hidden = true;
+            setLoadState(imageStatus, 'photo unavailable.', () => openPhotoModal(photo));
+        };
+        modalImage.alt = photo.name || 'Portfolio photo';
         modalImage.src = imgUrl;
+        if (modalImage.complete && modalImage.naturalWidth > 0) modalImage.onload();
         modalPhotoName.textContent = photo.name || 'Untitled Image';
 
-        // EXIF data mapping
-        exifCamera.textContent = photo.camera || photo.exif?.camera || 'Fujifilm X100VI';
-        exifLens.textContent = photo.lens || photo.exif?.lens || 'Fujinon 23mm F2.0 (Fixed)';
-        exifExposure.textContent = photo.exposure || photo.exif?.exposure || '1/250s';
-        exifAperture.textContent = photo.aperture || photo.exif?.aperture || 'f/5.6';
-        exifIso.textContent = photo.iso || photo.exif?.iso || '200';
-        exifLocation.textContent = photo.location || photo.exif?.location || 'California';
+        // Update return focus to current card if gallery card is present on the current page
+        const cardIndexOnPage = activePhotoIndex - (currentGalleryPage - 1) * PHOTOS_PER_PAGE;
+        const allCards = photoGrid?.querySelectorAll('.photo-card');
+        if (allCards && cardIndexOnPage >= 0 && allCards[cardIndexOnPage]) {
+            modalReturnFocus = allCards[cardIndexOnPage];
+        }
 
-        photoModal.classList.add('active');
+        // EXIF data mapping
+        if (exifCamera) exifCamera.textContent = photo.camera || photo.exif?.camera || '—';
+        if (exifLens) exifLens.textContent = photo.lens || photo.exif?.lens || '—';
+        if (exifExposure) exifExposure.textContent = photo.exposure || photo.exif?.exposure || '—';
+        if (exifAperture) exifAperture.textContent = photo.aperture || photo.exif?.aperture || '—';
+        if (exifIso) exifIso.textContent = photo.iso || photo.exif?.iso || '—';
+        if (exifLocation) exifLocation.textContent = photo.location || photo.exif?.location || '—';
+
+        showAccessibleModal(photoModal, modalCloseBtn);
     }
 
     function closePhotoModal() {
         if (photoModal) {
-            photoModal.classList.remove('active');
+            if (galleryPhotos && galleryPhotos.length > 0 && activePhotoIndex >= 0) {
+                const targetPage = Math.floor(activePhotoIndex / PHOTOS_PER_PAGE) + 1;
+                if (targetPage !== currentGalleryPage) {
+                    renderPhotosPage(targetPage, false);
+                }
+                const cardIndexOnPage = activePhotoIndex - (currentGalleryPage - 1) * PHOTOS_PER_PAGE;
+                const allCards = photoGrid?.querySelectorAll('.photo-card');
+                if (allCards && cardIndexOnPage >= 0 && allCards[cardIndexOnPage]) {
+                    modalReturnFocus = allCards[cardIndexOnPage];
+                }
+            }
+            hideAccessibleModal(photoModal);
         }
     }
+
+    function stepPhoto(direction) {
+        if (!galleryPhotos || galleryPhotos.length < 2) return;
+        activePhotoIndex = (activePhotoIndex + direction + galleryPhotos.length) % galleryPhotos.length;
+        openPhotoModal(galleryPhotos[activePhotoIndex]);
+    }
+    document.getElementById('photo-prev')?.addEventListener('click', () => stepPhoto(-1));
+    document.getElementById('photo-next')?.addEventListener('click', () => stepPhoto(1));
 
     // Modal Close hooks
     if (modalCloseBtn) {
@@ -974,12 +1362,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show loading state first
         modalBlogTitle.textContent = post.title || "Loading post...";
         modalBlogDate.textContent = post.date || "";
-        modalBlogContent.innerHTML = "<div style='font-family: var(--font-mono); text-align: center; padding: 2rem;'>fetching markdown content...</div>";
         if (modalBlogFilename) {
             modalBlogFilename.textContent = post.file || `${slug}.md`;
         }
 
-        blogModal.classList.add('active');
+        showAccessibleModal(blogModal, blogModalCloseBtn);
+        setLoadState(modalBlogContent, 'fetching markdown content...', null, true);
 
         if (updateHistory) {
             const targetUrl = `/blog/${slug}`;
@@ -1021,24 +1409,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             modalBlogTitle.textContent = post.title;
             modalBlogDate.textContent = post.date;
+            modalBlogContent.setAttribute('aria-busy', 'false');
             modalBlogContent.innerHTML = renderedHtml;
         } catch (error) {
             console.error("Error loading blog post:", error);
             modalBlogTitle.textContent = "Error Loading Post";
-            modalBlogContent.innerHTML = `<div style='font-family: var(--font-mono); color: #ff7675; text-align: center; padding: 2rem;'>
-                Could not load markdown for "<strong>${slug}</strong>".<br><br>
-                <button class="btn-retro" id="retry-blog-load-btn"><i class="fas fa-redo"></i> Retry</button>
-            </div>`;
-            const retryBtn = document.getElementById('retry-blog-load-btn');
-            if (retryBtn) {
-                retryBtn.addEventListener('click', () => openBlogModal(slug, false));
-            }
+            setLoadState(modalBlogContent, `could not load article "${slug}".`, () => openBlogModal(slug, false));
         }
     }
 
     function closeBlogModal(updateHistory = true) {
         if (blogModal) {
-            blogModal.classList.remove('active');
+            hideAccessibleModal(blogModal);
         }
         if (updateHistory && (window.location.pathname.startsWith('/blog/') || window.location.search.includes('post='))) {
             history.pushState({ tab: 'blog' }, '', '/blog');
@@ -1060,14 +1442,32 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Global keyboard listener to close open modals on Escape key
+    // Global keyboard listener to manage modal focus, Escape dismiss, and photo navigation
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' || e.key === 'Esc') {
-            if (blogModal && blogModal.classList.contains('active')) {
-                closeBlogModal(true);
+        if (activeModal) {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                e.preventDefault();
+                if (activeModal === photoModal) {
+                    closePhotoModal();
+                } else if (activeModal === blogModal) {
+                    closeBlogModal(true);
+                } else {
+                    hideAccessibleModal(activeModal);
+                }
+                return;
             }
-            if (photoModal && photoModal.classList.contains('active')) {
-                closePhotoModal();
+            if (e.key === 'Tab') {
+                trapModalFocus(activeModal, e);
+                return;
+            }
+            if (activeModal === photoModal) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    stepPhoto(-1);
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    stepPhoto(1);
+                }
             }
         }
     });

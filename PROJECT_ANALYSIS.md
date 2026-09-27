@@ -330,6 +330,45 @@ A comprehensive audit and implementation cycle established the following enhance
 - ✅ **Security on External Links**: Enforced `rel="noopener noreferrer"` across all external anchor tags.
 - ✅ **High-Contrast Focus Outlines**: Enhanced focus rings with high-visibility purple outlines for keyboard accessibility.
 
+### 7.6 Modal Focus, Mobile Navigation & Standardized State Engine (September 2026)
+- ✅ **Polished Photo Viewer (`image_viewer.exe`)**:
+  - Implemented sequential photo navigation with previous (`#photo-prev`) and next (`#photo-next`) buttons, counter indicator (`#photo-counter` with `role="status"` and `aria-live="polite"`), and automated disabled state toggling for single-photo categories.
+  - Added native keyboard arrow navigation (`ArrowLeft` / `ArrowRight`) while the modal is open.
+  - Image loading status overlay (`#photo-image-status`) with dark-theme contrast adaptation, indeterminate spinner, and retry callbacks for failed images.
+  - Return focus synchronization: modal dismiss restores focus directly to the active photo's card button in the gallery.
+- ✅ **Active Mobile Tab Visibility Preservation**:
+  - Implemented `keepActiveTabVisible`: calculates horizontal scroll offsets on narrow screens (`@media (max-width: 768px)`), centering the active `.nav-tab` within `.header-nav`.
+  - Automatically triggers on page transitions, direct deep links, scrollspy updates, device rotation, and keyboard focus events.
+  - Preserves alignment with `.nav-highlight` and respects `prefers-reduced-motion`.
+- ✅ **Accessible Modal Keyboard Focus Management**:
+  - Integrated `showAccessibleModal` and `hideAccessibleModal` using native background `inert` attribute isolation.
+  - Focus trapping (`trapModalFocus`) constrains `Tab` and `Shift+Tab` within open dialogs (`#photo-modal`, `#blog-modal`).
+  - Escape key dismiss across all active dialogs with precise focus restoration to the triggering element (`modalReturnFocus`).
+- ✅ **Standardized Loading & Retry States (Photos, Blog, Stats)**:
+  - Unified `setLoadState(container, message, retry, busy)` engine across photo gallery, photo modal viewer, markdown blog reader, and stats dashboard.
+  - Native semantic `<progress class="loading-spinner" aria-label="...">` styled with `conic-gradient` and modern fallbacks.
+  - Standardized `.load-state` layout with accessible ARIA live regions (`role="status"` / `role="alert"`) and retro brutalist retry buttons (`.btn-retro.load-retry-btn`).
+  - Full test coverage in `tests/ux.test.js` validating state transitions, focus cycles, and mobile scroll offsets.
+
+### 7.7 Photography Pagination & High-Priority Image Optimization (September 2026)
+- ✅ **Gallery Pagination Engine**:
+  - Slices category images into 12 photos per page (`PHOTOS_PER_PAGE = 12`) to dramatically reduce initial DOM weight and concurrent network requests.
+  - Automatically resets to Page 1 when category filters change (`#photo-category-filters`).
+  - Hides pagination navigation (`#photo-pagination[hidden]`) cleanly when a category has 12 or fewer images or no images.
+- ✅ **Retro OS Pagination Controls & Smart Ellipses**:
+  - Displays summary metrics: `showing 1–12 of 34 photos`.
+  - Accessible previous (`← prev`) and next (`next →`) controls with automated disabled state bounds.
+  - Numbered pagination buttons (`.page-num`) with active state (`aria-current="page"`) and compact ellipsis reduction (`getPaginationPages`) for collections >6 pages.
+  - Smoothly scrolls to the top of the photo section on page changes when triggered by pagination buttons.
+- ✅ **Modern Web Image Priority Optimization**:
+  - Implements modern browser image loading guidance: sets `fetchpriority="high"` on the first 2 above-the-fold images of each page without `loading="lazy"`.
+  - Applies `loading="lazy"` on remaining items (items 3–12) to defer off-screen image decoding and network payload.
+- ✅ **Photo Modal Viewer Synchronization**:
+  - Modal viewer retains access to all category photos for continuous Previous/Next navigation and counter indexing (`x / N`).
+  - When the modal is closed after stepping to a photo located on a different page, the gallery automatically updates to that page and restores keyboard focus directly to that photo's card button.
+- ✅ **Automated Test Coverage**:
+  - Unit tests in `tests/ux.test.js` validate `getPaginationPages` edge cases (single page, compact ranges, smart ellipses), page slicing, priority attributes, and modal close page synchronization.
+
 ```html
 <!-- Accessibility Implementation Pattern -->
 <button class="scroll-dot" data-section="main" aria-label="Navigate to main section"></button>
@@ -422,13 +461,14 @@ A comprehensive audit and implementation cycle established the following enhance
 - **Client-Side Markdown Rendering**: The reader utilizes `marked.js` to parse markdown content asynchronously on-the-fly and render rich elements (tables, code blocks, blockquotes, lists, badges) directly inside `#blog-modal` (`blog_post.txt`).
 - **Dynamic Card Grid & Deep Linking**: Blog cards in `index.html` are dynamically rendered from `blog/posts.json`. The SPA routing engine automatically supports deep-link clean URLs (`/blog/:slug`, `/blog?post=:slug`, or `#blog/:slug`), opening directly to the requested article modal while preserving browser history navigation.
 
-### 8.3 Photography Gallery & EXIF Metadata System
+### 8.3 Photography Gallery, EXIF Metadata & Pagination System
 - **Request Routing**: The browser loads `/api/categories`, `/api/images/:category`, and `/img/:key` from the site's own origin. Photography does not use the analytics `API_BASE`. Locally these API requests reach Express and return S3-presigned URLs; on Pages they reach the bundled `_worker.js` and its native `MY_BUCKET` binding.
 - **Production Entry Point**: The build outputs `dist/_worker.js`, enabling Pages advanced mode. `functions/_middleware.js` is legacy code and is ignored in this mode ([Cloudflare documentation](https://developers.cloudflare.com/pages/functions/advanced-mode/)). Edit `functions/_worker.js` for production gallery changes.
 - **R2 Storage Architecture**: Photography files are organized by folder categories in Cloudflare R2 (`california/`, `japan/`, `hawaii/`, `south_korea/`).
 - **Metadata Extraction**: `utils/image-metadata.js` parses RAW/JPEG headers with `ExifReader`, creating `functions/photos-metadata.json`.
 - **Edge Cache API**: `functions/_worker.js` handles `/img/:key` with a 1-year immutable cache header (`public, max-age=31536000, s-maxage=31536000, immutable`), cached asynchronously at Cloudflare edge POPs with `caches.default.put()`.
-- **Modal Viewer**: Selecting a gallery photo opens `image_viewer.exe` modal, displaying image dimensions, camera model, lens, exposure time, aperture, ISO, and location.
+- **Pagination & Loading Performance**: Slices photos into 12 items per page (`PHOTOS_PER_PAGE = 12`) with retro brutalist pagination controls (`#photo-pagination`), smart ellipsis compaction for collections >6 pages, and `fetchpriority="high"` on the initial 2 items with `loading="lazy"` on remaining items.
+- **Modal Viewer**: Selecting a gallery photo opens `image_viewer.exe` modal, displaying image dimensions, camera model, lens, exposure time, aperture, ISO, and location. Features interactive Previous/Next photo cycling across all category photos, live counter, keyboard Arrow navigation (`ArrowLeft`/`ArrowRight`), background inertness, Tab trapping, and focus restoration to the triggering gallery card button with cross-page synchronization on close.
 
 ### 8.4 Stateful Edge Analytics & Durable Objects
 Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
