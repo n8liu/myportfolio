@@ -353,6 +353,54 @@ test('photography infinite scroll appends subsequent batches and detects complet
     assert.equal(photoGrid.children.length, 16);
 });
 
+test('photography observer keeps loading beyond 24 when the sentinel stays visible', () => {
+    let observed = false;
+    let pending = false;
+    let callback;
+    class FakeIntersectionObserver {
+        constructor(cb) { callback = cb; }
+        observe() {
+            // Like the browser, observing an already observed target is a no-op.
+            if (!observed) pending = true;
+            observed = true;
+        }
+        unobserve() { observed = false; pending = false; }
+        disconnect() { this.unobserve(); }
+    }
+    const photoGrid = new FakeElement('div');
+    const photoLoadMoreBtn = new FakeElement('button');
+    const photoInfiniteStatus = new FakeElement('div');
+    const context = vm.createContext({
+        document: { createElement: tag => new FakeElement(tag) },
+        IntersectionObserver: FakeIntersectionObserver,
+        PHOTOS_PER_BATCH: 12,
+        photoGrid,
+        photoInfiniteContainer: new FakeElement('div'),
+        photoSentinel: new FakeElement('div'),
+        photoInfiniteStatus,
+        photoLoadMoreBtn,
+        galleryPhotos: [], renderedPhotoCount: 0, isAppendingBatch: false,
+        photoInfiniteObserver: null, openPhotoModal() {},
+    });
+    vm.runInContext([
+        extractFn('setupInfiniteObserver'), extractFn('updateInfiniteStatus'),
+        extractFn('appendPhotoBatch'),
+        extractFn('renderPhotos', '\n    function setupInfiniteObserver('),
+    ].join('\n'), context);
+    context.renderPhotos(Array.from({ length: 53 }, (_, i) => ({ url: `/photo-${i}.jpg` })));
+    assert.equal(photoLoadMoreBtn.hidden, false);
+    // Deliver browser observation frames, with no intervening threshold crossing.
+    for (let frame = 0; frame < 10 && pending; frame++) {
+        pending = false;
+        callback([{ isIntersecting: true }]);
+    }
+    assert.equal(context.renderedPhotoCount, 53);
+    assert.equal(photoGrid.children.length, 53);
+    assert.equal(photoInfiniteStatus.textContent, 'all 53 photos loaded.');
+    assert.equal(photoLoadMoreBtn.hidden, true);
+    assert.equal(observed, false);
+});
+
 test('closing photo modal dynamically loads missing batches and restores focus to active card', () => {
     const appendBatchCode = extractFn('appendPhotoBatch');
     const updateStatusCode = extractFn('updateInfiniteStatus');

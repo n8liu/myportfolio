@@ -153,8 +153,8 @@ async function getCategories(env, corsHeaders) {
       throw new Error('R2 bucket binding not available');
     }
     
-    const objects = await env.MY_BUCKET.list();
-    const keys = objects.objects.map(obj => obj.key);
+    const objects = await listAllObjects(env.MY_BUCKET);
+    const keys = objects.map(obj => obj.key);
     
     const categorySet = new Set();
     keys.forEach(key => {
@@ -186,6 +186,18 @@ async function getCategories(env, corsHeaders) {
   }
 }
 
+async function listAllObjects(bucket, options = {}) {
+  const objects = [];
+  let cursor;
+  do {
+    const page = await bucket.list({ ...options, ...(cursor ? { cursor } : {}) });
+    objects.push(...page.objects);
+    cursor = page.truncated ? page.cursor : undefined;
+    if (page.truncated && !cursor) throw new Error('Missing R2 listing cursor');
+  } while (cursor);
+  return objects;
+}
+
 async function getImages(category, env, corsHeaders) {
   try {
     if (!env.MY_BUCKET) {
@@ -197,8 +209,8 @@ async function getImages(category, env, corsHeaders) {
       options.prefix = `${category}/`;
     }
     
-    const result = await env.MY_BUCKET.list(options);
-    const objects = result.objects.filter(obj => !obj.key.endsWith('/'));
+    const listed = await listAllObjects(env.MY_BUCKET, options);
+    const objects = listed.filter(obj => !obj.key.endsWith('/'));
     
     const images = objects.map((object) => {
       const filename = object.key.split('/').pop();

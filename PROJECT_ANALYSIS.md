@@ -414,7 +414,7 @@ A comprehensive audit and implementation cycle established the following enhance
 - ✅ **Sentinel IntersectionObserver & Accessible Fallback**:
   - Tracks a bottom sentinel element (`#photo-sentinel`) with `IntersectionObserver` (`root: scrollContainer`, `rootMargin: 300px`), automatically appending the next batch of 12 photos before the user reaches the bottom.
   - Displays dynamic status metrics (`#photo-infinite-status` with `role="status"`): `showing 12 of 34 photos` while scrolling, and `all 34 photos loaded.` once complete.
-  - Accessible fallback: includes a manual `#photo-load-more` button (`load more photos ↓`) for keyboard navigation or browsers where IntersectionObserver is unavailable.
+  - Accessible fallback: keeps the manual `#photo-load-more` button (`load more photos ↓`) visible whenever photos remain, including when IntersectionObserver is available.
 - ✅ **Modern Web Image Priority Optimization**:
   - Implements modern browser image loading guidance: sets `fetchpriority="high"` on the first 2 above-the-fold images of the gallery without `loading="lazy"`.
   - Applies `loading="lazy"` on all remaining items to defer off-screen image decoding and network payload.
@@ -476,6 +476,9 @@ A comprehensive audit and implementation cycle established the following enhance
 - **Dynamic Card Grid & Deep Linking**: Blog cards in `index.html` are dynamically rendered from `blog/posts.json`. The SPA routing engine automatically supports deep-link clean URLs (`/blog/:slug`, `/blog?post=:slug`, or `#blog/:slug`), opening directly to the requested article modal while preserving browser history navigation.
 
 ### 8.3 Photography Gallery, EXIF Metadata & Infinite Scroll Pagination System
+- **Complete storage listings**: Production R2 listings follow `truncated` / `cursor`; local S3 listings follow `IsTruncated` / `NextContinuationToken`, for both images and categories. The API retains its array response and loads the complete metadata list before rendering; image elements are appended progressively in batches of 12. This is client-side rendering pagination, not incremental API requests.
+- **Scroll continuity**: After each batch, the sentinel is unobserved and observed again so a sentinel still within the preload area triggers another batch. Category changes disconnect the observer and clear the previous photo state before fetching. The manual load-more control remains available until completion.
+- **Regression coverage**: Tests simulate a continuously visible sentinel through 53 photos and multiple storage listing pages in both backends. These are mocked tests, not live browser or production verification.
 - **Request Routing**: The browser loads `/api/categories`, `/api/images/:category`, and `/img/:key` from the site's own origin. Photography does not use the analytics `API_BASE`. Locally these API requests reach Express and return S3-presigned URLs; on Pages they reach the bundled `_worker.js` and its native `MY_BUCKET` binding.
 - **Production Entry Point**: The build outputs `dist/_worker.js`, enabling Pages advanced mode. `functions/_middleware.js` is legacy code and is ignored in this mode ([Cloudflare documentation](https://developers.cloudflare.com/pages/functions/advanced-mode/)). Edit `functions/_worker.js` for production gallery changes.
 - **R2 Storage Architecture**: Photography files are organized by folder categories in Cloudflare R2 (`california/`, `japan/`, `hawaii/`, `south_korea/`).

@@ -50,6 +50,53 @@ test('built Pages worker lists categories and serves the exact R2 key', async ()
   }
 });
 
+test('gallery and categories follow every R2 listing cursor', async () => {
+  for (const route of ['images/all', 'images/Japan', 'categories']) {
+    const calls = [];
+    const pagedEnv = { MY_BUCKET: { async list(options = {}) {
+      calls.push(options);
+      const page = options.cursor ? Number(options.cursor) : 0;
+      return {
+        objects: Array.from({ length: 12 }, (_, i) => ({
+          key: `${route === 'images/Japan' ? 'Japan' : `Category${page}`}/${page * 12 + i}.jpg`,
+          size: 5,
+        })),
+        truncated: page < 2,
+        cursor: page < 2 ? String(page + 1) : undefined,
+      };
+    } } };
+    const response = await worker.fetch(new Request(`${origin}/api/${route}`), pagedEnv);
+    assert.equal(response.status, 200);
+    const result = await response.json();
+    assert.equal(result.length, route === 'categories' ? 3 : 36);
+    assert.deepEqual(calls.map(call => call.cursor), [undefined, '1', '2']);
+    assert.ok(calls.every(call => call.prefix === (route === 'images/Japan' ? 'Japan/' : undefined)));
+  }
+});
+
+test('local storage listing follows continuation tokens for images and categories', async () => {
+  const source = readFileSync(new URL('../utils/cloudflare.js', import.meta.url), 'utf8');
+  const start = source.indexOf('async function listAllObjects(');
+  const end = source.indexOf('\nasync function getCategories(', start);
+  const calls = [];
+  const context = vm.createContext({
+    ListObjectsV2Command: class { constructor(input) { this.input = input; } },
+    s3: { async send({ input }) {
+      calls.push(input);
+      return input.ContinuationToken
+        ? { Contents: [{ Key: 'Japan/second.jpg' }], CommonPrefixes: [{ Prefix: 'Japan/' }], IsTruncated: false }
+        : { Contents: [{ Key: 'England/first.jpg' }], CommonPrefixes: [{ Prefix: 'England/' }], IsTruncated: true, NextContinuationToken: 'next' };
+    } },
+  });
+  vm.runInContext(source.slice(start, end), context);
+  const result = await context.listAllObjects({ Bucket: 'photos', Prefix: 'test/' });
+  assert.equal(result.Contents.length, 2);
+  assert.equal(result.CommonPrefixes.length, 2);
+  assert.equal(calls[1].ContinuationToken, 'next');
+  assert.equal(calls[1].Bucket, 'photos');
+  assert.equal(calls[1].Prefix, 'test/');
+});
+
 // Exercise the actual built gallery loader with browser dependencies stubbed.
 const client = readFileSync(new URL('../dist/script.js', import.meta.url), 'utf8');
 const galleryLoader = client.slice(client.indexOf('    async function loadPhotosByCategory('),

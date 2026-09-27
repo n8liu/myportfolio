@@ -16,13 +16,30 @@ const s3 = new S3Client({
 });
 
 // Get all folders (prefixes) in the bucket to identify categories
+async function listAllObjects(params) {
+    const Contents = [];
+    const CommonPrefixes = [];
+    let ContinuationToken;
+    do {
+        const page = await s3.send(new ListObjectsV2Command({
+            ...params,
+            ...(ContinuationToken ? { ContinuationToken } : {})
+        }));
+        Contents.push(...(page.Contents || []));
+        CommonPrefixes.push(...(page.CommonPrefixes || []));
+        ContinuationToken = page.IsTruncated ? page.NextContinuationToken : undefined;
+        if (page.IsTruncated && !ContinuationToken) throw new Error('Missing storage listing token');
+    } while (ContinuationToken);
+    return { Contents, CommonPrefixes };
+}
+
 async function getCategories() {
     try {
         const params = {
             Bucket: process.env.R2_BUCKET_NAME,
             Delimiter: '/'
         };
-        const data = await s3.send(new ListObjectsV2Command(params));
+        const data = await listAllObjects(params);
         return data.CommonPrefixes ? data.CommonPrefixes.map(prefix => {
             return {
                 name: prefix.Prefix.replace('/', ''), // Remove trailing slash
@@ -52,7 +69,7 @@ async function getImagesFromCategory(category) {
             Bucket: process.env.R2_BUCKET_NAME,
             Prefix: category ? `${category}/` : ''
         };
-        const data = await s3.send(new ListObjectsV2Command(params));
+        const data = await listAllObjects(params);
         return data.Contents ? await Promise.all(data.Contents
             .filter(item => !item.Key.endsWith('/')) // Filter out directories
             .map(async item => {
@@ -76,7 +93,7 @@ async function getAllImages() {
         const params = {
             Bucket: process.env.R2_BUCKET_NAME
         };
-        const data = await s3.send(new ListObjectsV2Command(params));
+        const data = await listAllObjects(params);
         return data.Contents ? await Promise.all(data.Contents
             .filter(item => !item.Key.endsWith('/')) // Filter out directories
             .map(async item => {

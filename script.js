@@ -885,6 +885,11 @@ document.addEventListener('DOMContentLoaded', function () {
     async function loadPhotosByCategory(category) {
         if (!photoGrid) return;
         const request = typeof galleryRequest !== 'undefined' ? ++galleryRequest : 0;
+        if (typeof photoInfiniteObserver !== 'undefined' && photoInfiniteObserver) {
+            photoInfiniteObserver.disconnect();
+        }
+        if (typeof galleryPhotos !== 'undefined') galleryPhotos = [];
+        if (typeof renderedPhotoCount !== 'undefined') renderedPhotoCount = 0;
         if (typeof photoInfiniteContainer !== 'undefined' && photoInfiniteContainer) {
             photoInfiniteContainer.hidden = true;
         }
@@ -946,8 +951,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function setupInfiniteObserver() {
-        if (photoInfiniteObserver && photoSentinel) {
-            photoInfiniteObserver.unobserve(photoSentinel);
+        if (photoInfiniteObserver) {
+            photoInfiniteObserver.disconnect();
         }
         if (typeof IntersectionObserver !== 'undefined' && photoSentinel) {
             photoInfiniteObserver = new IntersectionObserver((entries) => {
@@ -1045,10 +1050,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 photoInfiniteStatus.textContent = `showing ${renderedPhotoCount} of ${galleryPhotos.length} photos`;
             }
             if (typeof photoInfiniteObserver !== 'undefined' && photoSentinel && photoInfiniteObserver) {
+                // Re-arm after each batch: the sentinel may still be in the
+                // preload area, so waiting for a new threshold crossing can stall.
+                photoInfiniteObserver.unobserve(photoSentinel);
                 photoInfiniteObserver.observe(photoSentinel);
             }
             if (photoLoadMoreBtn) {
-                photoLoadMoreBtn.hidden = (typeof IntersectionObserver !== 'undefined' && typeof photoInfiniteObserver !== 'undefined' && Boolean(photoInfiniteObserver));
+                photoLoadMoreBtn.hidden = false;
             }
         }
     }
