@@ -22,7 +22,7 @@ test('Pages stats routes reach external Durable Objects in the Cloudflare runtim
     const fetch = (path, method = 'GET') => mf.dispatchFetch(origin + path, {
       method, headers: { Origin: origin, 'CF-Connecting-IP': '192.0.2.1' },
     });
-    for (const path of ['/api/total/increment', '/api/unique/increment', '/api/resume/increment']) {
+    for (const path of ['/api/total/increment', '/api/unique/increment', '/api/resume/increment', '/api/sections/increment?section=projects']) {
       const response = await fetch(path, 'POST');
       assert.equal(response.status, 200, await response.text());
     }
@@ -34,6 +34,9 @@ test('Pages stats routes reach external Durable Objects in the Cloudflare runtim
       assert.equal(response.status, 200, path);
       assert.equal((await response.json())[field], 1, path);
     }
+    const sectionsRes = await fetch('/api/sections');
+    assert.equal(sectionsRes.status, 200, '/api/sections');
+    assert.equal((await sectionsRes.json()).projects, 1, 'sections.projects');
     for (const path of ['/api/total/history7d', '/api/unique/history7d']) {
       const response = await fetch(path);
       assert.equal(response.status, 200, path);

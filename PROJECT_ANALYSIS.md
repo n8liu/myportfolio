@@ -692,7 +692,8 @@ The **Most-Clicked Sections** breakdown is fully implemented with edge and local
 ### Stats routing after analytics hardening
 - The previous build injected a workers.dev API base. Requests from Pages domains then failed the analytics origin allowlist, even though Pages already had the correct Durable Object bindings.
 - Keep both browser API bases empty and route all analytics through the current site's `/api/*` endpoints. The owning Worker still needs deployment because it contains the Durable Object classes. Existing method, origin, and rate-limit checks remain enabled.
-- Read-only production checks from the development environment were blocked by Cloudflare/DNS; local Cloudflare runtime verification uses separate Pages and analytics Workers with real SQLite-backed Durable Objects. All six stats reads, seeded counters, and chart history pass without claiming live-site success.
+- Ensure the Pages entrypoint `functions/_worker.js` regex includes all analytics routes (`/^\/api\/(viewers|resume|unique|total|sections)(?:\/|$)/`); omitting `sections` caused the edge Pages worker to return 404 for `/api/sections` and 405 for `/api/sections/increment`, causing the UI to display "offline metrics shown."
+- Read-only production checks from the development environment were blocked by Cloudflare/DNS; local Cloudflare runtime verification uses separate Pages and analytics Workers with real SQLite-backed Durable Objects. All stats reads, seeded counters, sections telemetry, and chart history pass without claiming live-site success.
 
 
 ### Photography Infinite Scroll, Modal Focus & Mobile Tab Alignment (September 2026)

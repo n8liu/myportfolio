@@ -20,7 +20,7 @@ export default {
       'Access-Control-Allow-Headers': 'Content-Type',
     };
 
-    if (/^\/api\/(viewers|resume|unique|total)(?:\/|$)/.test(path)) {
+    if (/^\/api\/(viewers|resume|unique|total|sections)(?:\/|$)/.test(path)) {
       return handleAnalytics(request, env);
     }
     if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
