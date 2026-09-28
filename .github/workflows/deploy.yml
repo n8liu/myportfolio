@@ -36,7 +36,6 @@ jobs:
         run: npm test
         env:
           NODE_ENV: production
-          API_BASE: https://myportfolio.nathanliu528.workers.dev
 
       # Pages references these external Durable Objects; deploy their owner first.
       - name: Deploy analytics Worker

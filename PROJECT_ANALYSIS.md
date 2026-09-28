@@ -111,8 +111,8 @@ graph TD
 | **Edge State Storage** | Cloudflare Durable Objects (SQLite) | Distributed stateful counters & visitor tracking (migrations v1-v6) |
 | **Object Storage** | Cloudflare R2 + `@aws-sdk/client-s3` | High-res photography storage with Edge caching (`caches.default`) |
 | **Image Processing** | `ExifReader`, `imagemagick` | EXIF extraction and multi-resolution downsizing scripts |
-| **Bundler & Build** | `esbuild` + Node.js build scripts | Bundle worker into ESM, inject production `API_BASE` |
-| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 32 unit, subsystem, and security tests verifying routing, motion, state & UX |
+| **Bundler & Build** | `esbuild` + Node.js build scripts | Bundle worker into ESM, generate Pages bindings |
+| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 34 unit, subsystem, and security tests verifying routing, motion, state & UX |
 | **CI / CD** | GitHub Actions (`deploy.yml`) | Automated build and deploy to Cloudflare Pages on push |
 
 ---
@@ -165,7 +165,7 @@ myportfolio/
 │   ├── downsize-images.js          # ImageMagick multi-resolution downscaler (large, medium, thumb)
 │   ├── image-metadata.js           # ExifReader script to extract EXIF into photos-metadata.json
 │   ├── image-optimizer.js          # Asset size analyzer & WebP suggestion tool
-│   └── prepare-pages-config.js     # Build step: prepares dist/wrangler.toml & injects API_BASE
+│   └── prepare-pages-config.js     # Build step: prepares dist/wrangler.toml; preserves same-origin APIs
 ├── index.html                      # Main single-page application desktop interface
 ├── styles.css                      # Global Retro OS design system tokens, window chrome, and layout
 ├── script.js                       # Primary client controller (SPA routing, modals, chart, drag)
@@ -507,7 +507,7 @@ Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
    - Endpoints: `/api/resume/increment`, `/api/resume/count`.
 
 ### 8.5 Automated Test Suites & Regression Safety Net
-The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 32 unit, subsystem, and security regression tests that execute against production builds:
+The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 34 unit, subsystem, and security regression tests that execute against production builds:
 
 1. **`tests/motion.test.js` (View Transitions & SPA Motion Engine)**:
    - Validates that initial page loads and in-page anchor scrolling remain immediate with zero transition latency.
@@ -565,7 +565,7 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 
 ### 10.1 NPM Scripts Reference
 ```bash
-npm test                 # Run production build and execute full test runner suite (32 tests across 6 test files)
+npm test                 # Run production build and execute full test runner suite (34 tests across 7 test files)
 npm run dev              # Start local Express + Socket.IO server on port 3000 with nodemon
 npm start                # Start production Node server locally
 npm run build            # Full production build: compiles assets into dist/, bundles worker, prepares Pages config
@@ -583,11 +583,11 @@ npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality
    ```bash
    npx esbuild functions/_worker.js --bundle --outfile=dist/_worker.js --format=esm --platform=browser
    ```
-4. **Configuration & URL Injection (`utils/prepare-pages-config.js`)**:
+4. **Pages Configuration (`utils/prepare-pages-config.js`)**:
    - Generates `dist/wrangler.toml` from root `wrangler.toml`, replacing `main` with `pages_build_output_dir = "."`, removing Worker migrations, and binding Durable Objects to the existing `myportfolio` Worker via `script_name`.
-   - Injects the production analytics `API_BASE` (`https://myportfolio.nathanliu528.workers.dev`) into `dist/script.js` and `dist/viewers.js`. Photography always uses the site's own origin.
+   - Keeps browser API URLs same-origin for stats, viewer heartbeats, resume tracking, and photography. Pages forwards analytics through external Durable Object bindings; the build does not inject an external Worker URL.
 5. **Automated Subsystem Verification (`npm test`)**:
-   - Executes all 32 tests across motion, photography, scrollspy, UX, viewer sessions, and security suites. Security tests include a localhost Express listener; sandboxed test runs need local networking permission.
+   - Executes all 34 tests across motion, photography, scrollspy, UX, viewer sessions, security, and Cloudflare runtime suites. Security tests include a localhost Express listener; sandboxed test runs need local networking permission.
 
 ### Durable Object migration history
 Production has already applied migration `v6`, which created `InstagramCounter`, `GitHubCounter`, `EmailCounter`, and `LinkedInCounter`. Keep that original entry in `wrangler.toml`: removing it makes Wrangler replay earlier creation migrations and fail with error 10074. The retired classes remain exported from `functions/retired_counters.js` with inactive HTTP 410 handlers, preserving their namespaces and stored data. Their routes and bindings remain removed. Do not delete their namespaces as part of an unrelated deployment fix.
@@ -595,7 +595,7 @@ Production has already applied migration `v6`, which created `InstagramCounter`,
 ### 10.3 GitHub Actions Workflow (`.github/workflows/deploy.yml`)
 - Triggered on push or pull request to `main`.
 - Sets up Node 24 (minimum supported local version: 24.15.0).
-- Executes `npm ci`, `npm audit --audit-level=moderate`, and `npm test` with `API_BASE` env. Pull requests run verification only; deployments run on pushes to `main`.
+- Executes `npm ci`, `npm audit --audit-level=moderate`, and `npm test` with same-origin API routing. Pull requests run verification only; deployments run on pushes to `main`.
 - On pushes to `main`, deploys the owning analytics Worker first with `wrangler deploy --config wrangler.toml`. Pages deployment alone does not update the external Durable Object code. Pull requests do not deploy this production Worker.
 - Deploys to Cloudflare Pages using `wrangler pages deploy --cwd dist --project-name=myportfolio`. Running from `dist/` is required so Wrangler discovers the generated Pages configuration and applies its R2 binding.
 
@@ -638,7 +638,7 @@ npm run downsize:90
 
 ## Security hardening (September 2026)
 
-- **Secrets**: Local environment files, `.dev.vars*`, private keys/certificates, credentials files, and `.wrangler/` state are ignored. `.env.example` may contain placeholders only. Build configuration validates `API_BASE` as an HTTPS origin without credentials, paths, or query parameters, and serializes it safely into JavaScript. Public Worker URLs and bucket names are identifiers, not credentials.
+- **Secrets**: Local environment files, `.dev.vars*`, private keys/certificates, credentials files, and `.wrangler/` state are ignored. `.env.example` may contain placeholders only. Browser API routes remain same-origin; no environment-provided API URL or credential is injected into browser bundles. Public Worker URLs and bucket names are identifiers, not credentials.
 - **Analytics access**: `functions/analytics-security.js` explicitly lists valid routes/methods. The public reset endpoint is removed; increments and viewer mutations require POST. CORS allows the production site origins and the request's own origin. Missing Cloudflare client IPs and disallowed browser origins are rejected. Origin validation is not authentication: clients can spoof Origin, so quotas are enforced independently.
 - **Abuse controls**: The existing `SessionTracker` namespace enforces 120 analytics requests/minute/IP, 3 total and unique increments/minute/IP per endpoint, 10 resume increments/minute/IP, and 5 simultaneous viewer sessions/IP. Viewer IDs are bound to their client IP so another address cannot disconnect them. Quotas are transactional; rate-limit state uses a daily IP digest and expires via alarms. No new migration is required. Shared networks may hit these limits, and distributed abuse still requires edge-level WAF/bot controls.
 - **HTML safety**: Blog manifest fields are escaped and slugs restricted. DOMPurify sanitizes parsed Markdown with an HTML-only profile and no forms, styles, IDs, or names. If the sanitizer is unavailable, content is rendered as plain text. DOMPurify, marked, and Chart.js are served from explicit locked dependency files rather than fetched from external script CDNs.
@@ -646,6 +646,12 @@ npm run downsize:90
 - **Dependencies and CI**: Removed unused AWS SDK v2, ImageMagick wrapper, and http-server dependencies. Patched remaining dependencies, including Wrangler and its matching Cloudflare types. CI uses Node 24, `npm ci`, tests, and a dependency audit before main-branch deployment; checkout does not persist Git credentials. The implementation audit reported zero known vulnerabilities; rerun audits as advisories change.
 
 ## 12. Historical Defect Audit & Resolved Deficiencies
+
+### Stats routing after analytics hardening
+- The previous build injected a workers.dev API base. Requests from Pages domains then failed the analytics origin allowlist, even though Pages already had the correct Durable Object bindings.
+- Keep both browser API bases empty and route all analytics through the current site's `/api/*` endpoints. The owning Worker still needs deployment because it contains the Durable Object classes. Existing method, origin, and rate-limit checks remain enabled.
+- Read-only production checks from the development environment were blocked by Cloudflare/DNS; local Cloudflare runtime verification uses separate Pages and analytics Workers with real SQLite-backed Durable Objects. All six stats reads, seeded counters, and chart history pass without claiming live-site success.
+
 
 ### Photography Infinite Scroll, Modal Focus & Mobile Tab Alignment (September 2026)
 - **Observed**: Large photo galleries previously rendered all images simultaneously, producing heavy initial network payloads and slower Largest Contentful Paint (LCP). Additionally, the photo modal lacked sequential keyboard controls, mobile tab navigation would scroll out of visible view on small screens, and modal dialogs did not constrain keyboard tab focus.
@@ -691,7 +697,7 @@ When making modifications or adding features to this repository, adhere strictly
 1. **Do NOT Edit Ephemeral `dist/` Files Directly**:
    The `dist/` directory is completely overwritten during `npm run build`. Always edit the root source files (`index.html`, `script.js`, `styles.css`, etc.) and let the build pipeline handle compilation.
 2. **Preserve Empty String Placeholders**:
-   In source files like [script.js](file:///Users/natedogl/CODE/myportfolio/script.js) and [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js), keep `const API_BASE = '';` and `const workerBase = '';` as empty strings. The build step automatically injects production URLs in `dist/`. Hardcoding production URLs in root files will break local dev fallback behaviors.
+   In source files like [script.js](file:///Users/natedogl/CODE/myportfolio/script.js) and [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js), keep `const API_BASE = '';` and `const workerBase = '';` as empty strings. The build preserves these empty strings so browser requests use the current site origin. Do not inject external Worker URLs: they bypass Pages routing and may fail origin checks on Pages/custom domains.
 3. **Configuration Drift & `wrangler.toml`**:
    Cloudflare Pages requires R2 and external Durable Object bindings at deploy-time. We generate `dist/wrangler.toml` dynamically from root `wrangler.toml` using `prepare-pages-config.js`, removing Worker migrations and adding external `script_name` references ([Cloudflare configuration documentation](https://developers.cloudflare.com/pages/functions/wrangler-configuration/#durable-objects)). Deploy with `--cwd dist` so Wrangler reads this file. Update root `wrangler.toml` for binding changes. Durable Object migrations remain part of the separately deployed Worker.
 4. **Markdown Blog Authoring Contract**:

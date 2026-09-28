@@ -10,6 +10,8 @@ import worker from '../dist/_worker.js';
 import { SessionTracker } from '../functions/session_tracker.js';
 import { TotalCounter } from '../functions/total_counter.js';
 import { ViewerCounter } from '../functions/viewers.js';
+import { ResumeCounter } from '../functions/resume_counter.js';
+import { UniqueVisitors } from '../functions/unique_visitors.js';
 import { isPublicFile } from '../utils/public-files.js';
 
 function memoryStorage() {
@@ -40,7 +42,7 @@ function namespace(Class) {
   } };
 }
 function analyticsEnv() {
-  return { SESSION_TRACKER: namespace(SessionTracker), TOTAL_COUNTER: namespace(TotalCounter), VIEWER_COUNTER: namespace(ViewerCounter) };
+  return { SESSION_TRACKER: namespace(SessionTracker), TOTAL_COUNTER: namespace(TotalCounter), VIEWER_COUNTER: namespace(ViewerCounter), RESUME_COUNTER: namespace(ResumeCounter), UNIQUE_VISITORS: namespace(UniqueVisitors) };
 }
 function request(path, method = 'POST', extra = {}) {
   return new Request(`https://counter.example${path}`, { method, headers: {
@@ -65,6 +67,51 @@ test('analytics reset is removed and mutations require POST and an allowed origi
   missingIP.headers.delete('CF-Connecting-IP');
   missingIP.headers.set('X-Forwarded-For', '192.0.2.5');
   assert.equal((await worker.fetch(missingIP, env)).status, 403);
+});
+
+test('built stats client renders through same-origin APIs on Pages and custom domains', async () => {
+  const built = readFileSync('dist/script.js', 'utf8');
+  const viewers = readFileSync('dist/viewers.js', 'utf8');
+  assert.match(built, /const API_BASE = '';/);
+  assert.match(viewers, /const workerBase = '';/);
+  const start = built.indexOf('    async function loadStatsAndRenderChart(');
+  const end = built.indexOf('\n    // ----------------------------------------------------', start);
+  for (const origin of ['https://myportfolio.pages.dev', 'https://custom-portfolio.example']) {
+    const elements = new Map();
+    const env = analyticsEnv();
+    const calls = [];
+    let chart;
+    const context = vm.createContext({
+      API_BASE: '', statsLoading: false, statsChartInstance: null, window: {}, console,
+      document: { getElementById(id) {
+        if (!elements.has(id)) elements.set(id, { textContent: '', hidden: false, getContext: () => ({}) });
+        return elements.get(id);
+      } },
+      setLoadState(element, message) { element.textContent = message; },
+      async fetchJSON(path) {
+        assert.ok(path.startsWith('/api/'));
+        calls.push(path);
+        const response = await worker.fetch(new Request(origin + path, {
+          headers: { Origin: origin, 'CF-Connecting-IP': '192.0.2.1' },
+        }), env);
+        assert.equal(response.status, 200);
+        return response.json();
+      },
+      async loadScript(path) {
+        assert.equal(path, '/vendor/chart.umd.js');
+        assert.equal(isPublicFile(path), true);
+        context.window.Chart = class { constructor(_ctx, config) { chart = config; } };
+      },
+    });
+    vm.runInContext(built.slice(start, end), context);
+    await context.loadStatsAndRenderChart();
+    assert.equal(calls.length, 6);
+    assert.equal(elements.get('cf-total-views').textContent, 0);
+    assert.equal(elements.get('stats-status').textContent, '');
+    assert.equal(elements.get('statsChart').hidden, false);
+    assert.equal(chart.data.labels.length, 7);
+    assert.equal(chart.data.datasets.length, 2);
+  }
 });
 
 test('rate limits enforce per-IP increments, concurrent session caps, and ownership', async () => {
