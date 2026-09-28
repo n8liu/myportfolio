@@ -1178,7 +1178,7 @@ body.loaded {
 
 .photo-grid-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     padding-right: 6px;
     padding-bottom: 6px;
