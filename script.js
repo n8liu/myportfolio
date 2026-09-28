@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (window.innerWidth <= 768) return; // Disable dragging on mobile
 
             // Do not drag if clicking controls, buttons, or editing content
-            if (e.target.closest('.win-btn') || e.target.closest('.menu-item') || e.target.closest('.taskbar-app-btn') || e.target.isContentEditable) return;
+            if (e.target.closest('.win-btn') || e.target.closest('.taskbar-app-btn') || e.target.isContentEditable) return;
 
             isDragging = true;
 
@@ -382,6 +382,9 @@ document.addEventListener('DOMContentLoaded', function () {
             initPhotographyGallery();
         } else if (viewName === 'stats') {
             loadStatsAndRenderChart();
+            if (typeof loadSectionStats === 'function') {
+                loadSectionStats();
+            }
         } else if (viewName === 'blog') {
             loadBlogPosts();
         }
@@ -412,6 +415,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function performNavigation(target, updateHistory = true) {
         if (!target) target = 'home';
+        if (typeof trackSectionVisit === 'function') {
+            trackSectionVisit(target);
+        }
 
         if (separatePages.includes(target)) {
             // It's a separate page (photography, blog, stats)
@@ -767,6 +773,128 @@ document.addEventListener('DOMContentLoaded', function () {
             statsLoading = false;
             setLoadState(status, failed ? 'some stats are unavailable.' : '', failed ? loadStatsAndRenderChart : null);
         }
+    }
+
+    // ----------------------------------------------------
+    // 3.1. Most-Clicked Sections Telemetry
+    // ----------------------------------------------------
+    let sectionStatsLoading = false;
+    const SECTION_METADATA = {
+        projects: { path: '/projects' },
+        photography: { path: '/photography' },
+        experience: { path: '/experience' },
+        blog: { path: '/blog' },
+        education: { path: '/education' },
+        skills: { path: '/skills' }
+    };
+
+    const recordedSectionsThisSession = new Set();
+
+    function trackSectionVisit(section) {
+        if (!section || !SECTION_METADATA[section]) return;
+        if (recordedSectionsThisSession.has(section)) return;
+        recordedSectionsThisSession.add(section);
+        fetch(API_BASE + `/api/sections/increment?section=${encodeURIComponent(section)}`, {
+            method: 'POST',
+            keepalive: true
+        }).catch(() => {});
+    }
+
+    async function loadSectionStats() {
+        const container = document.getElementById('section-stats-container');
+        const statusEl = document.getElementById('section-stats-status');
+        if (!container || sectionStatsLoading) return;
+
+        sectionStatsLoading = true;
+        if (typeof setLoadState === 'function') {
+            setLoadState(statusEl, 'loading section breakdown...', null, true);
+        }
+
+        try {
+            const data = await fetchJSON(API_BASE + '/api/sections');
+            renderSectionStats(data, container);
+            if (typeof setLoadState === 'function') {
+                setLoadState(statusEl, '', null);
+            }
+        } catch (error) {
+            console.error('Error fetching section stats:', error);
+            const fallbackData = {
+                projects: 0,
+                photography: 0,
+                experience: 0,
+                blog: 0,
+                education: 0,
+                skills: 0
+            };
+            renderSectionStats(fallbackData, container);
+            if (typeof setLoadState === 'function') {
+                setLoadState(statusEl, 'offline metrics shown.', loadSectionStats);
+            }
+        } finally {
+            sectionStatsLoading = false;
+        }
+    }
+
+    function renderSectionStats(data, container) {
+        if (!container) return;
+        container.innerHTML = '';
+
+        const entries = Object.entries(data)
+            .filter(([key]) => SECTION_METADATA[key])
+            .map(([key, count]) => ({
+                key,
+                count: typeof count === 'number' ? count : 0,
+                ...SECTION_METADATA[key]
+            }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 6);
+
+        const total = entries.reduce((sum, item) => sum + item.count, 0);
+
+        entries.forEach((item, index) => {
+            const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+            const rank = index + 1;
+            const isTop = rank === 1 && item.count > 0;
+            const row = document.createElement('div');
+            row.className = `section-stat-row${isTop ? ' rank-top' : ''}`;
+            row.setAttribute('tabindex', '0');
+            row.setAttribute('role', 'button');
+            row.setAttribute('aria-label', `Navigate to ${item.path} section (${item.count.toLocaleString()} views, ${pct}%)`);
+
+            row.innerHTML = `
+                <div class="section-stat-info">
+                    <div class="section-stat-name-group">
+                        <span class="section-stat-rank">${isTop ? '★ #1' : `#${rank}`}</span>
+                        <span class="section-stat-path">${item.path}</span>
+                    </div>
+                    <div class="section-stat-metrics">
+                        <span class="section-stat-count">${item.count.toLocaleString()} views</span>
+                        <span class="section-stat-pct">${pct}%</span>
+                    </div>
+                </div>
+                <div class="section-stat-track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${item.path} view percentage: ${pct}%">
+                    <div class="section-stat-fill" style="width: 0%;"></div>
+                </div>
+            `;
+
+            const jumpToSection = () => {
+                navigateTo(item.key, true);
+            };
+            row.addEventListener('click', jumpToSection);
+            row.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    jumpToSection();
+                }
+            });
+
+            container.appendChild(row);
+
+            requestAnimationFrame(() => {
+                const fill = row.querySelector('.section-stat-fill');
+                if (fill) fill.style.width = `${pct}%`;
+            });
+        });
     }
 
     // ----------------------------------------------------

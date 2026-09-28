@@ -42,6 +42,11 @@ test('Pages stats routes reach external Durable Objects in the Cloudflare runtim
       assert.equal(data.counts.length, 7);
       assert.equal(data.counts.at(-1), 1);
     }
+    // A returning visitor adds a view but is still one unique visitor.
+    assert.equal((await fetch('/api/total/increment', 'POST')).status, 200);
+    assert.equal((await fetch('/api/unique/increment', 'POST')).status, 200);
+    assert.equal((await (await fetch('/api/total/requests24h')).json()).requests24h, 2);
+    assert.equal((await (await fetch('/api/unique/count')).json()).count, 1);
     assert.equal((await fetch('/api/total/reset', 'POST')).status, 404);
     assert.equal((await fetch('/api/total/increment')).status, 405);
   } finally {

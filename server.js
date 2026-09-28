@@ -168,6 +168,14 @@ let mockTotalViews = 1530;
 let mockUniqueViews = 412;
 let mockViews24h = 87;
 let mockResumeClicks = 28;
+let mockSectionViews = {
+    projects: 0,
+    photography: 0,
+    experience: 0,
+    blog: 0,
+    education: 0,
+    skills: 0
+};
 
 // Local mock history generator helper
 function getPast7Days() {
@@ -225,6 +233,18 @@ app.get('/api/unique/history7d', (req, res) => {
         days: getPast7Days(),
         counts: [40, 52, 45, 61, 55, 68, 80]
     });
+});
+
+app.get('/api/sections', (req, res) => {
+    res.json(mockSectionViews);
+});
+
+app.post('/api/sections/increment', (req, res) => {
+    const section = req.query.section;
+    if (section && mockSectionViews[section] !== undefined) {
+        mockSectionViews[section]++;
+    }
+    res.json(mockSectionViews);
 });
 
 // API endpoint to get the current viewer count

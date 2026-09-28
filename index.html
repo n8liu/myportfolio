@@ -93,15 +93,14 @@
             </div>
         </div>
 
-        <!-- Menu Bar -->
-        <div class="window-menubar">
-            <div class="menu-item" onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with care.')">File</div>
-            <div class="menu-item"
-                onclick="alert('This document is read-only.')">Edit</div>
-            <div class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</div>
-            <div class="menu-item" onclick="document.querySelector('[data-tab=\'stats\']').click()">Stats</div>
-            <div class="menu-item" onclick="alert('Email nathan.dtliu@gmail.com for help.')">Help</div>
-        </div>
+        <!-- Desktop menu bar -->
+        <nav class="window-menubar" aria-label="Window menu">
+            <button type="button" class="menu-item" onclick="alert('Nathan Liu Portfolio\nVersion 3.0\nBuilt with care.')">File</button>
+            <button type="button" class="menu-item" onclick="alert('This document is read-only.')">Edit</button>
+            <button type="button" class="menu-item" onclick="alert('View settings: Retro OS Theme active.')">View</button>
+            <button type="button" class="menu-item" onclick="document.querySelector('[data-tab=\'stats\']').click()">Stats</button>
+            <button type="button" class="menu-item" onclick="alert('Email nathan.dtliu@gmail.com for help.')">Help</button>
+        </nav>
 
         <!-- Body Content -->
         <div class="window-body">
@@ -396,7 +395,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">CardboardDex</h3>
-                                <span class="retro-badge">Active (2026)</span>
+                                <span class="retro-badge">2026</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">A full-stack trading card market
                                 platform
@@ -419,7 +418,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">Live Semantic Market</h3>
-                                <span class="retro-badge">Completed (2026)</span>
+                                <span class="retro-badge">2026</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses
                                 zero-shot extraction, vector search, and clustering to process financial news into
@@ -435,7 +434,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">Clickbait Classifier</h3>
-                                <span class="retro-badge">Completed (2026)</span>
+                                <span class="retro-badge">2026</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on
                                 18K
@@ -453,7 +452,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">FleetManager</h3>
-                                <span class="retro-badge">Completed (2025)</span>
+                                <span class="retro-badge">2025</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built backend APIs and reliable data
                                 pipelines for EV fleet management, integrating telemetry and utility data to support
@@ -469,7 +468,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">ItineraryAI</h3>
-                                <span class="retro-badge">Completed (2025)</span>
+                                <span class="retro-badge">2025</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built a chat-based travel concierge
                                 that
@@ -487,7 +486,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">The IBD Digest</h3>
-                                <span class="retro-badge">Completed (2025)</span>
+                                <span class="retro-badge">2025</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion
                                 app
@@ -508,7 +507,7 @@
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">Spotify Analytics</h3>
-                                <span class="retro-badge">Completed (2025)</span>
+                                <span class="retro-badge">2025</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard
                                 showing profile insights, favorite genres, and user recommendations.</p>
@@ -518,12 +517,16 @@
                                 <span class="tech-pill">Spotify API</span>
                                 <span class="tech-pill">Pandas</span>
                             </div>
+                            <div class="project-actions">
+                                <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro primary" target="_blank"><i
+                                         class="fas fa-external-link-alt"></i> demo</a>
+                            </div>
                         </div>
 
                         <div class="retro-card">
                             <div class="card-header">
                                 <h3 class="card-title">SimplyMail</h3>
-                                <span class="retro-badge">Completed (2024)</span>
+                                <span class="retro-badge">2024</span>
                             </div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high
                                 performance, clean visual interfaces, and secure Gmail API integrations.</p>
@@ -669,7 +672,7 @@
                                 <div class="value" id="cf-total-views">Loading...</div>
                             </div>
                             <div class="stat-card">
-                                <span class="label">Unique Visitors</span>
+                                <span class="label">Unique Visitors (7d)</span>
                                 <div class="value" id="unique-visitors">Loading...</div>
                             </div>
                             <div class="stat-card">
@@ -677,7 +680,7 @@
                                 <div class="value" id="requests-24h">Loading...</div>
                             </div>
                             <div class="stat-card">
-                                <span class="label">Resume Downloads</span>
+                                <span class="label">Resume Clicks</span>
                                 <div class="value" id="resume-clicks">Loading...</div>
                             </div>
                         </div>
@@ -687,6 +690,20 @@
                                 style="font-weight: 700; margin-bottom: 1rem; font-family: var(--font-mono); font-size: 0.9rem;">
                                 7-Day Traffic Trends</h4>
                             <canvas id="statsChart" style="width: 100%; height: 280px;"></canvas>
+                        </div>
+
+                        <!-- Most-Clicked Sections Breakdown -->
+                        <div class="stats-section-box">
+                            <div class="stats-box-header">
+                                <h4 class="stats-box-title">
+                                    <i class="fas fa-layer-group" aria-hidden="true"></i> Most-Clicked Sections
+                                </h4>
+                                <span class="stats-box-file">started: Sep 28, 2026</span>
+                            </div>
+                            <div id="section-stats-status"></div>
+                            <div id="section-stats-container" class="section-stats-list" role="region" aria-label="Most-clicked sections breakdown">
+                                <!-- Dynamically populated by script.js -->
+                            </div>
                         </div>
                     </div>
                 </section>

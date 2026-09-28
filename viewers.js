@@ -41,22 +41,10 @@ class ViewerCounter {
       this.sessionId = crypto.randomUUID();
       this.startPolling(workerBase);
 
-      // Only increment total page views and unique visitors if this is NOT a reload or back/forward
-      let isNewVisit = true;
-      if (performance.getEntriesByType) {
-        const nav = performance.getEntriesByType("navigation")[0];
-        if (nav && (nav.type === "reload" || nav.type === "back_forward")) {
-          isNewVisit = false;
-        }
-      } else if (performance.navigation) {
-        if (performance.navigation.type === 1 || performance.navigation.type === 2) {
-          isNewVisit = false;
-        }
-      }
-      if (isNewVisit) {
-        fetch(`${workerBase}/api/total/increment`, { method: 'POST' }).catch(() => {});
-        fetch(`${workerBase}/api/unique/increment`, { method: 'POST' }).catch(() => {});
-      }
+      // A page load is a view, including reloads and restored full navigations.
+      // Unique visitors are deduplicated by the server, independently of views.
+      fetch(`${workerBase}/api/total/increment`, { method: 'POST' }).catch(() => {});
+      fetch(`${workerBase}/api/unique/increment`, { method: 'POST' }).catch(() => {});
     } catch (error) {
       console.error('Error connecting to viewer counter:', error);
     }

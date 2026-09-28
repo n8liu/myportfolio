@@ -20,24 +20,21 @@ export class UniqueVisitors {
 
     if (url.pathname.endsWith('/increment')) {
       if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
-      let ip = request.headers.get('cf-connecting-ip') || request.headers.get('x-forwarded-for') || '';
-      if (!ip) {
-        ip = Math.random().toString(36).slice(2);
-      }
+      const ip = request.headers.get('cf-connecting-ip');
+      if (!ip) return new Response('Client address unavailable', { status: 400 });
 
-      // Check if IP is already seen today
+      // Repeat visits refresh last-seen time, but only the first visit that day
+      // increments the daily unique count. Serialize simultaneous tabs.
       const seenKey = `seen:${todayStr}:${ip}`;
-      const hasBeenSeen = await this.state.storage.get(seenKey);
-
-      if (!hasBeenSeen) {
-        // Record as seen today, with value as timestamp
-        await this.state.storage.put(seenKey, now);
-
-        // Increment today's unique count
-        const dailyKey = `count:${todayStr}`;
-        const dailyCount = (await this.state.storage.get(dailyKey)) || 0;
-        await this.state.storage.put(dailyKey, dailyCount + 1);
-      }
+      await this.state.storage.transaction(async storage => {
+        const seen = await storage.get(seenKey);
+        if (seen === undefined) {
+          const dailyKey = `count:${todayStr}`;
+          const count = ((await storage.get(dailyKey)) || 0) + 1;
+          await storage.put(dailyKey, count);
+        }
+        await storage.put(seenKey, now);
+      });
 
       // Trigger pruning of data older than 7 days once a day
       const lastPruned = await this.state.storage.get('last_pruned_date');
@@ -84,46 +81,39 @@ export class UniqueVisitors {
     return new Response('Not found', { status: 404, headers: corsHeaders });
   }
 
-  // Calculate unique IP count over past 7 days
+  // Durable Object list() returns a Map, not an R2 cursor response.
+  async *listSeen(prefix) {
+    let startAfter;
+    while (true) {
+      const page = await this.state.storage.list({ prefix, limit: 100, ...(startAfter ? { startAfter } : {}) });
+      for (const entry of page) yield entry;
+      if (page.size < 100) return;
+      startAfter = [...page.keys()].at(-1);
+    }
+  }
+
+  // Distinct complete IP addresses across the seven UTC calendar days shown.
   async getUniqueCount7D(now) {
     const uniqueIPs = new Set();
     for (let i = 0; i < 7; i++) {
       const dateStr = new Date(now - i * 24 * 3600 * 1000).toISOString().split('T')[0];
-      let cursor = "";
-      while (true) {
-        const options = { prefix: `seen:${dateStr}:`, limit: 100 };
-        if (cursor) options.cursor = cursor;
-        const res = await this.state.storage.list(options);
-        for (const key of res.keys()) {
-          const parts = key.split(':');
-          if (parts.length >= 3) {
-            uniqueIPs.add(parts[2]);
-          }
-        }
-        if (res.cursor) {
-          cursor = res.cursor;
-        } else {
-          break;
-        }
+      const prefix = `seen:${dateStr}:`;
+      for await (const [key] of this.listSeen(prefix)) {
+        uniqueIPs.add(key.slice(prefix.length));
       }
     }
     return uniqueIPs.size;
   }
 
-  // Calculate unique IP count over past 24 hours
+  // Rolling 24-hour distinct visitors, using refreshed last-seen timestamps.
   async getUniqueCount24H(now) {
     const uniqueIPs = new Set();
-    const twentyFourHoursAgo = now - 24 * 3600 * 1000;
+    const cutoff = now - 24 * 3600 * 1000;
     for (let i = 0; i < 2; i++) {
       const dateStr = new Date(now - i * 24 * 3600 * 1000).toISOString().split('T')[0];
-      const res = await this.state.storage.list({ prefix: `seen:${dateStr}:` });
-      for (const [key, lastSeen] of res.entries()) {
-        if (lastSeen >= twentyFourHoursAgo) {
-          const parts = key.split(':');
-          if (parts.length >= 3) {
-            uniqueIPs.add(parts[2]);
-          }
-        }
+      const prefix = `seen:${dateStr}:`;
+      for await (const [key, lastSeen] of this.listSeen(prefix)) {
+        if (lastSeen > cutoff && lastSeen <= now) uniqueIPs.add(key.slice(prefix.length));
       }
     }
     return uniqueIPs.size;

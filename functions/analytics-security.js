@@ -13,6 +13,8 @@ const routes = {
   '/api/unique/history7d': ['UNIQUE_VISITORS', 'GET'],
   '/api/resume/count': ['RESUME_COUNTER', 'GET'],
   '/api/resume/increment': ['RESUME_COUNTER', 'POST'],
+  '/api/sections': ['TOTAL_COUNTER', 'GET'],
+  '/api/sections/increment': ['TOTAL_COUNTER', 'POST'],
 };
 
 async function digest(value) {

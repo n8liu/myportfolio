@@ -248,23 +248,28 @@ body.loaded {
 }
 
 .window-menubar {
-    background-color: var(--bg-chrome);
-    border-bottom: var(--border);
+    flex-shrink: 0;
     display: flex;
     gap: 1.2rem;
     padding: 0.3rem 1rem;
+    background-color: var(--bg-chrome);
+    border-bottom: var(--border);
     font-family: var(--font-mono);
     font-size: 0.8rem;
-    user-select: none;
 }
 
 .menu-item {
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
     cursor: pointer;
     padding: 0.1rem 0.5rem;
     border-radius: 3px;
 }
 
-.menu-item:hover {
+.menu-item:hover,
+.menu-item:focus-visible {
     background-color: var(--text);
     color: var(--bg-canvas);
 }
@@ -614,11 +619,22 @@ body.loaded {
     margin-top: 1rem;
 }
 
-/* Keep dates at the right edge, including when a long role forces a new line. */
-#panel-experience .retro-badge {
+/* Keep dates at the right edge, including when a long role or title forces a new line. */
+#panel-experience .retro-badge,
+.projects-grid .retro-badge {
     margin-inline-start: auto;
     text-align: right;
     white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.projects-grid .card-header {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+.projects-grid .card-title {
+    min-width: 0;
 }
 
 .projects-grid {
@@ -1200,7 +1216,7 @@ body.loaded {
     box-shadow: 3px 3px 0px 0px var(--border-color);
     border-radius: 4px;
     overflow: hidden;
-    height: 180px;
+    aspect-ratio: 1;
     position: relative;
     cursor: pointer;
     transition: all 0.1s ease;
@@ -1224,6 +1240,8 @@ body.loaded {
 }
 
 .photo-card img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1330,6 +1348,172 @@ body.loaded {
     width: 100%;
 }
 
+/* Most-Viewed Sections Telemetry Widget */
+.stats-section-box {
+    border: var(--border);
+    box-shadow: var(--shadow);
+    background-color: var(--bg-window);
+    padding: 1.1rem 1.25rem 1rem;
+    border-radius: 4px;
+    margin-top: 1.25rem;
+    width: 100%;
+}
+
+.stats-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.4rem;
+    border-bottom: var(--border-thin);
+}
+
+.stats-box-title {
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.stats-box-file {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.section-stats-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    gap: 0.55rem 0.85rem;
+}
+
+.section-stat-row {
+    background-color: var(--bg-canvas);
+    border: var(--border-thin);
+    border-radius: 4px;
+    padding: 0.45rem 0.75rem;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.section-stat-row:hover {
+    transform: translate(1px, 1px);
+    box-shadow: var(--shadow-hover);
+    background-color: var(--bg-chrome);
+}
+
+.section-stat-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.section-stat-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+}
+
+.section-stat-name-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-stat-rank {
+    font-weight: 700;
+    font-size: 0.68rem;
+    padding: 0.05rem 0.35rem;
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    background-color: var(--bg-window);
+    min-width: 26px;
+    text-align: center;
+    font-family: var(--font-mono);
+}
+
+.section-stat-row.rank-top .section-stat-rank {
+    background-color: var(--bg-active);
+    color: var(--text);
+    border-color: var(--border-color);
+}
+
+.section-stat-path {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text);
+    letter-spacing: -0.2px;
+}
+
+.section-stat-metrics {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+}
+
+.section-stat-count {
+    color: var(--text-muted);
+}
+
+.section-stat-pct {
+    font-weight: 700;
+    color: var(--text);
+    min-width: 32px;
+    text-align: right;
+}
+
+.section-stat-track {
+    width: 100%;
+    height: 8px;
+    background-color: var(--bg-chrome);
+    border: 1px solid var(--border-color);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.section-stat-fill {
+    height: 100%;
+    background-color: var(--accent);
+    border-radius: 1px;
+    width: 0%;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section-stat-row.rank-top .section-stat-fill {
+    background-color: #513989;
+    background-image: linear-gradient(90deg, #513989 0%, #7353be 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-stat-fill {
+        transition: none;
+    }
+}
+
+@media (max-width: 680px) {
+    .section-stats-list {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        grid-auto-flow: row;
+        gap: 0.45rem;
+    }
+    .section-stat-row {
+        padding: 0.4rem 0.65rem;
+    }
+}
+
 /* Window Taskbar/Status Bar (Game UI OS style) */
 .window-taskbar {
     background-color: var(--bg-chrome);
@@ -1426,6 +1610,26 @@ body.loaded {
 
 .modal-overlay.active .modal-dialog {
     animation: dialog-enter 180ms ease;
+}
+
+#photo-modal .modal-dialog {
+    max-width: 1250px;
+    max-height: 90dvh;
+}
+
+#photo-modal .modal-titlebar {
+    flex-shrink: 0;
+}
+
+#photo-modal .modal-body {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+@media (min-width: 769px) {
+    #photo-modal .modal-body {
+        height: 750px;
+    }
 }
 
 .modal-titlebar {
@@ -1800,27 +2004,29 @@ body.zooming-out {
     }
 
     .window-taskbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+        flex-direction: row;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.25rem 0.5rem calc(0.25rem + env(safe-area-inset-bottom, 0px));
     }
 
     .taskbar-left,
     .taskbar-right {
         min-width: 0;
-        flex-wrap: wrap;
-        justify-content: space-between;
+        flex-wrap: nowrap;
         gap: 0.5rem;
     }
 
-    .taskbar-status {
-        margin-inline-start: auto;
-        font-size: 0.7rem;
+    .window-menubar,
+    .taskbar-status,
+    #taskbar-top-btn {
+        display: none;
     }
 
-    .taskbar-right .taskbar-app-btn {
-        margin-left: 0;
+    .start-btn {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        white-space: nowrap;
     }
 
     .taskbar-stat {
@@ -1832,16 +2038,6 @@ body.zooming-out {
 
     .photo-grid-layout {
         grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr));
-    }
-
-    .photo-card {
-        height: auto;
-        aspect-ratio: 1;
-    }
-
-    .photo-card img {
-        position: absolute;
-        inset: 0;
     }
 
     .panel {

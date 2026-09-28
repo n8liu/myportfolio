@@ -112,7 +112,7 @@ graph TD
 | **Object Storage** | Cloudflare R2 + `@aws-sdk/client-s3` | High-res photography storage with Edge caching (`caches.default`) |
 | **Image Processing** | `ExifReader`, `imagemagick` | EXIF extraction and multi-resolution downsizing scripts |
 | **Bundler & Build** | `esbuild` + Node.js build scripts | Bundle worker into ESM, generate Pages bindings |
-| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 34 unit, subsystem, and security tests verifying routing, motion, state & UX |
+| **Automated Testing** | Node.js Test Runner (`node:test`, `node:assert/strict`, `node:vm`) | 40 unit, subsystem, and security tests verifying routing, motion, state & UX |
 | **CI / CD** | GitHub Actions (`deploy.yml`) | Automated build and deploy to Cloudflare Pages on push |
 
 ---
@@ -150,7 +150,7 @@ myportfolio/
 │   ├── _worker.js                  # Main Worker entrypoint: DO routing, R2 streaming, SPA fallback
 │   ├── _middleware.js              # Legacy middleware; ignored by advanced-mode Pages deployment
 │   ├── photos-metadata.json        # Pre-extracted EXIF metadata array for photography assets
-│   ├── resume_counter.js           # Durable Object: Tracks resume downloads
+│   ├── resume_counter.js           # Durable Object: Tracks resume clicks
 │   ├── session_tracker.js          # Durable Object: Active session management
 │   ├── total_counter.js            # Durable Object: 7-day request history & total view counter
 │   ├── unique_visitors.js          # Durable Object: IP-deduplicated unique visitor counts + auto-prune
@@ -221,14 +221,14 @@ These values describe the current source in `index.html` and `styles.css`; earli
 The profile retains its circular border, offset shadow, and `object-fit: cover`. Experience and leadership share the existing retro card styles, while section headings and skill badges use lighter decoration.
 
 ### Mobile footer, photos, and experience dates
-- At widths up to 768px, the taskbar stacks its left and right groups, lets controls wrap, and reserves bottom safe-area padding. The footer does not shrink inside the OS window.
-- Mobile photo cards use a 1:1 aspect ratio and cover-cropped images; the grid minimum shrinks to the available width. Desktop cards retain their existing 180px height.
+- At widths up to 768px, the taskbar is a compact single row (about 32px before device safe-area padding). It shows the start button, active viewers, and clock; `top.exe` and system status are hidden. The menu bar is visible on desktop only.
+- Photo cards use a 1:1 aspect ratio and cover-cropped images at every viewport size. Desktop uses three equal columns; on mobile, the grid minimum shrinks to the available width.
 - Experience and leadership date badges retain right alignment, including when a long role title moves the badge to a new line.
-- Verified in local Chrome at 320, 375, 390, 430, 768, and 1280px: no footer control overflow, square mobile photos, and right-aligned dates. Checks used local markup/styles with external fonts and network content disabled.
+- Verified in local Chrome at 320, 375, 390, 430, 768, and 1280px: no footer control overflow, correct mobile/desktop menu visibility, square photos, and right-aligned dates. Checks used local markup/styles with external fonts and network content disabled.
 
 ### Key UI Features & Micro-Interactions
 - **Interactive Ambient Wallpaper**: Mouse pointer movement updates `--mouse-x`, `--mouse-y`, `--mouse-px`, `--mouse-py` on `document.documentElement` to smoothly shift an ambient spotlight and parallax background grid.
-- **Retro OS Window Chrome**: Features a classic titlebar with icon, dynamic file path (`C:\nathan\portfolio\...`), window control buttons (`_`, `口`, `X`), a retro menu bar (`File`, `Edit`, `View`, `Tools`, `Help`), and a bottom taskbar with a live digital clock and active viewer count.
+- **Retro OS Window Chrome**: Features a classic titlebar with icon, dynamic file path (`C:\nathan\portfolio\...`), window control buttons (`_`, `口`, `X`), and a bottom taskbar with a live digital clock and active viewer count.
 - **Draggable Windows**: Both the main OS desktop window and all modal popups (`image_viewer.exe`, `blog_post.txt`) can be dragged via their titlebars using `makeElementDraggable()` in `script.js` (disabled on mobile <= 768px).
 - **Interactive Retro Terminal Console (`term.exe`)**: A bottom-left docked and draggable retro CLI console with interactive commands (`about`, `skills`, `projects`, `education`, `blog`, `matcha`, `photos`, `stats`, `goto`, `theme`, `contact`, `clear`), command history with up/down arrow cycling, tab completion, and taskbar launch controls.
 - **Tactile Button Press**: Interactive cards and buttons use a brutalist offset shadow (`4px 4px 0px #1e1e1e`) that translates `translate(1px, 1px)` on hover and `translate(2px, 2px)` on click with reduced shadow.
@@ -505,15 +505,21 @@ Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
    - Generates 7-day daily traffic buckets for Chart.js.
    - Endpoints: `/api/total`, `/api/total/increment`, `/api/total/requests24h`, `/api/total/history7d`.
 3. **`UniqueVisitors` (`functions/unique_visitors.js`)**:
-   - Deduplicates visitors by IP (`cf-connecting-ip` / `x-forwarded-for`) using daily keys `seen:YYYY-MM-DD:ip`.
+   - Deduplicates visitors using the Cloudflare-provided `cf-connecting-ip` header and daily keys `seen:YYYY-MM-DD:ip`, preserving full IPv6 addresses and paginating with `startAfter`.
    - Automatically prunes records older than 8 days to prevent storage bloat.
    - Endpoints: `/api/unique/count`, `/api/unique/increment`, `/api/unique/history7d`, `/api/unique/visitors24h`.
 4. **`ResumeCounter` (`functions/resume_counter.js`)**:
-   - Tracks downloads of `Nathan_Liu_Resume.pdf`.
+   - Tracks clicks on `Nathan_Liu_Resume.pdf`; it does not confirm completed downloads.
    - Endpoints: `/api/resume/increment`, `/api/resume/count`.
 
+#### Current stats page
+
+The implemented cards show lifetime total views, unique visitors across seven UTC calendar days, rolling 24-hour views, and lifetime resume clicks. The chart compares daily views and daily unique visitors for seven UTC calendar days. Below the chart, the **Most-Viewed Sections** widget (`started: Sep 28, 2026`) displays a compact two-column grid of ranked horizontal progress bars with visit counts and percentage breakdowns across clean route paths (`/projects`, `/photography`, `/experience`, `/blog`, `/education`, `/skills`), complete with tactile row interactions that jump directly to each section. Tracking starts from zero on Sep 28, 2026. Active viewers appear separately in the footer.
+
+These metrics are site-wide and shared by mobile and desktop. Project clicks, blog opens, photo opens, device breakdowns, and traffic sources are documented in [the stats roadmap](#113-stats-page-roadmap-planned-not-implemented).
+
 ### 8.5 Automated Test Suites & Regression Safety Net
-The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 34 unit, subsystem, and security regression tests that execute against production builds:
+The repository features an automated Node test runner test suite (`node --test tests/*.test.js`) containing 40 unit, subsystem, and security regression tests that execute against production builds:
 
 1. **`tests/motion.test.js` (View Transitions & SPA Motion Engine)**:
    - Validates that initial page loads and in-page anchor scrolling remain immediate with zero transition latency.
@@ -562,8 +568,10 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 | `/api/unique/count` | `GET` | 7-day unique visitor count | `{"count": 412}` |
 | `/api/unique/increment` | `POST`| Records unique visitor if unseen today | `{"count": 413}` |
 | `/api/unique/history7d` | `GET` | 7-day daily unique visitor history | `{"days":[1716163200000,...],"counts":[40,52,45,61,55,68,80]}` |
-| `/api/resume/count` | `GET` | Returns total resume downloads | `{"clicks": 28}` |
-| `/api/resume/increment` | `POST`| Increments resume download count | `{"clicks": 29}` |
+| `/api/resume/count` | `GET` | Returns total resume clicks | `{"clicks": 28}` |
+| `/api/resume/increment` | `POST`| Records a resume-link click | `{"clicks": 29}` |
+| `/api/sections` | `GET` | Breakdown of views per portfolio section | `{"projects":524,"photography":348,...}` |
+| `/api/sections/increment?section=<name>` | `POST`| Increments visit counter for valid section | `{"projects":525,...}` |
 
 ---
 
@@ -571,7 +579,7 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 
 ### 10.1 NPM Scripts Reference
 ```bash
-npm test                 # Run production build and execute full test runner suite (34 tests across 7 test files)
+npm test                 # Run production build and execute full test runner suite (40 tests across 8 test files)
 npm run dev              # Start local Express + Socket.IO server on port 3000 with nodemon
 npm start                # Start production Node server locally
 npm run build            # Full production build: compiles assets into dist/, bundles worker, prepares Pages config
@@ -593,7 +601,7 @@ npm run downsize:90      # Downscale photos in-place to 90% scale at 82% quality
    - Generates `dist/wrangler.toml` from root `wrangler.toml`, replacing `main` with `pages_build_output_dir = "."`, removing Worker migrations, and binding Durable Objects to the existing `myportfolio` Worker via `script_name`.
    - Keeps browser API URLs same-origin for stats, viewer heartbeats, resume tracking, and photography. Pages forwards analytics through external Durable Object bindings; the build does not inject an external Worker URL.
 5. **Automated Subsystem Verification (`npm test`)**:
-   - Executes all 34 tests across motion, photography, scrollspy, UX, viewer sessions, security, and Cloudflare runtime suites. Security tests include a localhost Express listener; sandboxed test runs need local networking permission.
+   - Executes all 40 tests across motion, photography, scrollspy, UX, viewer sessions, security, stats counts, and Cloudflare runtime suites. Security tests include a localhost Express listener; sandboxed test runs need local networking permission.
 
 ### Durable Object migration history
 Production has already applied migration `v6`, which created `InstagramCounter`, `GitHubCounter`, `EmailCounter`, and `LinkedInCounter`. Keep that original entry in `wrangler.toml`: removing it makes Wrangler replay earlier creation migrations and fail with error 10074. The retired classes remain exported from `functions/retired_counters.js` with inactive HTTP 410 handlers, preserving their namespaces and stored data. Their routes and bindings remain removed. Do not delete their namespaces as part of an unrelated deployment fix.
@@ -640,6 +648,28 @@ npm run downsize:90
 - 📝 Video demos for complex project showcases
 - 📝 Interactive map integration for photo travel locations
 
+### 11.3 Stats Page Roadmap
+
+The **Most-Clicked Sections** breakdown is fully implemented with edge and local mock endpoints, tactile row jump navigation, and session-deduplicated visit tracking. Remaining roadmap additions prioritize metrics that show which external links visitors explore and where traffic originates:
+
+| Addition | Status | Purpose | Suggested display | Tracking needed |
+| :--- | :--- | :--- | :--- | :--- |
+| Most-clicked sections | ✅ Implemented | Compare interest across Projects, Photography, Experience, Blog, Education, Skills | Horizontal bars (`started: Sep 28, 2026`) | Explicit section navigation + clean session deduplication |
+| Project link clicks | 📝 Planned | Identify projects that attract further exploration | Ranked project list | Click events keyed by stable project ID and link type |
+| Mobile vs. desktop | 📝 Planned | Prioritize layout and usability work | Percentage split, with tablet/unknown where applicable | Coarse device category aggregated over the selected period |
+| Most-read blog posts | 📝 Planned | Highlight popular writing | Top five posts | Successful blog opens keyed by slug; label as opens/views unless reading completion is actually measured |
+| Photos opened | 📝 Planned | Measure engagement beyond scrolling thumbnails | Total opens and popular categories | Photo-viewer opens; distinguish these from thumbnail loads and infinite-scroll batches |
+| Traffic sources | 📝 Planned | Understand referrals from LinkedIn, GitHub, search, or direct visits | Ranked source list | Referring hostname only; group missing referrers as direct/unknown |
+
+**Presentation and metric definitions:**
+- Rename the existing **Resume Downloads** card to **Resume Clicks**; no new tracking is required for this wording change.
+- Add a shared **7-day / 30-day** selector for period-based charts and breakdowns. Keep lifetime totals and rolling 24-hour cards explicitly labelled if they do not follow that selector.
+- Thirty-day reporting requires extending backend retention and aggregation first. Do not present the existing seven-day data as a thirty-day history or imply that historical custom events can be reconstructed.
+- Keep view counts distinct from unique visitors. IP-based uniqueness is approximate: shared networks may combine visitors, and changing addresses may split one visitor.
+- Preserve same-origin API routing, input validation, rate limits, and aggregate reporting when adding event endpoints. Do not publish visitor identifiers or full referrer URLs/query strings.
+
+[Cloudflare Web Analytics dimensions](https://developers.cloudflare.com/web-analytics/data-metrics/dimensions/) include device type and referrer breakdowns. These could supply those reports separately; integrating them into the public custom dashboard is still a separate implementation task. Project clicks and photo opens need custom interaction tracking.
+
 ---
 
 ## Security hardening (September 2026)
@@ -652,6 +682,12 @@ npm run downsize:90
 - **Dependencies and CI**: Removed unused AWS SDK v2, ImageMagick wrapper, and http-server dependencies. Patched remaining dependencies, including Wrangler and its matching Cloudflare types. CI uses Node 24, `npm ci`, tests, and a dependency audit before main-branch deployment; checkout does not persist Git credentials. The implementation audit reported zero known vulnerabilities; rerun audits as advisories change.
 
 ## 12. Historical Defect Audit & Resolved Deficiencies
+
+### Views versus unique visitors
+- Each loaded document, including reloads and full back/forward navigations, records a page view and refreshes the visitor's last-seen timestamp. SPA tab changes and heartbeat polls do not create page views; existing abuse limits still apply.
+- `Views (24h)` is the rolling 24-hour page-view total. `Unique Visitors (7d)` deduplicates complete IP addresses across the seven UTC calendar days shown. These are site-wide metrics, not separate mobile/desktop totals, and may legitimately match.
+- Unique listing pagination uses Durable Object `startAfter` keys, avoiding the former 100-record cutoff. Removing only the known key prefix preserves complete IPv6 addresses. Concurrent increments are transactional, and repeated visits refresh last-seen timestamps without increasing daily unique counts.
+- View-history buckets now align to their UTC calendar-day labels. Existing stored totals are preserved; previously omitted reloads cannot be reconstructed. Regression coverage includes concurrency, 250+ IPv6 visitors, midnight boundaries, reload tracking, and repeated visits in the actual Cloudflare runtime.
 
 ### Stats routing after analytics hardening
 - The previous build injected a workers.dev API base. Requests from Pages domains then failed the analytics origin allowlist, even though Pages already had the correct Durable Object bindings.
@@ -680,7 +716,7 @@ During historical codebase audits, four significant defects were identified and 
 
 ### ✅ 1. Restored Production Analytics (Frozen Counters)
 - **Problem**: When client tracking was modularized into `script.js` and `viewers.js`, the `/api/total/increment` and `/api/unique/increment` calls were dropped, freezing production metrics.
-- **Resolution**: Added deduplicated visit checks (`performance.getEntriesByType("navigation")`) to [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js) and reconnected increment triggers.
+- **Resolution**: Initially added navigation-type filtering to [viewers.js](file:///Users/natedogl/CODE/myportfolio/viewers.js) and reconnected increment triggers. The later counting fix removes this filtering so reloads count as views; unique deduplication remains server-side.
 
 ### ✅ 2. Fixed Dev Server Route Mismatch
 - **Problem**: `server.js` attempted to serve `pages/index.html` on the root `/` path, which did not exist.
