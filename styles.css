@@ -614,6 +614,13 @@ body.loaded {
     margin-top: 1rem;
 }
 
+/* Keep dates at the right edge, including when a long role forces a new line. */
+#panel-experience .retro-badge {
+    margin-inline-start: auto;
+    text-align: right;
+    white-space: nowrap;
+}
+
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
@@ -1334,6 +1341,7 @@ body.loaded {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     user-select: none;
+    flex-shrink: 0;
 }
 
 .taskbar-left {
@@ -1789,6 +1797,51 @@ body.zooming-out {
 
     .window-titlebar {
         border-radius: 0;
+    }
+
+    .window-taskbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .taskbar-left,
+    .taskbar-right {
+        min-width: 0;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    .taskbar-status {
+        margin-inline-start: auto;
+        font-size: 0.7rem;
+    }
+
+    .taskbar-right .taskbar-app-btn {
+        margin-left: 0;
+    }
+
+    .taskbar-stat {
+        padding-left: 0;
+        border-left: none;
+        white-space: nowrap;
+        font-size: 0.7rem;
+    }
+
+    .photo-grid-layout {
+        grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr));
+    }
+
+    .photo-card {
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .photo-card img {
+        position: absolute;
+        inset: 0;
     }
 
     .panel {

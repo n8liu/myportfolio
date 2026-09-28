@@ -220,6 +220,12 @@ These values describe the current source in `index.html` and `styles.css`; earli
 
 The profile retains its circular border, offset shadow, and `object-fit: cover`. Experience and leadership share the existing retro card styles, while section headings and skill badges use lighter decoration.
 
+### Mobile footer, photos, and experience dates
+- At widths up to 768px, the taskbar stacks its left and right groups, lets controls wrap, and reserves bottom safe-area padding. The footer does not shrink inside the OS window.
+- Mobile photo cards use a 1:1 aspect ratio and cover-cropped images; the grid minimum shrinks to the available width. Desktop cards retain their existing 180px height.
+- Experience and leadership date badges retain right alignment, including when a long role title moves the badge to a new line.
+- Verified in local Chrome at 320, 375, 390, 430, 768, and 1280px: no footer control overflow, square mobile photos, and right-aligned dates. Checks used local markup/styles with external fonts and network content disabled.
+
 ### Key UI Features & Micro-Interactions
 - **Interactive Ambient Wallpaper**: Mouse pointer movement updates `--mouse-x`, `--mouse-y`, `--mouse-px`, `--mouse-py` on `document.documentElement` to smoothly shift an ambient spotlight and parallax background grid.
 - **Retro OS Window Chrome**: Features a classic titlebar with icon, dynamic file path (`C:\nathan\portfolio\...`), window control buttons (`_`, `口`, `X`), a retro menu bar (`File`, `Edit`, `View`, `Tools`, `Help`), and a bottom taskbar with a live digital clock and active viewer count.
