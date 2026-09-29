@@ -373,9 +373,10 @@ A comprehensive audit and implementation cycle established the following enhance
 ```
 
 ### 7.4 Project Cards Architecture
-- **Uniform sizing**: `.projects-grid` uses equal-width columns and `grid-auto-rows: 1fr` so every project card shares the tallest card’s height. Flex card bodies align action buttons at the bottom without fixed heights or clipped descriptions.
-- **Current layout**: `.projects-grid` displays `.retro-card` entries with titles, status badges, concise descriptions, technology pills, and demo links where provided. Per-project GitHub buttons are consolidated into a final “More projects on GitHub” card linking to `https://github.com/n8liu` with the shared button style and safe new-tab attributes. Cards use the shared offset shadow and hover movement.
-- **Current order**: CardboardDex, Live Semantic Market, Clickbait Classifier, FleetManager, ItineraryAI, The IBD Digest, Spotify Analytics, SimplyMail, and More projects on GitHub.
+- **Featured work**: CardboardDex, FleetManager, and ItineraryAI appear first in `.projects-featured`, with domain labels, accent top borders, and equal-height cards. The responsive grid collapses naturally on narrow screens.
+- **Featured presentation**: Featured cards use a compact text-only layout with category labels, project descriptions, technology badges, and existing project links.
+- **Other projects / archive**: A native `<details class="projects-archive">` disclosure, collapsed initially, groups Clickbait Classifier, Live Semantic Market, The IBD Digest, Spotify Analytics, and SimplyMail. Its summary shows “Other projects (5)” and `archive.dir`, with native keyboard interaction and a visible focus outline. Archived cards use lighter borders, compact padding, and automatic row heights.
+- **Project content and links**: Existing descriptions, dates, technology badges, and demo links are preserved. A persistent “more projects on GitHub” link sits below the archive, visible whether it is open or closed. This is a layout change; no new routes or JavaScript dependencies are required.
 - **FleetManager**: Marked `Completed (2025)`. Describes backend ownership of an electric-vehicle fleet platform: telemetry and electrical-utility ingestion, AWS S3 storage, backend API delivery, end-to-end debugging, and predictive maintenance using driver behavior and utilization data. Technology pills: Python, Django, PostgreSQL, AWS S3. No code or demo link is currently supplied.
 - **Historical implementation**: Earlier project cards used expandable hover highlights for SimplyMail, Spotify Analytics, Pokédex API, and Live Semantic Market. The current markup presents descriptions directly.
 
@@ -440,10 +441,10 @@ A comprehensive audit and implementation cycle established the following enhance
   - `/experience` -> `#panel-experience` (`C:\nathan\portfolio\experience.txt`)
   - `/projects` -> `#panel-projects` (`C:\nathan\portfolio\projects.bat`)
   - `/skills` -> `#panel-skills` (`C:\nathan\portfolio\skills.cfg`)
-  - `/education` -> `#panel-education` (`C:\nathan\portfolio\academics.doc`)
+  - `/education` -> `#panel-education` (`C:\nathan\portfolio\education.doc`)
   - `/photos` -> `#panel-photography` (`C:\nathan\portfolio\photos.exe`); navigation label is “photos”, and `/photography` redirects to `/photos`.
   - `/blog` -> `#panel-blog` (`C:\nathan\portfolio\blog.ini`)
-  - `/stats` -> `#panel-stats` (`C:\nathan\portfolio\dashboard.sys`)
+  - `/stats` -> `#panel-stats` (`C:\nathan\portfolio\stats.sys`)
 - **Scrollspy Engine**: A passive `.window-body` scroll listener batches updates with `requestAnimationFrame`. The last section heading above 35% of the visible scroll area determines the active section; within 2px of the bottom, the final panel is selected explicitly so Skills does not need to reach that line. Resize events and ResizeObserver refresh tracking after layout changes. Separate page views and programmatic navigation are excluded. Regression coverage in `tests/scrollspy.test.js` verifies bottom detection, reverse scrolling, event batching, and navigation guards.
 - **Direct Link Scroll Restoration**: On direct URL entry (e.g. `/projects` or `/photography`), the controller calculates sticky navigation offsets and smoothly scrolls to the target section on DOM ready.
 - **Server Rewrite Support**: Express (`server.js`) and Cloudflare Workers (`functions/_worker.js`) rewrite clean URL paths without file extensions to serve `index.html`.
@@ -466,7 +467,7 @@ A comprehensive audit and implementation cycle established the following enhance
 | Cal Vietnamese Student Association, Berkeley | Famhead | Jan. 2026 – May 2026 |
 | Cal Vietnamese Student Association, Berkeley | Historian | May 2025 – Jan. 2026 |
 | Cal Vietnamese Student Association, Berkeley | Secretary | Jan. 2025 – May 2025 |
-| Cal Vietnamese Student Association, Berkeley | Intercollegiate Council (ICC) Intern | Aug. 2024 – May 2025 |
+| Cal Vietnamese Student Association, Berkeley | Intercollegiate Council (ICC) Intern | on24 – May 2025 |
 | Associated Students of the University of California | Web Design Director | Feb. 2025 – May 2026 |
 | Associated Students of the University of California | Photography Director | Sep. 2025 – May 2026 |
 | Happy Lemon USA | Operations Shift Manager | Oct. 2022 – Jun. 2024 |

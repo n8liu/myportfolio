@@ -327,13 +327,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const pathMappings = {
         'home': 'C:\\nathan\\portfolio\\home.md',
-        'education': 'C:\\nathan\\portfolio\\academics.doc',
+        'education': 'C:\\nathan\\portfolio\\education.doc',
         'experience': 'C:\\nathan\\portfolio\\experience.txt',
         'projects': 'C:\\nathan\\portfolio\\projects.bat',
         'skills': 'C:\\nathan\\portfolio\\skills.cfg',
         'photography': 'C:\\nathan\\portfolio\\photos.exe',
         'blog': 'C:\\nathan\\portfolio\\blog.ini',
-        'stats': 'C:\\nathan\\portfolio\\dashboard.sys'
+        'stats': 'C:\\nathan\\portfolio\\stats.sys'
     };
 
     let isProgrammaticScroll = false;
@@ -1300,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', function () {
         {
             "id": "matcha",
             "title": "Ranking Every Matcha I Tried!",
-            "date": "Aug. 20, 2026",
+            "date": "Aug. 20, 2026 (Updated Sep. 21, 2026)",
             "datetime": "2026-08-20",
             "readTime": "2 min read",
             "summary": "Matcha this, matcha that. I love matcha, so here is every matcha I have tried.",

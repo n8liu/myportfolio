@@ -169,7 +169,7 @@
                 <section id="panel-education" class="panel">
                     <div class="section-divider-bar">
                         <h2 class="section-divider-title">education</h2>
-                        <span class="section-divider-file">academics.doc</span>
+                        <span class="section-divider-file">education.doc</span>
                     </div>
                     <div class="education-grid">
                         <div class="retro-card">
@@ -391,8 +391,10 @@
                         <h2 class="section-divider-title">projects</h2>
                         <span class="section-divider-file">projects.bat</span>
                     </div>
-                    <div class="projects-grid">
+                    <p class="projects-group-label" id="featured-work-label">featured work</p>
+                    <div class="projects-grid projects-featured" role="group" aria-labelledby="featured-work-label">
                         <div class="retro-card">
+                            <p class="project-category">Full-stack product</p>
                             <div class="card-header">
                                 <h3 class="card-title">CardboardDex</h3>
                                 <span class="retro-badge">2026</span>
@@ -416,40 +418,7 @@
                             </div>
                         </div>
                         <div class="retro-card">
-                            <div class="card-header">
-                                <h3 class="card-title">Live Semantic Market</h3>
-                                <span class="retro-badge">2026</span>
-                            </div>
-                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses
-                                zero-shot extraction, vector search, and clustering to process financial news into
-                                deduplicated market intelligence.</p>
-                            <div class="tech-badges">
-                                <span class="tech-pill">JavaScript</span>
-                                <span class="tech-pill">Python</span>
-                                <span class="tech-pill">Fast APIs</span>
-                                <span class="tech-pill">React</span>
-                            </div>
-                        </div>
-
-                        <div class="retro-card">
-                            <div class="card-header">
-                                <h3 class="card-title">Clickbait Classifier</h3>
-                                <span class="retro-badge">2026</span>
-                            </div>
-                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on
-                                18K
-                                social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set,
-                                outperforming
-                                a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
-                            <div class="tech-badges">
-                                <span class="tech-pill">Python</span>
-                                <span class="tech-pill">PyTorch</span>
-                                <span class="tech-pill">Pandas</span>
-                            </div>
-                        </div>
-
-
-                        <div class="retro-card">
+                            <p class="project-category">Backend engineering</p>
                             <div class="card-header">
                                 <h3 class="card-title">FleetManager</h3>
                                 <span class="retro-badge">2025</span>
@@ -466,6 +435,7 @@
                         </div>
 
                         <div class="retro-card">
+                            <p class="project-category">AI application</p>
                             <div class="card-header">
                                 <h3 class="card-title">ItineraryAI</h3>
                                 <span class="retro-badge">2025</span>
@@ -483,75 +453,112 @@
                             </div>
                         </div>
 
-                        <div class="retro-card">
-                            <div class="card-header">
-                                <h3 class="card-title">The IBD Digest</h3>
-                                <span class="retro-badge">2025</span>
-                            </div>
-                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion
-                                app
-                                for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent
-                                onboarding and local state persistence.</p>
-                            <div class="tech-badges">
-                                <span class="tech-pill">Flutter</span>
-                                <span class="tech-pill">Dart</span>
-                                <span class="tech-pill">Provider</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="https://apps.apple.com/tr/app/the-ibd-digest/id6473455443"
-                                    class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i>
-                                    demo</a>
-                            </div>
-                        </div>
 
-                        <div class="retro-card">
-                            <div class="card-header">
-                                <h3 class="card-title">Spotify Analytics</h3>
-                                <span class="retro-badge">2025</span>
-                            </div>
-                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard
-                                showing profile insights, favorite genres, and user recommendations.</p>
-                            <div class="tech-badges">
-                                <span class="tech-pill">Python</span>
-                                <span class="tech-pill">Flask</span>
-                                <span class="tech-pill">Spotify API</span>
-                                <span class="tech-pill">Pandas</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro primary" target="_blank"><i
-                                         class="fas fa-external-link-alt"></i> demo</a>
-                            </div>
-                        </div>
+                    </div>
 
-                        <div class="retro-card">
-                            <div class="card-header">
-                                <h3 class="card-title">SimplyMail</h3>
-                                <span class="retro-badge">2024</span>
+                    <details class="projects-archive">
+                        <summary>
+                            <span class="archive-title">Other projects <span class="archive-count">(5)</span></span>
+                            <span class="archive-filename">archive.dir</span>
+                        </summary>
+                        <div class="projects-grid projects-archive-grid">
+                            <div class="retro-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Clickbait Classifier</h3>
+                                    <span class="retro-badge">2026</span>
+                                </div>
+                                <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Fine-tuned a BERT-based classifier on
+                                    18K
+                                    social-news titles; achieved 0.89 F1 and 91% accuracy on a held-out test set,
+                                    outperforming
+                                    a TF-IDF logistic regression baseline by +0.14 F1 points.</p>
+                                <div class="tech-badges">
+                                    <span class="tech-pill">Python</span>
+                                    <span class="tech-pill">PyTorch</span>
+                                    <span class="tech-pill">Pandas</span>
+                                </div>
                             </div>
-                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high
-                                performance, clean visual interfaces, and secure Gmail API integrations.</p>
-                            <div class="tech-badges">
-                                <span class="tech-pill">JavaScript</span>
-                                <span class="tech-pill">Firebase</span>
-                                <span class="tech-pill">Gmail API</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i
-                                        class="fas fa-external-link-alt"></i> demo</a>
-                            </div>
-                        </div>
 
-                        <div class="retro-card">
-                            <div class="card-header">
-                                <h3 class="card-title">More projects on GitHub</h3>
+                            <div class="retro-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Live Semantic Market</h3>
+                                    <span class="retro-badge">2026</span>
+                                </div>
+                                <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">An event-driven data pipeline that uses
+                                    zero-shot extraction, vector search, and clustering to process financial news into
+                                    deduplicated market intelligence.</p>
+                                <div class="tech-badges">
+                                    <span class="tech-pill">JavaScript</span>
+                                    <span class="tech-pill">Python</span>
+                                    <span class="tech-pill">Fast APIs</span>
+                                    <span class="tech-pill">React</span>
+                                </div>
                             </div>
-                            <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Explore more of my projects and experiments.</p>
-                            <div class="project-actions">
-                                <a href="https://github.com/n8liu" class="btn-retro" target="_blank"
-                                    rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i>
-                                    visit GitHub</a>
+
+                            <div class="retro-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">The IBD Digest</h3>
+                                    <span class="retro-badge">2025</span>
+                                </div>
+                                <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Built an offline-first IBD companion
+                                    app
+                                    for 5,000+ users (recipes, ingredient libraries, SIBDQ assessment) with persistent
+                                    onboarding and local state persistence.</p>
+                                <div class="tech-badges">
+                                    <span class="tech-pill">Flutter</span>
+                                    <span class="tech-pill">Dart</span>
+                                    <span class="tech-pill">Provider</span>
+                                </div>
+                                <div class="project-actions">
+                                    <a href="https://apps.apple.com/tr/app/the-ibd-digest/id6473455443"
+                                        class="btn-retro primary" target="_blank"><i class="fas fa-external-link-alt"></i>
+                                        demo</a>
+                                </div>
                             </div>
+
+                            <div class="retro-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Spotify Analytics</h3>
+                                    <span class="retro-badge">2025</span>
+                                </div>
+                                <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Personal listening telemetry dashboard
+                                    showing profile insights, favorite genres, and user recommendations.</p>
+                                <div class="tech-badges">
+                                    <span class="tech-pill">Python</span>
+                                    <span class="tech-pill">Flask</span>
+                                    <span class="tech-pill">Spotify API</span>
+                                    <span class="tech-pill">Pandas</span>
+                                </div>
+                                <div class="project-actions">
+                                    <a href="https://github.com/n8liu/spotifyprofileanalysis" class="btn-retro primary" target="_blank"><i
+                                             class="fas fa-external-link-alt"></i> demo</a>
+                                </div>
+                            </div>
+
+                            <div class="retro-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">SimplyMail</h3>
+                                    <span class="retro-badge">2024</span>
+                                </div>
+                                <p style="font-size: 0.9rem; margin-bottom: 0.8rem;">Modern web Gmail client focused on high
+                                    performance, clean visual interfaces, and secure Gmail API integrations.</p>
+                                <div class="tech-badges">
+                                    <span class="tech-pill">JavaScript</span>
+                                    <span class="tech-pill">Firebase</span>
+                                    <span class="tech-pill">Gmail API</span>
+                                </div>
+                                <div class="project-actions">
+                                    <a href="https://simplymail-a10f8.web.app/" class="btn-retro primary" target="_blank"><i
+                                            class="fas fa-external-link-alt"></i> demo</a>
+                                </div>
+                            </div>
+
                         </div>
+                    </details>
+                    <div class="projects-footer">
+                        <a href="https://github.com/n8liu" class="btn-retro" target="_blank"
+                            rel="noopener noreferrer"><i class="fab fa-github" aria-hidden="true"></i>
+                            more projects on GitHub</a>
                     </div>
                 </section>
 

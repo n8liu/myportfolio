@@ -3,7 +3,7 @@
 Matcha. The taste of grass, I love it. Here is every place I have tried and my thoughts.
 
 ## My Top 5
-(Updated Aug. 20, 2026)
+(Updated September 21, 2026)
 
 1. Airoma Cafe (Fountain Valley, CA): Matcha Einspanner -> big cup and actually tastes the matcha
 2. Brew Story (Huntington Beach, CA): Banana Cream Matcha -> actually really good, decent cup, good flavors, strong matcha

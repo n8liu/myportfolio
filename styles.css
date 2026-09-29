@@ -337,6 +337,10 @@ body.loaded {
     padding-top: 3.5rem;
 }
 
+#panel-skills {
+    padding-bottom: 4rem;
+}
+
 
 /* Minimal file-style section headings */
 .section-divider-bar {
@@ -664,6 +668,85 @@ body.loaded {
     gap: 0.5rem;
     margin-top: auto;
     padding-top: 0.8rem;
+}
+
+.projects-group-label {
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.projects-featured > .retro-card {
+    border-top: 4px solid var(--accent);
+    padding: 1.5rem;
+}
+
+.project-category {
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+.projects-archive {
+    margin-top: 2rem;
+    border-top: var(--border-thin);
+    border-bottom: var(--border-thin);
+}
+
+.projects-archive > summary {
+    padding: 1rem 0.25rem;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    border-radius: 2px;
+}
+
+.projects-archive > summary::marker {
+    color: var(--accent);
+}
+
+.projects-archive > summary:hover {
+    background: var(--bg-chrome);
+}
+
+.projects-archive > summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+}
+
+.archive-title {
+    font-weight: 700;
+}
+
+.archive-count,
+.archive-filename {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+.archive-filename {
+    display: inline-block;
+    margin-inline-start: 0.75rem;
+}
+
+.projects-archive-grid {
+    padding-top: 0.5rem;
+    padding-bottom: 1.25rem;
+    grid-auto-rows: auto;
+}
+
+.projects-archive-grid > .retro-card {
+    padding: 1rem;
+    border: var(--border-thin);
+    box-shadow: none;
+}
+
+.projects-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }
 
 .retro-card {
@@ -1626,8 +1709,29 @@ body.loaded {
     overflow-y: auto;
 }
 
+#photo-modal .modal-details {
+    min-width: 0;
+    padding: 1rem;
+    gap: 0.75rem;
+    overflow-wrap: anywhere;
+}
+
+#photo-modal .exif-row {
+    gap: 0.75rem;
+}
+
+#photo-modal .exif-label {
+    flex-shrink: 0;
+}
+
+#photo-modal .exif-val {
+    min-width: 0;
+    text-align: right;
+}
+
 @media (min-width: 769px) {
     #photo-modal .modal-body {
+        grid-template-columns: minmax(0, 1fr) 260px;
         height: 750px;
     }
 }
