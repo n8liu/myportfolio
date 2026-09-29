@@ -74,7 +74,7 @@
         <a href="#panel-projects" class="nav-tab" data-tab="projects">projects</a>
         <a href="#panel-skills" class="nav-tab" data-tab="skills">skills</a>
         <span class="nav-separator" aria-hidden="true">|</span>
-        <a href="/photography" class="nav-tab" data-tab="photography">photography</a>
+        <a href="/photos" class="nav-tab" data-tab="photography">photos</a>
         <a href="/blog" class="nav-tab" data-tab="blog">blog</a>
         <a href="/stats" class="nav-tab" data-tab="stats">stats</a>
     </nav>
@@ -128,8 +128,8 @@
                                     href="mailto:nathan.dtliu@gmail.com?subject=New%20Grad%20Opportunity%20-%20Nathan%20Liu">new
                                     grad and full-time opportunities</a>. beyond writing code, i'm an avid photographer
                                 capturing urban structures and natural landscapes.</p>
-                            <p>in my free time, i like to go <a href="#photography"
-                                    onclick="document.querySelector('[data-tab=\'photography\']').click()">sidequesting
+                            <p>in my free time, i like to go <a href="/photos"
+                                    onclick="document.querySelector('[data-tab=\'photography\']').click(); return false;">sidequesting
                                     with
                                     my camera</a>, hit the gym to clear my head, or travel the world.</p>
 
@@ -631,13 +631,7 @@
             <div id="view-photography" class="page-view">
                 <section id="panel-photography" class="panel">
                     <div class="photo-panel-layout">
-                        <div class="photo-cats" id="photo-category-filters">
-                            <button class="photo-cat active" data-category="all">all</button>
-                            <button class="photo-cat" data-category="california">california</button>
-                            <button class="photo-cat" data-category="japan">japan</button>
-                            <button class="photo-cat" data-category="hawaii">hawaii</button>
-                            <button class="photo-cat" data-category="south_korea">south korea</button>
-                        </div>
+                        <div class="photo-cats" id="photo-category-filters"></div>
 
                         <div class="photo-grid-layout" id="portfolio-photo-grid">
                             <p class="photo-status" role="status">loading photos...</p>
@@ -672,7 +666,7 @@
                                 <div class="value" id="cf-total-views">Loading...</div>
                             </div>
                             <div class="stat-card">
-                                <span class="label">Unique Visitors (7d)</span>
+                                <span class="label">Unique Visitors</span>
                                 <div class="value" id="unique-visitors">Loading...</div>
                             </div>
                             <div class="stat-card">

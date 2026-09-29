@@ -1,6 +1,7 @@
 import { S3Client, ListObjectsV2Command, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import dotenv from 'dotenv';
+import { sortPhotoCategories } from './photo-categories.js';
 
 dotenv.config();
 
@@ -36,16 +37,18 @@ async function listAllObjects(params) {
 async function getCategories() {
     try {
         const params = {
-            Bucket: process.env.R2_BUCKET_NAME,
-            Delimiter: '/'
+            Bucket: process.env.R2_BUCKET_NAME
         };
         const data = await listAllObjects(params);
-        return data.CommonPrefixes ? data.CommonPrefixes.map(prefix => {
+        return sortPhotoCategories(data.Contents.map(item => ({
+            key: item.Key,
+            uploaded: item.LastModified
+        }))).map(name => {
             return {
-                name: prefix.Prefix.replace('/', ''), // Remove trailing slash
-                displayName: formatCategoryName(prefix.Prefix.replace('/', ''))
+                name,
+                displayName: formatCategoryName(name)
             };
-        }) : [];
+        });
     } catch (error) {
         console.error('Error fetching categories:', error);
         return [];

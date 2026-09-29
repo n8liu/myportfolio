@@ -441,7 +441,7 @@ A comprehensive audit and implementation cycle established the following enhance
   - `/projects` -> `#panel-projects` (`C:\nathan\portfolio\projects.bat`)
   - `/skills` -> `#panel-skills` (`C:\nathan\portfolio\skills.cfg`)
   - `/education` -> `#panel-education` (`C:\nathan\portfolio\academics.doc`)
-  - `/photography` -> `#panel-photography` (`C:\nathan\portfolio\gallery.exe`)
+  - `/photos` -> `#panel-photography` (`C:\nathan\portfolio\photos.exe`); navigation label is “photos”, and `/photography` redirects to `/photos`.
   - `/blog` -> `#panel-blog` (`C:\nathan\portfolio\blog.ini`)
   - `/stats` -> `#panel-stats` (`C:\nathan\portfolio\dashboard.sys`)
 - **Scrollspy Engine**: A passive `.window-body` scroll listener batches updates with `requestAnimationFrame`. The last section heading above 35% of the visible scroll area determines the active section; within 2px of the bottom, the final panel is selected explicitly so Skills does not need to reach that line. Resize events and ResizeObserver refresh tracking after layout changes. Separate page views and programmatic navigation are excluded. Regression coverage in `tests/scrollspy.test.js` verifies bottom detection, reverse scrolling, event batching, and navigation guards.
@@ -490,6 +490,8 @@ A comprehensive audit and implementation cycle established the following enhance
 - **Metadata Extraction**: `utils/image-metadata.js` parses RAW/JPEG headers with `ExifReader`, creating `functions/photos-metadata.json`.
 - **Edge Cache API**: `functions/_worker.js` handles `/img/:key` with a 1-year immutable cache header (`public, max-age=31536000, s-maxage=31536000, immutable`), cached asynchronously at Cloudflare edge POPs with `caches.default.put()`.
 - **Infinite Scroll Pagination & Performance**: Batches category photos into chunks of 12 items (`PHOTOS_PER_BATCH = 12`) managed by an `IntersectionObserver` sentinel (`#photo-sentinel`, `rootMargin: 300px`), accompanied by dynamic count reporting (`#photo-infinite-status`), accessible manual trigger fallback (`#photo-load-more`), and modern image priority optimization (`fetchpriority="high"` on initial 2 items, `loading="lazy"` on remainder).
+- **Location Filter Order**: “all” stays first; locations follow their newest photo upload, most recent first. Production uses R2 `uploaded`, and local development uses S3 `LastModified`, through `utils/photo-categories.js`. Equal dates sort alphabetically, missing/invalid dates sort last, and folder placeholders are ignored. This measures upload recency, not EXIF capture dates.
+- **Dynamic Filters Only**: The initial filter container is empty. “all” and actual location buttons appear after a successful, nonempty category response; no default location filters flash during loading or remain after a failed request. The public route is `/photos`; internal view IDs and the `photography` analytics key remain stable.
 - **Modal Viewer**: Selecting a gallery photo opens `image_viewer.exe` modal, displaying image dimensions, camera model, lens, exposure time, aperture, ISO, and location. Features interactive Previous/Next photo cycling across all category photos, live counter, keyboard Arrow navigation (`ArrowLeft`/`ArrowRight`), background inertness, Tab trapping, and focus restoration to the triggering gallery card button with on-demand batch loading on close.
 
 ### 8.4 Stateful Edge Analytics & Durable Objects
@@ -514,7 +516,7 @@ Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
 
 #### Current stats page
 
-The implemented cards show lifetime total views, unique visitors across seven UTC calendar days, rolling 24-hour views, and lifetime resume clicks. The chart compares daily views and daily unique visitors for seven UTC calendar days. Below the chart, the **Most-Viewed Sections** widget (`started: Sep 28, 2026`) displays a compact two-column grid of ranked horizontal progress bars with visit counts and percentage breakdowns across clean route paths (`/projects`, `/photography`, `/experience`, `/blog`, `/education`, `/skills`), complete with tactile row interactions that jump directly to each section. Tracking starts from zero on Sep 28, 2026. Active viewers appear separately in the footer.
+The implemented cards show lifetime total views, all-time unique visitors, rolling 24-hour views, and lifetime resume clicks. The chart compares daily views and daily unique visitors for seven UTC calendar days. Below the chart, the **Most-Viewed Sections** widget (`started: Sep 28, 2026`) displays a compact two-column grid of ranked horizontal progress bars with visit counts and percentage breakdowns across clean route paths (`/projects`, `/photography`, `/experience`, `/blog`, `/education`, `/skills`), complete with tactile row interactions that jump directly to each section. Tracking starts from zero on Sep 28, 2026. Active viewers appear separately in the footer.
 
 These metrics are site-wide and shared by mobile and desktop. Project clicks, blog opens, photo opens, device breakdowns, and traffic sources are documented in [the stats roadmap](#113-stats-page-roadmap-planned-not-implemented).
 
@@ -685,8 +687,8 @@ The **Most-Clicked Sections** breakdown is fully implemented with edge and local
 
 ### Views versus unique visitors
 - Each loaded document, including reloads and full back/forward navigations, records a page view and refreshes the visitor's last-seen timestamp. SPA tab changes and heartbeat polls do not create page views; existing abuse limits still apply.
-- `Views (24h)` is the rolling 24-hour page-view total. `Unique Visitors (7d)` deduplicates complete IP addresses across the seven UTC calendar days shown. These are site-wide metrics, not separate mobile/desktop totals, and may legitimately match.
-- Unique listing pagination uses Durable Object `startAfter` keys, avoiding the former 100-record cutoff. Removing only the known key prefix preserves complete IPv6 addresses. Concurrent increments are transactional, and repeated visits refresh last-seen timestamps without increasing daily unique counts.
+- `Views (24h)` is the rolling 24-hour page-view total. `Unique Visitors` displays lifetime/all-time distinct visitors deduplicated by complete IP address, while the 7-day traffic chart retains daily unique counts. These are site-wide metrics, not separate mobile/desktop totals.
+- Unique listing pagination uses Durable Object `startAfter` keys, avoiding the former 100-record cutoff. Removing only the known key prefix preserves complete IPv6 addresses. Concurrent increments are transactional, and repeated visits refresh last-seen timestamps without increasing daily unique counts. All-time unique counts persist under `total_uniques` and `ever:<ip>` entries, surviving 8-day rolling window pruning.
 - View-history buckets now align to their UTC calendar-day labels. Existing stored totals are preserved; previously omitted reloads cannot be reconstructed. Regression coverage includes concurrency, 250+ IPv6 visitors, midnight boundaries, reload tracking, and repeated visits in the actual Cloudflare runtime.
 
 ### Stats routing after analytics hardening

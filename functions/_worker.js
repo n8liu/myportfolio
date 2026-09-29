@@ -1,5 +1,6 @@
 import { handleAnalytics } from './analytics-security.js';
 import { isPublicFile } from '../utils/public-files.js';
+import { sortPhotoCategories } from '../utils/photo-categories.js';
 import { ViewerCounter } from './viewers';
 import { SessionTracker } from './session_tracker';
 import { TotalCounter } from './total_counter';
@@ -40,11 +41,17 @@ export default {
       return await serveR2Object(path.substring(5), env, corsHeaders, request, ctx); // Remove '/img/' from path
     }
 
+    if (path === '/photography' || path === '/photography/') {
+      const destination = new URL(request.url);
+      destination.pathname = '/photos';
+      return Response.redirect(destination.toString(), 301);
+    }
+
     // 3. Fallback to Cloudflare Pages static asset serving
     if (env.ASSETS) {
-      // For client-side clean sub-routes without an extension (like /photography, /experience, etc.),
+      // For client-side clean sub-routes without an extension (like /photos, /experience, etc.),
       // serve the root index.html so client-side routing can take over.
-      const isCleanRoute = /^\/(?:home|experience|projects|skills|education|photography|blog|stats)(?:\/[a-z0-9-]+)?$/.test(path);
+      const isCleanRoute = /^\/(?:home|experience|projects|skills|education|photos|blog|stats)(?:\/[a-z0-9-]+)?$/.test(path);
       if (isCleanRoute) {
         const indexRequest = new Request(new URL('/index.html', request.url), request);
         return env.ASSETS.fetch(indexRequest);
@@ -139,17 +146,7 @@ async function getCategories(env, corsHeaders) {
     }
     
     const objects = await listAllObjects(env.MY_BUCKET);
-    const keys = objects.map(obj => obj.key);
-    
-    const categorySet = new Set();
-    keys.forEach(key => {
-      const parts = key.split('/');
-      if (parts.length > 1) {
-        categorySet.add(parts[0]);
-      }
-    });
-    
-    const categories = Array.from(categorySet).map(name => ({
+    const categories = sortPhotoCategories(objects).map(name => ({
       name,
       displayName: name.replace(/_/g, ' ').toUpperCase()
     }));

@@ -56,6 +56,27 @@ test('unique visitors include all storage pages and preserve full IPv6 identitie
   const unique = new UniqueVisitors({ storage: db });
   assert.equal(await unique.getUniqueCount7D(now), 251);
   assert.equal(await unique.getUniqueCount24H(now), 251);
+  assert.equal(await unique.getAllTimeUniqueCount(), 252);
+  assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 252);
+});
+
+test('all-time unique visitors persist and increment across days even after old daily records are pruned', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.UTC(2026, 8, 20, 12) });
+  const db = storage();
+  const unique = new UniqueVisitors({ storage: db });
+  await unique.fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  await unique.fetch(req('unique/increment', 'POST', '192.0.2.2'));
+  assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 2);
+
+  // Advance time past 8 days
+  t.mock.timers.tick(9 * 24 * 3600 * 1000);
+  // Repeat visit from existing user 192.0.2.1 does not increment all-time count
+  await unique.fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 2);
+
+  // New visit from 192.0.2.3 increments all-time count to 3
+  await unique.fetch(req('unique/increment', 'POST', '192.0.2.3'));
+  assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 3);
 });
 
 test('repeat visits refresh last seen without increasing daily uniques', async t => {

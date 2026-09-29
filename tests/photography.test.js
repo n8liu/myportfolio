@@ -8,6 +8,20 @@ import worker from '../dist/_worker.js';
 import * as workerExports from '../dist/_worker.js';
 
 const origin = 'https://portfolio.example';
+test('photos route serves the gallery shell and legacy links redirect with query parameters', async () => {
+  const assets = { async fetch(request) {
+    assert.equal(new URL(request.url).pathname, '/index.html');
+    return new Response('gallery shell');
+  } };
+  const response = await worker.fetch(new Request(`${origin}/photos`), { ASSETS: assets });
+  assert.equal(await response.text(), 'gallery shell');
+  for (const path of ['/photography', '/photography/']) {
+    const redirect = await worker.fetch(new Request(`${origin}${path}?ref=old`), {});
+    assert.equal(redirect.status, 301);
+    assert.equal(redirect.headers.get('Location'), `${origin}/photos?ref=old`);
+  }
+});
+
 const key = 'Japan/Tokyo #1 100%.jpg';
 const env = {
   MY_BUCKET: {
@@ -73,6 +87,31 @@ test('gallery and categories follow every R2 listing cursor', async () => {
     assert.deepEqual(calls.map(call => call.cursor), [undefined, '1', '2']);
     assert.ok(calls.every(call => call.prefix === (route === 'images/Japan' ? 'Japan/' : undefined)));
   }
+});
+
+test('location filters use the newest upload across listing pages, with undated locations last', async () => {
+  const pages = [
+    [
+      { key: 'Japan/old.jpg', uploaded: new Date('2020-01-01') },
+      { key: 'England/photo.jpg', uploaded: new Date('2025-01-01') },
+      { key: 'Empty/', uploaded: new Date('2026-09-01') },
+      { key: 'Unknown/photo.jpg' },
+    ],
+    [
+      { key: 'Japan/new.jpg', uploaded: new Date('2026-01-01') },
+      { key: 'Canada/photo.jpg', uploaded: new Date('2025-01-01') },
+      { key: 'Invalid/photo.jpg', uploaded: 'invalid' },
+      { key: 'root.jpg', uploaded: new Date('2026-09-01') },
+    ],
+  ];
+  const response = await worker.fetch(new Request(`${origin}/api/categories`), {
+    MY_BUCKET: { async list({ cursor } = {}) {
+      return { objects: pages[cursor ? 1 : 0], truncated: !cursor, cursor: cursor ? undefined : 'next' };
+    } },
+  });
+  assert.equal(response.status, 200);
+  assert.deepEqual((await response.json()).map(category => category.name),
+    ['Japan', 'Canada', 'England', 'Invalid', 'Unknown']);
 });
 
 test('local storage listing follows continuation tokens for images and categories', async () => {

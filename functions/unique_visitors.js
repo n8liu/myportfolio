@@ -26,6 +26,7 @@ export class UniqueVisitors {
       // Repeat visits refresh last-seen time, but only the first visit that day
       // increments the daily unique count. Serialize simultaneous tabs.
       const seenKey = `seen:${todayStr}:${ip}`;
+      const everKey = `ever:${ip}`;
       await this.state.storage.transaction(async storage => {
         const seen = await storage.get(seenKey);
         if (seen === undefined) {
@@ -34,6 +35,26 @@ export class UniqueVisitors {
           await storage.put(dailyKey, count);
         }
         await storage.put(seenKey, now);
+
+        const seenEver = await storage.get(everKey);
+        if (seenEver === undefined) {
+          let totalUniques = await storage.get('total_uniques');
+          if (totalUniques === undefined) {
+            const existingIPs = new Set();
+            for await (const [key] of this.listSeen('seen:')) {
+              if (key.length > 16) existingIPs.add(key.slice(16));
+            }
+            existingIPs.add(ip);
+            totalUniques = existingIPs.size;
+            for (const existingIp of existingIPs) {
+              await storage.put(`ever:${existingIp}`, 1);
+            }
+          } else {
+            totalUniques += 1;
+            await storage.put(everKey, 1);
+          }
+          await storage.put('total_uniques', totalUniques);
+        }
       });
 
       // Trigger pruning of data older than 7 days once a day
@@ -48,8 +69,8 @@ export class UniqueVisitors {
         await this.state.storage.put('last_pruned_date', todayStr);
       }
 
-      // Get 7-day exact unique visitors count
-      const count = await this.getUniqueCount7D(now);
+      // Get all-time exact unique visitors count
+      const count = await this.getAllTimeUniqueCount();
       return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
 
     } else if (url.pathname.endsWith('/visitors24h')) {
@@ -58,8 +79,8 @@ export class UniqueVisitors {
       return new Response(JSON.stringify({ visitors24h }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
 
     } else if (url.pathname.endsWith('/count')) {
-      // Get 7-day unique count (this matches previous behavior)
-      const count = await this.getUniqueCount7D(now);
+      // Get all-time unique count
+      const count = await this.getAllTimeUniqueCount();
       return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
 
     } else if (url.pathname.endsWith('/history7d')) {
@@ -117,5 +138,27 @@ export class UniqueVisitors {
       }
     }
     return uniqueIPs.size;
+  }
+
+  // All-time distinct visitors across entire history.
+  async getAllTimeUniqueCount() {
+    let totalUniques = await this.state.storage.get('total_uniques');
+    if (totalUniques !== undefined) {
+      return totalUniques;
+    }
+    return await this.state.storage.transaction(async storage => {
+      let current = await storage.get('total_uniques');
+      if (current !== undefined) return current;
+      const existingIPs = new Set();
+      for await (const [key] of this.listSeen('seen:')) {
+        if (key.length > 16) existingIPs.add(key.slice(16));
+      }
+      for (const existingIp of existingIPs) {
+        await storage.put(`ever:${existingIp}`, 1);
+      }
+      const initialCount = existingIPs.size;
+      await storage.put('total_uniques', initialCount);
+      return initialCount;
+    });
   }
 }

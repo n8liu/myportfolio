@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'experience': 'C:\\nathan\\portfolio\\experience.txt',
         'projects': 'C:\\nathan\\portfolio\\projects.bat',
         'skills': 'C:\\nathan\\portfolio\\skills.cfg',
-        'photography': 'C:\\nathan\\portfolio\\gallery.exe',
+        'photography': 'C:\\nathan\\portfolio\\photos.exe',
         'blog': 'C:\\nathan\\portfolio\\blog.ini',
         'stats': 'C:\\nathan\\portfolio\\dashboard.sys'
     };
@@ -429,7 +429,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (updateHistory) {
-                const newPath = `/${target}`;
+                const newPath = target === 'photography' ? '/photos' : `/${target}`;
                 if (window.location.pathname !== newPath) {
                     history.pushState({ page: target }, '', newPath);
                 }
@@ -478,6 +478,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getTabFromPath() {
         const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
         const cleanPath = path.replace('.html', '').toLowerCase();
+        if (cleanPath === 'photos') return 'photography';
         if (cleanPath.startsWith('blog/') || cleanPath === 'blog') {
             return 'blog';
         }
@@ -781,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let sectionStatsLoading = false;
     const SECTION_METADATA = {
         projects: { path: '/projects' },
-        photography: { path: '/photography' },
+        photography: { path: '/photos' },
         experience: { path: '/experience' },
         blog: { path: '/blog' },
         education: { path: '/education' },
@@ -978,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         } catch (e) {
-            console.warn('Failed to load dynamic categories from API, using static default list.', e);
+            console.warn('Failed to load photo location filters.', e);
         }
 
         // Bind filter button click events

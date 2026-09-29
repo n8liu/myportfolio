@@ -35,6 +35,7 @@ photos_original/
 photos/
 dist/
 resize/
+assets/photos_web/
 
 # windsurf rules
 .windsurfrules

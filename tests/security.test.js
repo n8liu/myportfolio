@@ -180,7 +180,7 @@ test('Express source and build preview refuse private files and serve public ass
       for (const path of ['/server.js', '/utils/cloudflare.js', '/package.json', '/.env', '/.env.production', '/.git/config', '/dist/wrangler.toml', '/_worker.js', '/wrangler.toml']) {
         assert.equal((await fetch(origin + path)).status, 404, `${mode}: ${path}`);
       }
-      for (const path of ['/', '/photography', '/script.js', '/vendor/purify.min.js', '/blog/posts/portfolio.md']) {
+      for (const path of ['/', '/photos', '/photography', '/script.js', '/vendor/purify.min.js', '/blog/posts/portfolio.md']) {
         const response = await fetch(origin + path);
         assert.equal(response.status, 200, `${mode}: ${path}`);
         assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');

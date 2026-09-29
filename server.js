@@ -84,7 +84,10 @@ app.get('/blog/:slug', (req, res, next) => {
 });
 
 // Route for other HTML pages - handles clean URLs and SPA routing
-const clientRoutes = ['home', 'experience', 'projects', 'skills', 'education', 'photography', 'blog', 'stats'];
+app.get('/photography', (req, res) => {
+    res.redirect(301, '/photos' + req.originalUrl.slice(req.path.length));
+});
+const clientRoutes = ['home', 'experience', 'projects', 'skills', 'education', 'photos', 'blog', 'stats'];
 
 app.get('/:page', (req, res, next) => {
     const page = req.params.page;
