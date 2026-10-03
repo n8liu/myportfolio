@@ -79,6 +79,24 @@ test('all-time unique visitors persist and increment across days even after old 
   assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 3);
 });
 
+test('historical adjustment adds 400 once across concurrent reads, restarts, and visits', async () => {
+  const db = storage();
+  await db.put('total_uniques', 31);
+  const env = { UNIQUE_VISITOR_ADJUSTMENT_2026_10_02: 'true' };
+  const unique = new UniqueVisitors({ storage: db }, env);
+  const counts = await Promise.all(Array.from({ length: 5 }, () => unique.getAllTimeUniqueCount()));
+  assert.deepEqual(counts, [431, 431, 431, 431, 431]);
+  assert.equal((await db.get('adjustment:2026-10-02:add-400')).previousCount, 31);
+  const restarted = new UniqueVisitors({ storage: db }, env);
+  await restarted.fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  await restarted.fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  assert.equal(await restarted.getAllTimeUniqueCount(), 432);
+  const history = await (await restarted.fetch(req('unique/history7d'))).json();
+  assert.equal(history.counts.at(-1), 1);
+  assert.equal(await restarted.getUniqueCount24H(Date.now()), 1);
+  assert.equal(await new UniqueVisitors({ storage: db }).getAllTimeUniqueCount(), 432);
+});
+
 test('repeat visits refresh last seen without increasing daily uniques', async t => {
   t.mock.timers.enable({ apis: ['Date'], now: Date.UTC(2026, 8, 27, 0, 10) });
   const db = storage();
@@ -138,4 +156,3 @@ test('section telemetry tracks visits, handles increments, and rejects invalid s
   // Invalid section name
   assert.equal((await total.fetch(req('sections/increment?section=malicious', 'POST'))).status, 400);
 });
-

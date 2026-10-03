@@ -3,6 +3,10 @@ name = "myportfolio"
 compatibility_date = "2023-12-01"
 main = "functions/_worker.js"
 
+[vars]
+# User-requested historical baseline; the Durable Object applies it only once.
+UNIQUE_VISITOR_ADJUSTMENT_2026_10_02 = "true"
+
 [[r2_buckets]]
 binding = "MY_BUCKET"
 bucket_name = "myportfolio"

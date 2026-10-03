@@ -2,6 +2,7 @@
 export class UniqueVisitors {
   constructor(state, env) {
     this.state = state;
+    this.applyHistoricalAdjustment = env?.UNIQUE_VISITOR_ADJUSTMENT_2026_10_02 === 'true';
   }
 
   async fetch(request) {
@@ -69,7 +70,7 @@ export class UniqueVisitors {
         await this.state.storage.put('last_pruned_date', todayStr);
       }
 
-      // Get all-time exact unique visitors count
+      // Get the cumulative count, including the historical adjustment if enabled.
       const count = await this.getAllTimeUniqueCount();
       return new Response(JSON.stringify({ count }), { headers: { "Content-Type": "application/json", ...corsHeaders } });
 
@@ -140,25 +141,30 @@ export class UniqueVisitors {
     return uniqueIPs.size;
   }
 
-  // All-time distinct visitors across entire history.
+  // Cumulative tracked visitors plus the explicitly requested historical adjustment.
   async getAllTimeUniqueCount() {
-    let totalUniques = await this.state.storage.get('total_uniques');
-    if (totalUniques !== undefined) {
-      return totalUniques;
-    }
     return await this.state.storage.transaction(async storage => {
       let current = await storage.get('total_uniques');
-      if (current !== undefined) return current;
-      const existingIPs = new Set();
-      for await (const [key] of this.listSeen('seen:')) {
-        if (key.length > 16) existingIPs.add(key.slice(16));
+      if (current === undefined) {
+        const existingIPs = new Set();
+        for await (const [key] of this.listSeen('seen:')) {
+          if (key.length > 16) existingIPs.add(key.slice(16));
+        }
+        for (const existingIp of existingIPs) {
+          await storage.put(`ever:${existingIp}`, 1);
+        }
+        current = existingIPs.size;
+        await storage.put('total_uniques', current);
       }
-      for (const existingIp of existingIPs) {
-        await storage.put(`ever:${existingIp}`, 1);
+      const adjustmentKey = 'adjustment:2026-10-02:add-400';
+      if (this.applyHistoricalAdjustment && await storage.get(adjustmentKey) === undefined) {
+        // Store the marker and total atomically so retries/redeploys cannot add twice.
+        const previousCount = current;
+        current += 400;
+        await storage.put('total_uniques', current);
+        await storage.put(adjustmentKey, { amount: 400, previousCount, appliedAt: Date.now() });
       }
-      const initialCount = existingIPs.size;
-      await storage.put('total_uniques', initialCount);
-      return initialCount;
+      return current;
     });
   }
 }
