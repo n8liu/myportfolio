@@ -583,7 +583,7 @@ All endpoints return JSON and include CORS headers (`Access-Control-Allow-Origin
 ### 10.1 NPM Scripts Reference
 ```bash
 npm test                 # Run production build and execute full test runner suite (40 tests across 8 test files)
-npm run dev              # Start local Express + Socket.IO server on port 3000 with nodemon
+npm run dev              # Start local Express + Socket.IO server on port 3000 with Node's built-in watcher
 npm start                # Start production Node server locally
 npm run build            # Full production build: compiles assets into dist/, bundles worker, prepares Pages config
 npm run serve            # Serve dist/ directory locally on port 8080 with the restricted Express public-file allowlist
@@ -615,6 +615,12 @@ Production has already applied migration `v6`, which created `InstagramCounter`,
 - Executes `npm ci`, `npm audit --audit-level=moderate`, and `npm test` with same-origin API routing. Pull requests run verification only; deployments run on pushes to `main`.
 - On pushes to `main`, deploys the owning analytics Worker first with `wrangler deploy --config wrangler.toml`. Pages deployment alone does not update the external Durable Object code. Pull requests do not deploy this production Worker.
 - Deploys to Cloudflare Pages using `wrangler pages deploy --cwd dist --project-name=myportfolio`. Running from `dist/` is required so Wrangler discovers the generated Pages configuration and applies its R2 binding.
+
+### 10.4 Deployment dependency audit repair (October 2026)
+- CI audits development dependencies too; `npm audit --audit-level=moderate` blocks deployment when build or test tooling has known vulnerabilities.
+- Removed Nodemon and its Chokidar/Braces dependency chain. The [Braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) has no patched release. `npm run dev` now uses Node 24's built-in `--watch` mode to restart when the server or its imported modules change.
+- Updated Wrangler to `^4.147.0` and the directly imported test dependency Miniflare to `5.20261001.0-alpha`, matching Wrangler's dependency. This Miniflare release uses patched Undici `7.29.1`; the project already used Miniflare 5 alpha and its `convertV4MiniflareOptions` API.
+- Commit `package.json` and the regenerated `package-lock.json` together because CI installs the locked dependency tree with `npm ci`. Keep the security gate enabled and verify with `npm audit --audit-level=moderate` and `npm test`; do not apply the suggested Nodemon downgrade via `npm audit fix --force`.
 
 ---
 
