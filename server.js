@@ -1,3 +1,4 @@
+import photoThumbnails from './functions/photo-thumbnails.json' with { type: 'json' };
 import express from 'express';
 import path from 'path';
 import http from 'http';
@@ -43,7 +44,9 @@ app.use((req, res, next) => {
     if (!isPublicFile(req.path)) return next();
     const name = decodeURIComponent(req.path).replace(/^\/+/, '');
     if (!serveBuild && Object.hasOwn(vendorFiles, name)) return res.sendFile(path.join(__dirname, vendorFiles[name]));
-    return express.static(publicDirectory, { dotfiles: 'deny', index: false })(req, res, next);
+    const thumbnail = /^assets\/photo-thumbnails\/[a-f0-9]{20}-(480|960)\.webp$/.test(name);
+    return express.static(publicDirectory, { dotfiles: 'deny', index: false,
+        ...(thumbnail ? { maxAge: '1y', immutable: true } : {}) })(req, res, next);
 });
 app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false }));
 
@@ -125,7 +128,8 @@ app.get('/api/images/:category?', async (req, res) => {
         }
         
         // Enrich images with metadata
-        const enrichedImages = images.map(img => {
+        const enrichedImages = images.map(original => {
+            const img = { ...original, ...(photoThumbnails[original.key] || {}) };
             const filename = img.key.split('/').pop();
             const meta = photosMetadata.find(m => m.filename.toLowerCase() === filename.toLowerCase());
             

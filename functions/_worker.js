@@ -7,6 +7,7 @@ import { TotalCounter } from './total_counter';
 import { ResumeCounter } from './resume_counter';
 import { UniqueVisitors } from './unique_visitors';
 import photosMetadata from './photos-metadata.json';
+import photoThumbnails from './photo-thumbnails.json';
 // Keep the v6 namespaces exported without restoring retired social-counter routes.
 export { InstagramCounter, GitHubCounter, EmailCounter, LinkedInCounter } from './retired_counters.js';
 
@@ -57,7 +58,15 @@ export default {
         return env.ASSETS.fetch(indexRequest);
       }
       if (path !== '/' && !isPublicFile(path)) return new Response('Not found', { status: 404 });
-      return env.ASSETS.fetch(request);
+      const asset = await env.ASSETS.fetch(request);
+      if (asset.ok && /^\/assets\/photo-thumbnails\/[a-f0-9]{20}-(480|960)\.webp$/.test(path)) {
+        const response = new Response(asset.body, asset);
+        response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+        response.headers.delete('Pragma');
+        response.headers.delete('Expires');
+        return response;
+      }
+      return asset;
     }
 
     return new Response("Not found", { status: 404 });
@@ -200,6 +209,7 @@ async function getImages(category, env, corsHeaders) {
       
       const baseObj = {
         key: object.key,
+        ...(photoThumbnails[object.key] || {}),
         name: filename.replace(/\.[^/.]+$/, ""),
         url: `/img/${object.key.split('/').map(encodeURIComponent).join('/')}`,
         category: object.key.includes('/') ? object.key.split('/')[0] : 'uncategorized',

@@ -14,6 +14,7 @@
     "downsize:dry": "node utils/downsize-images.js photos --in-place --scale=90 --quality=82 --dry-run",
     "downsize:60:small": "node utils/downsize-images.js photos assets/photos_resized_60 --scale=60 --quality=75",
     "downsize:web": "node utils/downsize-images.js photos assets/photos_web --scale=20 --quality=75",
+    "photos:thumbnails": "node utils/generate-photo-thumbnails.js",
     "analyze:images": "node utils/image-optimizer.js assets",
     "analyze:photos": "node utils/image-optimizer.js photos"
   },

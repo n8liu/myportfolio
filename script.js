@@ -345,6 +345,59 @@ document.addEventListener('DOMContentLoaded', function () {
         if (reducedMotion.matches) pageTransition?.skipTransition();
     });
 
+    // History entries own their positions; tab returns also reuse the last view position.
+    const viewPlaces = new Map();
+    let pendingPlace = null;
+    let placeSaveTimer = null;
+
+    function saveVisitorPlace() {
+        clearTimeout(placeSaveTimer);
+        if (!scrollContainer || pendingPlace) return;
+        const view = document.querySelector('.page-view.active')?.id.replace('view-', '');
+        if (!view) return;
+        const place = {
+            view, top: scrollContainer.scrollTop,
+            archiveOpen: document.querySelector('.projects-archive')?.open || false,
+            ...(view === 'photography' ? { category: selectedPhotoCategory, count: renderedPhotoCount } : {})
+        };
+        viewPlaces.set(view, place);
+        history.replaceState({ ...history.state, place }, '');
+    }
+
+    function restoreVisitorPlace(place) {
+        const view = document.querySelector('.page-view.active')?.id.replace('view-', '');
+        if (!place || place.view !== view || !Number.isFinite(place.top)) {
+            pendingPlace = null;
+            return;
+        }
+        pendingPlace = place;
+        if (view === 'photography') {
+            if (selectedPhotoCategory !== place.category) {
+                loadPhotosByCategory(place.category || 'all');
+                return;
+            }
+            if (!galleryPhotos.length && photoGrid?.getAttribute('aria-busy') === 'true') return;
+            // Initial category discovery may still be pending.
+            if (!galleryPhotos.length && !galleryLoaded) return;
+            while (renderedPhotoCount < Math.min(place.count || 12, galleryPhotos.length)) appendPhotoBatch();
+        }
+        const archive = document.querySelector('.projects-archive');
+        if (archive && view === 'portfolio') archive.open = Boolean(place.archiveOpen);
+        isProgrammaticScroll = true;
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollContainer.scrollTo({ top: Math.max(0, place.top), behavior: 'instant' });
+        pendingPlace = null;
+        saveVisitorPlace();
+        scrollTimeout = setTimeout(() => { isProgrammaticScroll = false; }, 100);
+    }
+
+    scrollContainer?.addEventListener('scroll', () => {
+        clearTimeout(placeSaveTimer);
+        placeSaveTimer = setTimeout(saveVisitorPlace, 150);
+    }, { passive: true });
+    window.addEventListener('pagehide', saveVisitorPlace);
+    document.querySelector('.projects-archive')?.addEventListener('toggle', saveVisitorPlace);
+
     function updateActiveNav(tabName) {
         navTabs.forEach(t => {
             if (t.getAttribute('data-tab') === tabName) {
@@ -390,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function navigateTo(target, updateHistory = true) {
+    function navigateTo(target, updateHistory = true, place = null) {
         const version = ++navigationVersion;
         const targetViewId = separatePages.includes(target) ? `view-${target}` : 'view-portfolio';
         const switchingViews = document.querySelector('.page-view.active')?.id !== targetViewId;
@@ -400,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (navigationInitialized && switchingViews && !reducedMotion.matches && document.startViewTransition) {
             const transition = document.startViewTransition(() => {
                 // A newer click supersedes callbacks waiting for a snapshot.
-                if (version === navigationVersion) performNavigation(target, updateHistory);
+                if (version === navigationVersion) performNavigation(target, updateHistory, place);
             });
             pageTransition = transition;
             transition.ready.catch(() => {}); // Skipped transitions still apply their DOM update.
@@ -408,12 +461,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (pageTransition === transition) pageTransition = null;
             });
         } else {
-            performNavigation(target, updateHistory);
+            performNavigation(target, updateHistory, place);
         }
         navigationInitialized = true;
     }
 
-    function performNavigation(target, updateHistory = true) {
+    function performNavigation(target, updateHistory = true, place = null) {
+        if (updateHistory) saveVisitorPlace();
+        const destinationView = separatePages.includes(target) ? target : 'portfolio';
+        const saved = place || (updateHistory && separatePages.includes(target) ? viewPlaces.get(destinationView) : null);
+        pendingPlace = saved;
+        if (saved?.view === 'photography' && !photographyInitialized) {
+            selectedPhotoCategory = saved.category || 'all';
+        }
         if (!target) target = 'home';
         if (typeof trackSectionVisit === 'function') {
             trackSectionVisit(target);
@@ -465,6 +525,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         }
+        if (saved) restoreVisitorPlace(saved);
+        else saveVisitorPlace();
     }
 
     // Keep switchTab & scrollToSection as aliases
@@ -512,8 +574,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle back/forward navigation
     window.addEventListener('popstate', function (e) {
+        clearTimeout(placeSaveTimer);
         const target = (e.state && e.state.page) || getTabFromPath() || 'home';
-        navigateTo(target, false);
+        navigateTo(target, false, e.state?.place || null);
         if (e.state && e.state.post) {
             openBlogModal(e.state.post, false);
         } else if (blogModal && blogModal.classList.contains('active')) {
@@ -550,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateActiveNav(sectionId);
             const newPath = sectionId === 'home' ? '/' : `/${sectionId}`;
             if (window.location.pathname !== newPath) {
-                history.replaceState({ page: sectionId }, '', newPath);
+                history.replaceState({ ...history.state, page: sectionId }, '', newPath);
             }
         }
 
@@ -573,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Check URL path on page load
     const initialTab = getTabFromPath() || 'home';
     const initialPost = getInitialBlogPost();
-    queueMicrotask(() => navigateTo(initialTab, false));
+    queueMicrotask(() => navigateTo(initialTab, false, history.state?.place || null));
 
     setupScrollspy();
 
@@ -929,6 +992,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----------------------------------------------------
     const PHOTOS_PER_BATCH = 12;
     let photographyInitialized = false;
+    let selectedPhotoCategory = 'all';
+    let galleryLoaded = false;
     let galleryRequest = 0;
     let galleryPhotos = [];
     let renderedPhotoCount = 0;
@@ -990,6 +1055,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.querySelectorAll('.photo-cat').forEach(b => b.classList.remove('active'));
                     target.classList.add('active');
                     const category = target.getAttribute('data-category');
+                    pendingPlace = null;
                     loadPhotosByCategory(category);
                 }
             });
@@ -1000,11 +1066,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Initial load
-        loadPhotosByCategory('all');
+        loadPhotosByCategory(selectedPhotoCategory);
     }
 
     async function loadPhotosByCategory(category) {
         if (!photoGrid) return;
+        if (typeof selectedPhotoCategory !== 'undefined') selectedPhotoCategory = category;
+        if (typeof galleryLoaded !== 'undefined') galleryLoaded = false;
+        if (typeof photoCategoryFilters !== 'undefined' && photoCategoryFilters) {
+            photoCategoryFilters.querySelectorAll('.photo-cat').forEach(button => {
+                button.classList.toggle('active', button.getAttribute('data-category') === category);
+            });
+        }
         const request = typeof galleryRequest !== 'undefined' ? ++galleryRequest : 0;
         if (typeof photoInfiniteObserver !== 'undefined' && photoInfiniteObserver) {
             photoInfiniteObserver.disconnect();
@@ -1026,6 +1099,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const images = await response.json();
             if (typeof galleryRequest !== 'undefined' && request !== galleryRequest) return;
             if (!Array.isArray(images)) throw new Error('Invalid photography API response');
+            if (typeof galleryLoaded !== 'undefined') galleryLoaded = true;
 
             if (images.length === 0) {
                 if (typeof galleryPhotos !== 'undefined') galleryPhotos = [];
@@ -1035,6 +1109,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 if (typeof setLoadState === 'function') {
                     setLoadState(photoGrid, 'no photos in this category.');
+                    if (typeof pendingPlace !== 'undefined') pendingPlace = null;
                 } else {
                     photoGrid.innerHTML = '<p class="photo-status" role="status">no photos in this category.</p>';
                 }
@@ -1045,7 +1120,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 photoGrid.setAttribute('aria-busy', 'false');
             }
             renderPhotos(images);
+            if (typeof pendingPlace !== 'undefined' && pendingPlace) restoreVisitorPlace(pendingPlace);
+            else if (typeof saveVisitorPlace === 'function') saveVisitorPlace();
         } catch (e) {
+            if (typeof galleryRequest !== 'undefined' && request !== galleryRequest) return;
+            if (typeof pendingPlace !== 'undefined') pendingPlace = null;
+            if (typeof galleryLoaded !== 'undefined') galleryLoaded = true;
             if (typeof console !== 'undefined' && console.warn) {
                 console.warn('Error fetching category images.', e);
             }
@@ -1110,7 +1190,12 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'photo-card';
 
             const img = document.createElement('img');
-            let imgUrl = image.url;
+            let imgUrl = image.thumbnailUrl || image.url;
+            img.decoding = 'async';
+            if (image.thumbnailSrcset) {
+                img.srcset = image.thumbnailSrcset;
+                img.sizes = '(max-width: 768px) calc(100vw - 64px), 370px';
+            }
             if (!imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
                 imgUrl = '/' + imgUrl;
             }
@@ -1128,8 +1213,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const revealImage = () => img.classList.remove('photo-loading');
             img.addEventListener('load', revealImage, { once: true });
             img.addEventListener('error', () => {
+                if (image.thumbnailUrl && img.getAttribute('src') !== image.url) {
+                    img.removeAttribute('srcset');
+                    img.src = image.url;
+                }
                 revealImage();
-                img.alt = 'Photo unavailable';
+                img.alt = image.name || 'Portfolio photo';
             }, { once: true });
             img.src = imgUrl;
             if (img.complete && img.naturalWidth > 0) revealImage();
@@ -1470,7 +1559,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (updateHistory) {
             const targetUrl = `/blog/${slug}`;
             if (window.location.pathname !== targetUrl) {
-                history.pushState({ tab: 'blog', post: slug }, '', targetUrl);
+                saveVisitorPlace();
+                history.pushState({ ...history.state, tab: 'blog', post: slug }, '', targetUrl);
             }
         }
 
@@ -1530,7 +1620,7 @@ document.addEventListener('DOMContentLoaded', function () {
             hideAccessibleModal(blogModal);
         }
         if (updateHistory && (window.location.pathname.startsWith('/blog/') || window.location.search.includes('post='))) {
-            history.pushState({ tab: 'blog' }, '', '/blog');
+            history.pushState({ page: 'blog', place: history.state?.place }, '', '/blog');
         }
     }
 
