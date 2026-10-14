@@ -619,8 +619,8 @@ Production has already applied migration `v6`, which created `InstagramCounter`,
 ### 10.4 Deployment dependency audit repair (October 2026)
 - CI audits development dependencies too; `npm audit --audit-level=moderate` blocks deployment when build or test tooling has known vulnerabilities.
 - Removed Nodemon and its Chokidar/Braces dependency chain. The [Braces advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) has no patched release. `npm run dev` now uses Node 24's built-in `--watch` mode to restart when the server or its imported modules change.
-- Updated Wrangler to `^4.147.0` and the directly imported test dependency Miniflare to `5.20261001.0-alpha`, matching Wrangler's dependency. This Miniflare release uses patched Undici `7.29.1`; the project already used Miniflare 5 alpha and its `convertV4MiniflareOptions` API.
-- Commit `package.json` and the regenerated `package-lock.json` together because CI installs the locked dependency tree with `npm ci`. Keep the security gate enabled and verify with `npm audit --audit-level=moderate` and `npm test`; do not apply the suggested Nodemon downgrade via `npm audit fix --force`.
+- Updated Wrangler to `^4.147.0` and the directly imported test dependency Miniflare to `5.20261006.2-beta`, matching Wrangler's dependency and updating Sharp to `0.35.5` to resolve the librsvg vulnerability (CVE-2026-96889 / GHSA-wq5f-xc86-pv6w). This Miniflare release preserves patched Undici `7.29.1` and compatibility with the `convertV4MiniflareOptions` API.
+- Commit `package.json` and the regenerated `package-lock.json` together because CI installs the locked dependency tree with `npm ci`. Keep the security gate enabled and verify with `npm audit --audit-level=moderate` and `npm test`; do not apply the suggested downgrade via `npm audit fix --force`.
 
 ---
 
