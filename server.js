@@ -9,6 +9,7 @@ import fs from 'fs';
 import { rateLimit } from 'express-rate-limit';
 import { isPublicFile, vendorFiles } from './utils/public-files.js';
 import { getCategories, getImagesFromCategory, getAllImages } from './utils/cloudflare.js';
+import { createExifEnricher } from './utils/photo-exif.js';
 
 dotenv.config();
 
@@ -28,6 +29,8 @@ try {
 } catch (error) {
     console.error('Failed to load photos-metadata.json:', error);
 }
+
+const withExif = createExifEnricher(photosMetadata);
 
 const app = express();
 const server = http.createServer(app);
@@ -128,40 +131,11 @@ app.get('/api/images/:category?', async (req, res) => {
         }
         
         // Enrich images with metadata
-        const enrichedImages = images.map(original => {
-            const img = { ...original, ...(photoThumbnails[original.key] || {}) };
-            const filename = img.key.split('/').pop();
-            const meta = photosMetadata.find(m => m.filename.toLowerCase() === filename.toLowerCase());
-            
-            if (meta) {
-                const cameraStr = `${meta.camera || 'FUJIFILM'} ${meta.model || 'X100VI'}`;
-                const lensStr = meta.software ? meta.software.replace('Digital Camera ', '') : 'Fujinon 23mm F2.0 (Fixed)';
-                const exposureStr = meta.shutterSpeed || '1/250s';
-                const apertureStr = meta.aperture ? meta.aperture.replace('f/f/', 'f/') : 'f/5.6';
-                const isoStr = meta.iso ? String(meta.iso) : '200';
-                const locationStr = img.category ? img.category.replace(/_/g, ' ').toUpperCase() : 'CALIFORNIA';
-
-                return {
-                    ...img,
-                    name: filename.replace(/\.[^/.]+$/, ""),
-                    camera: cameraStr,
-                    lens: lensStr,
-                    exposure: exposureStr,
-                    aperture: apertureStr,
-                    iso: isoStr,
-                    location: locationStr,
-                    exif: {
-                        camera: cameraStr,
-                        lens: lensStr,
-                        exposure: exposureStr,
-                        aperture: apertureStr,
-                        iso: isoStr,
-                        location: locationStr
-                    }
-                };
-            }
-            return img;
-        });
+        const enrichedImages = images.map(original => withExif({
+            ...original,
+            ...(photoThumbnails[original.key] || {}),
+            name: original.key.split('/').pop().replace(/\.[^/.]+$/, ''),
+        }));
 
         res.json(enrichedImages);
     } catch (error) {

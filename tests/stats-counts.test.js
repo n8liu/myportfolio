@@ -156,3 +156,43 @@ test('section telemetry tracks visits, handles increments, and rejects invalid s
   // Invalid section name
   assert.equal((await total.fetch(req('sections/increment?section=malicious', 'POST'))).status, 400);
 });
+
+test('visitor IPs are stored only as keyed hashes', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.UTC(2026, 9, 26, 12) });
+  const db = storage();
+  const unique = new UniqueVisitors({ storage: db });
+  await unique.fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  const keys = [...db.values.keys()].filter(key => key.startsWith('seen:') || key.startsWith('ever:'));
+  assert.equal(keys.length, 2);
+  for (const key of keys) {
+    assert.doesNotMatch(key, /192\.0\.2\.1/);
+    assert.match(key, /[0-9a-f]{64}$/);
+  }
+  // The salt survives restarts, so a returning visitor keeps the same ID.
+  await new UniqueVisitors({ storage: db }).fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 1);
+});
+
+test('raw IP records migrate to hashed IDs once without changing counts', async t => {
+  const now = Date.UTC(2026, 9, 26, 12);
+  t.mock.timers.enable({ apis: ['Date'], now });
+  const db = storage();
+  await db.put({
+    'seen:2026-10-26:192.0.2.1': now - 3600000, 'seen:2026-10-25:2001:db8::1': now - 7200000,
+    'ever:192.0.2.1': 1, 'ever:2001:db8::1': 1, 'ever:198.51.100.7': 1,
+    'count:2026-10-26': 1, total_uniques: 3,
+  });
+  const unique = new UniqueVisitors({ storage: db });
+  await Promise.all([unique.fetch(req('unique/count')), new UniqueVisitors({ storage: db }).fetch(req('unique/count'))]);
+  const keys = [...db.values.keys()].filter(key => key.startsWith('seen:') || key.startsWith('ever:'));
+  assert.equal(keys.length, 5);
+  for (const key of keys) assert.match(key, /^(seen:\d{4}-\d{2}-\d{2}|ever):[0-9a-f]{64}$/);
+  assert.equal(db.values.get('migration:hashed-visitor-ids').migrated, 5);
+  assert.equal(await unique.getUniqueCount24H(now), 2);
+
+  // Migrated visitors are recognized, so revisits do not inflate any count.
+  await unique.fetch(req('unique/increment', 'POST', '192.0.2.1'));
+  await unique.fetch(req('unique/increment', 'POST', '198.51.100.7'));
+  assert.equal((await (await unique.fetch(req('unique/count'))).json()).count, 3);
+  assert.equal(db.values.get('count:2026-10-26'), 2);
+});

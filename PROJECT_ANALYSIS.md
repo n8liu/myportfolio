@@ -107,7 +107,7 @@ graph TD
 | **Icons & Visuals** | FontAwesome 6.4.0 (CDN) | UI actions, controls, status indicators, social links |
 | **Data Visualization** | Chart.js 4.4.2 (UMD CDN) | 7-day traffic telemetry line chart with dynamic theming |
 | **Dev Server** | Express 4.21.2 + Socket.IO 4.8.1 | Local static file server, live WebSocket viewer counter |
-| **Serverless Edge** | Cloudflare Pages & Workers | Functions runtime (`_worker.js`, `_middleware.js`) |
+| **Serverless Edge** | Cloudflare Pages & Workers | Functions runtime (`_worker.js`) |
 | **Edge State Storage** | Cloudflare Durable Objects (SQLite) | Distributed stateful counters & visitor tracking (migrations v1-v6) |
 | **Object Storage** | Cloudflare R2 + `@aws-sdk/client-s3` | High-res photography storage with Edge caching (`caches.default`) |
 | **Image Processing** | `ExifReader`, `imagemagick` | EXIF extraction and multi-resolution downsizing scripts |
@@ -148,12 +148,11 @@ myportfolio/
 ├── dist/                           # Generated production build artifacts (ephemeral, gitignored)
 ├── functions/                      # Cloudflare Pages / Workers serverless backend
 │   ├── _worker.js                  # Main Worker entrypoint: DO routing, R2 streaming, SPA fallback
-│   ├── _middleware.js              # Legacy middleware; ignored by advanced-mode Pages deployment
 │   ├── photos-metadata.json        # Pre-extracted EXIF metadata array for photography assets
 │   ├── resume_counter.js           # Durable Object: Tracks resume clicks
 │   ├── session_tracker.js          # Durable Object: Active session management
 │   ├── total_counter.js            # Durable Object: 7-day request history & total view counter
-│   ├── unique_visitors.js          # Durable Object: IP-deduplicated unique visitor counts + auto-prune
+│   ├── unique_visitors.js          # Durable Object: hashed-IP-deduplicated unique visitor counts + auto-prune
 │   └── viewers.js                  # Durable Object: Real-time concurrent viewer counter
 ├── tests/                          # Automated Node test runner suites (node:test)
 │   ├── motion.test.js              # View Transitions, rapid navigation, reduced-motion fallback tests
@@ -486,7 +485,7 @@ A comprehensive audit and implementation cycle established the following enhance
 - **Scroll continuity**: After each batch, the sentinel is unobserved and observed again so a sentinel still within the preload area triggers another batch. Category changes disconnect the observer and clear the previous photo state before fetching. The manual load-more control remains available until completion.
 - **Regression coverage**: Tests simulate a continuously visible sentinel through 53 photos and multiple storage listing pages in both backends. These are mocked tests, not live browser or production verification.
 - **Request Routing**: The browser loads `/api/categories`, `/api/images/:category`, and `/img/:key` from the site's own origin. Photography does not use the analytics `API_BASE`. Locally these API requests reach Express and return S3-presigned URLs; on Pages they reach the bundled `_worker.js` and its native `MY_BUCKET` binding.
-- **Production Entry Point**: The build outputs `dist/_worker.js`, enabling Pages advanced mode. `functions/_middleware.js` is legacy code and is ignored in this mode ([Cloudflare documentation](https://developers.cloudflare.com/pages/functions/advanced-mode/)). Edit `functions/_worker.js` for production gallery changes.
+- **Production Entry Point**: The build outputs `dist/_worker.js`, enabling Pages advanced mode ([Cloudflare documentation](https://developers.cloudflare.com/pages/functions/advanced-mode/)). Edit `functions/_worker.js` for production gallery changes; EXIF enrichment is shared with `server.js` through `utils/photo-exif.js`. Static media cache lifetimes are set in `assetCacheControl()` in the Worker, because `_headers` marks every response no-store.
 - **R2 Storage Architecture**: Photography files are organized by folder categories in Cloudflare R2 (`california/`, `japan/`, `hawaii/`, `south_korea/`).
 - **Metadata Extraction**: `utils/image-metadata.js` parses RAW/JPEG headers with `ExifReader`, creating `functions/photos-metadata.json`.
 - **Edge Cache API**: `functions/_worker.js` handles `/img/:key` with a 1-year immutable cache header (`public, max-age=31536000, s-maxage=31536000, immutable`), cached asynchronously at Cloudflare edge POPs with `caches.default.put()`.
@@ -508,7 +507,8 @@ Four SQLite-backed Cloudflare Durable Objects track site activity in real time:
    - Generates 7-day daily traffic buckets for Chart.js.
    - Endpoints: `/api/total`, `/api/total/increment`, `/api/total/requests24h`, `/api/total/history7d`.
 3. **`UniqueVisitors` (`functions/unique_visitors.js`)**:
-   - Deduplicates visitors using the Cloudflare-provided `cf-connecting-ip` header and daily keys `seen:YYYY-MM-DD:ip`, preserving full IPv6 addresses and paginating with `startAfter`.
+   - Deduplicates visitors using the Cloudflare-provided `cf-connecting-ip` header, stored only as an HMAC-SHA256 visitor ID keyed by a random per-object `visitor_salt` (keys `seen:YYYY-MM-DD:<id>` and `ever:<id>`). Full IPv6 addresses are hashed whole; listing paginates with `startAfter`.
+   - Records written before hashing are rewritten once on first request after deploy (marker `migration:hashed-visitor-ids`); counts are unchanged. Never delete `visitor_salt`, or every returning visitor is counted as new.
    - Automatically prunes records older than 8 days to prevent storage bloat.
    - Endpoints: `/api/unique/count`, `/api/unique/increment`, `/api/unique/history7d`, `/api/unique/visitors24h`.
 4. **`ResumeCounter` (`functions/resume_counter.js`)**:
