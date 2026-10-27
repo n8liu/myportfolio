@@ -75,3 +75,22 @@ test('versioned thumbnails override no-store asset headers, but missing previews
         if (status === 200) assert.equal(response.headers.has('Pragma'), false);
     }
 });
+
+test('static media is cacheable while pages, scripts, and styles stay uncached', async () => {
+    const expected = {
+        '/assets/profile.jpeg': 'public, max-age=86400, stale-while-revalidate=604800',
+        '/vendor/chart.umd.js': 'public, max-age=86400, stale-while-revalidate=604800',
+        '/assets/Nathan_Liu_Resume.pdf': 'public, max-age=3600, must-revalidate',
+        '/script.js': 'no-cache, no-store',
+        '/styles.css': 'no-cache, no-store',
+    };
+    for (const [path, cacheControl] of Object.entries(expected)) {
+        const response = await worker.fetch(new Request('https://site.example' + path), {
+            ASSETS: { async fetch() { return new Response('asset', { headers: {
+                'Cache-Control': 'no-cache, no-store', Pragma: 'no-cache', Expires: '0'
+            } }); } }
+        });
+        assert.equal(response.headers.get('Cache-Control'), cacheControl, path);
+        assert.equal(response.headers.has('Pragma'), cacheControl.startsWith('no-cache'), path);
+    }
+});

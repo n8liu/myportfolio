@@ -1,4 +1,7 @@
-// Durable Object to track unique visitors by IP with last seen timestamps
+// Durable Object to track unique visitors by hashed IP with last seen timestamps
+const HASHED_ID = /^[0-9a-f]{64}$/;
+const MIGRATION_KEY = 'migration:hashed-visitor-ids';
+
 export class UniqueVisitors {
   constructor(state, env) {
     this.state = state;
@@ -16,13 +19,16 @@ export class UniqueVisitors {
       return new Response(null, { headers: corsHeaders });
     }
 
+    await this.migrateRawIps();
     const now = Date.now();
     const todayStr = new Date(now).toISOString().split('T')[0];
 
     if (url.pathname.endsWith('/increment')) {
       if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
-      const ip = request.headers.get('cf-connecting-ip');
-      if (!ip) return new Response('Client address unavailable', { status: 400 });
+      const address = request.headers.get('cf-connecting-ip');
+      if (!address) return new Response('Client address unavailable', { status: 400 });
+      // Only a keyed hash of the address is stored; the raw IP never reaches storage.
+      const ip = await this.visitorId(address);
 
       // Repeat visits refresh last-seen time, but only the first visit that day
       // increments the daily unique count. Serialize simultaneous tabs.
@@ -103,6 +109,50 @@ export class UniqueVisitors {
     return new Response('Not found', { status: 404, headers: corsHeaders });
   }
 
+  // Keyed with a per-object random secret so stored IDs cannot be reversed by
+  // hashing the IPv4 space. The salt never changes, keeping IDs stable.
+  async visitorId(ip) {
+    if (!this.hmacKey) {
+      const salt = await this.state.storage.transaction(async storage => {
+        let value = await storage.get('visitor_salt');
+        if (value === undefined) {
+          value = Array.from(crypto.getRandomValues(new Uint8Array(32)), byte => byte.toString(16).padStart(2, '0')).join('');
+          await storage.put('visitor_salt', value);
+        }
+        return value;
+      });
+      this.hmacKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(salt),
+        { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    }
+    const signature = await crypto.subtle.sign('HMAC', this.hmacKey, new TextEncoder().encode(ip));
+    return Array.from(new Uint8Array(signature), byte => byte.toString(16).padStart(2, '0')).join('');
+  }
+
+  // One-time rewrite of records stored before IPs were hashed. Counts are
+  // unchanged because each raw key maps to exactly one hashed key.
+  async migrateRawIps() {
+    if (this.migrated) return;
+    if (await this.state.storage.get(MIGRATION_KEY) === undefined) {
+      const raw = [];
+      for (const prefix of ['seen:', 'ever:']) {
+        for await (const [key, value] of this.listSeen(prefix)) {
+          const idStart = prefix === 'seen:' ? 16 : 5;
+          if (key.length > idStart && !HASHED_ID.test(key.slice(idStart))) raw.push([key, value, idStart]);
+        }
+      }
+      const hashed = await Promise.all(raw.map(([key, , idStart]) => this.visitorId(key.slice(idStart))));
+      await this.state.storage.transaction(async storage => {
+        if (await storage.get(MIGRATION_KEY) !== undefined) return;
+        for (const [index, [key, value, idStart]] of raw.entries()) {
+          await storage.put(key.slice(0, idStart) + hashed[index], value);
+          await storage.delete(key);
+        }
+        await storage.put(MIGRATION_KEY, { migrated: raw.length, appliedAt: Date.now() });
+      });
+    }
+    this.migrated = true;
+  }
+
   // Durable Object list() returns a Map, not an R2 cursor response.
   async *listSeen(prefix) {
     let startAfter;
@@ -114,7 +164,7 @@ export class UniqueVisitors {
     }
   }
 
-  // Distinct complete IP addresses across the seven UTC calendar days shown.
+  // Distinct visitor IDs across the seven UTC calendar days shown.
   async getUniqueCount7D(now) {
     const uniqueIPs = new Set();
     for (let i = 0; i < 7; i++) {
